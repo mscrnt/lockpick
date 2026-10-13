@@ -22,7 +22,7 @@ jobs:
     name: Build and test (Windows)
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
@@ -49,7 +49,7 @@ jobs:
     name: Validate data and repository hygiene
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Profiles are valid JSON (comments allowed)
         run: |
