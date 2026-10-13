@@ -1,0 +1,102 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Lockpick.App.ViewModels"
+             xmlns:c="using:Lockpick.App.Controls"
+             x:Class="Lockpick.App.Views.SetupView"
+             x:DataType="vm:SetupViewModel">
+
+  <UserControl.Styles>
+    <Style Selector="TextBlock.title">
+      <Setter Property="FontSize" Value="20" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="LetterSpacing" Value="1" />
+      <Setter Property="Margin" Value="0,0,0,4" />
+    </Style>
+    <Style Selector="TextBlock.body">
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="LineHeight" Value="20" />
+    </Style>
+    <Style Selector="TextBlock.bullet">
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="Foreground" Value="{StaticResource LpMutedBrush}" />
+    </Style>
+  </UserControl.Styles>
+
+  <DockPanel Margin="16">
+    <!-- Footer: navigation -->
+    <Grid DockPanel.Dock="Bottom" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="8" Margin="0,12,0,0">
+      <Button Grid.Column="0" Content="Skip setup" Command="{Binding SkipCommand}" Background="Transparent" Foreground="{StaticResource LpMutedBrush}" IsVisible="{Binding !IsLast}" />
+      <Button Grid.Column="2" Content="Back" Command="{Binding BackCommand}" IsVisible="{Binding !IsFirst}" />
+      <Button Grid.Column="3" Command="{Binding NextCommand}" Classes="accent" MinWidth="110" Content="{Binding NextLabel}" HorizontalContentAlignment="Center" />
+    </Grid>
+
+    <!-- Header: progress -->
+    <StackPanel DockPanel.Dock="Top" Spacing="6" Margin="0,0,0,12">
+      <TextBlock Text="{Binding StepLabel}" Classes="caption" Margin="0" />
+      <ProgressBar Classes="health" Minimum="0" Maximum="4" Value="{Binding StepNumber}" />
+    </StackPanel>
+
+    <ScrollViewer>
+      <Border Classes="card" MaxWidth="760" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="20,18">
+        <Panel>
+
+          <!-- 1. Welcome -->
+          <StackPanel Spacing="12" IsVisible="{Binding IsWelcome}">
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <TextBlock Text="LOCKPICK" FontSize="26" FontWeight="Black" LetterSpacing="6" Foreground="{StaticResource LpGreenBrush}" />
+              <TextBlock Text="Master of Unlocking." FontStyle="Italic" Foreground="{StaticResource LpMutedBrush}" VerticalAlignment="Bottom" Margin="0,0,0,4" />
+            </StackPanel>
+            <TextBlock Classes="body" Text="Lockpick is a companion for the original Resident Evil on PC. It watches the running game and shows live information: where you are, your health, the in-game timer and what's happening. Trainer, overlay and speedrun tools are coming in later versions." />
+            <StackPanel Spacing="4">
+              <TextBlock Classes="bullet" Text="• Read-only today: it never changes the game, its files or your saves." />
+              <TextBlock Classes="bullet" Text="• It only connects to game versions it can identify exactly, so it can't misread an unknown build." />
+              <TextBlock Classes="bullet" Text="• Everything stays on your PC. The only network use is the optional update check (GitHub)." />
+            </StackPanel>
+          </StackPanel>
+
+          <!-- 2. Game -->
+          <StackPanel Spacing="10" IsVisible="{Binding IsGame}">
+            <StackPanel Classes="cardhead">
+              <c:LucideIcon Data="{StaticResource Icon.Gamepad}" />
+              <TextBlock Classes="caption" Text="FIND YOUR GAME" />
+            </StackPanel>
+            <TextBlock Classes="body" Text="{Binding DetectedInstall}" />
+            <TextBlock Classes="label" Text="Game executable (ResidentEvil.exe)" />
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+              <TextBox Text="{Binding GameExecutablePath}" FontFamily="{StaticResource LpMono}" PlaceholderText="Path to ResidentEvil.exe" />
+              <Button Grid.Column="1" Content="Browse..." Click="OnBrowse" />
+              <Button Grid.Column="2" Content="Check" Command="{Binding CheckBuildCommand}" />
+            </Grid>
+            <Border Classes="chip" Classes.valid="{Binding BuildSupported}" Classes.bad="{Binding BuildProblem}" Padding="10,6">
+              <TextBlock Text="{Binding BuildSummary}" FontSize="12" TextWrapping="Wrap" />
+            </Border>
+            <SelectableTextBlock Classes="mono" Text="{Binding BuildDetails}" TextWrapping="Wrap" Foreground="{StaticResource LpMutedBrush}" FontSize="11.5" />
+            <TextBlock Classes="bullet" Text="Tip: start the game normally (desktop shortcut or GOG Galaxy). If it's started as administrator — for example from the GOG installer's Launch button — Lockpick can't read it." />
+          </StackPanel>
+
+          <!-- 3. Updates -->
+          <StackPanel Spacing="10" IsVisible="{Binding IsUpdates}">
+            <StackPanel Classes="cardhead">
+              <c:LucideIcon Data="{StaticResource Icon.RefreshCw}" />
+              <TextBlock Classes="caption" Text="UPDATES" />
+            </StackPanel>
+            <ToggleSwitch IsChecked="{Binding CheckForUpdates}" OnContent="Check for updates automatically" OffContent="Check for updates automatically" />
+            <ToggleSwitch IsChecked="{Binding IncludePrereleases}" OnContent="Include pre-release versions" OffContent="Include pre-release versions" />
+            <TextBlock Classes="bullet" Text="{Binding UpdatesNote}" />
+          </StackPanel>
+
+          <!-- 4. Ready -->
+          <StackPanel Spacing="10" IsVisible="{Binding IsReady}">
+            <TextBlock Classes="title" Text="You're set." />
+            <TextBlock Classes="body" Text="{Binding ReadySummary}" />
+            <StackPanel Spacing="4">
+              <TextBlock Classes="bullet" Text="• Dashboard: connection, game state and the event log." />
+              <TextBlock Classes="bullet" Text="• Debug: capture a play session to help Lockpick learn more of the game." />
+              <TextBlock Classes="bullet" Text="• Settings: game location, updates, and this setup again." />
+            </StackPanel>
+          </StackPanel>
+        </Panel>
+      </Border>
+    </ScrollViewer>
+  </DockPanel>
+</UserControl>

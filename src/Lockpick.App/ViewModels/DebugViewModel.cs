@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -18,20 +19,21 @@ public sealed record RawFieldRow(string Name, string Address, string Type, strin
 
 public sealed record LogRow(string Time, string Level, string Category, string Message, bool IsWarning);
 
-public sealed partial class DiagnosticsViewModel : PageViewModel, IDisposable
+/// <summary>Debug page: session capture for research, monitor statistics, raw profile fields and the live log.</summary>
+public sealed partial class DebugViewModel : PageViewModel, IDisposable
 {
     private const int MaxLogRows = 400;
 
     private readonly AppServices _services;
-    private readonly DispatcherTimer _statsTimer;
+    private readonly DispatcherTimer _timer;
     private readonly ILogger _logger;
-    private SessionRecorder? _recorder;
+    private CaptureSession? _capture;
 
-    public DiagnosticsViewModel(AppServices services, LiveState state)
-        : base("Diagnostics", "Icon.Activity")
+    public DebugViewModel(AppServices services, LiveState state)
+        : base("Debug", "Icon.Bug")
     {
         _services = services;
-        _logger = services.LoggerFactory.CreateLogger("Diagnostics");
+        _logger = services.LoggerFactory.CreateLogger("Debug");
         State = state;
         LogFile = services.LogProvider.FilePath ?? "(file logging disabled)";
         TimerInfo = services.IsReplay ? "Replay" : services.HighResolutionTimer ? "High-resolution waitable timer" : "Default OS timer (≈15.6 ms granularity)";
@@ -42,8 +44,10 @@ public sealed partial class DiagnosticsViewModel : PageViewModel, IDisposable
 
         services.LogProvider.EntryLogged += entry => Dispatcher.UIThread.Post(() => AddLog(entry), DispatcherPriority.Background);
         state.PropertyChanged += OnStateChanged;
-        state.Source.SnapshotChanged += OnSnapshotForRecording;
-        _statsTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(500), DispatcherPriority.Background, (_, _) => RefreshStats());
+
+        // Capture status ticks even while the page is hidden so the nav badge stays current.
+        _timer = new DispatcherTimer(TimeSpan.FromMilliseconds(500), DispatcherPriority.Background, (_, _) => Tick());
+        _timer.Start();
         RefreshRawFields();
     }
 
@@ -61,70 +65,137 @@ public sealed partial class DiagnosticsViewModel : PageViewModel, IDisposable
     public partial string PollStats { get; private set; } = "—";
 
     [ObservableProperty]
-    public partial string RecordingStatus { get; private set; } = "Not recording";
+    [NotifyCanExecuteChangedFor(nameof(StartCaptureCommand), nameof(StopCaptureCommand))]
+    public partial bool IsCapturing { get; private set; }
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(StartRecordingCommand), nameof(StopRecordingCommand))]
-    public partial bool IsRecording { get; private set; }
+    public partial string CaptureStatus { get; private set; } = "Not capturing.";
+
+    [ObservableProperty]
+    public partial string? LastCaptureZip { get; private set; }
+
+    private bool IsVisible { get; set; }
 
     public override void OnVisibilityChanged(bool visible)
     {
+        IsVisible = visible;
         if (visible)
         {
             RefreshStats();
             RefreshRawFields();
-            _statsTimer.Start();
-        }
-        else
-        {
-            _statsTimer.Stop();
         }
     }
 
-    [RelayCommand(CanExecute = nameof(CanStartRecording))]
-    private void StartRecording()
+    [RelayCommand(CanExecute = nameof(CanStartCapture))]
+    private void StartCapture()
     {
-        var path = Path.Combine(AppPaths.Recordings, $"re1-{DateTime.Now:yyyyMMdd-HHmmss}.jsonl");
-        var recorder = SessionRecorder.Create(path, _services.Adapter.GameId, State.Status.Profile?.Id, DateTimeOffset.UtcNow);
-        if (State.Snapshot is { } current)
+        try
         {
-            recorder.Append(current);
+            _capture = new CaptureSession(_services.Source, AppPaths.Captures, _services.Adapter.GameId, _services.AppVersion);
+            IsCapturing = true;
+            LastCaptureZip = null;
+            _logger.LogInformation("Capture started: {Directory}", _capture.Directory);
+            UpdateCaptureStatus();
         }
-
-        Volatile.Write(ref _recorder, recorder);
-        IsRecording = true;
-        RecordingStatus = $"Recording to {path}";
-        _logger.LogInformation("Recording started: {Path}", path);
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            CaptureStatus = $"Couldn't start capture: {ex.Message}";
+        }
     }
 
-    private bool CanStartRecording() => !IsRecording;
+    private bool CanStartCapture() => !IsCapturing;
 
-    [RelayCommand(CanExecute = nameof(IsRecording))]
-    private void StopRecording()
+    [RelayCommand(CanExecute = nameof(IsCapturing))]
+    private async Task StopCaptureAsync()
     {
-        var recorder = Interlocked.Exchange(ref _recorder, null);
-        if (recorder is null)
+        var capture = _capture;
+        if (capture is null)
         {
             return;
         }
 
-        recorder.Dispose();
-        IsRecording = false;
-        RecordingStatus = $"Saved {recorder.FrameCount} frames to {recorder.Path}";
-        _logger.LogInformation("Recording saved: {Path} ({Frames} frames)", recorder.Path, recorder.FrameCount);
+        _capture = null;
+        IsCapturing = false;
+        CaptureStatus = "Saving capture...";
+        try
+        {
+            var zip = await Task.Run(capture.Stop).ConfigureAwait(true);
+            LastCaptureZip = zip;
+            CaptureStatus = $"Saved {capture.Samples:N0} samples and {capture.EventCount:N0} events.";
+            _logger.LogInformation("Capture saved: {Zip}", zip);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            CaptureStatus = $"Couldn't save the capture: {ex.Message}. The raw files are in {capture.Directory}.";
+        }
+        finally
+        {
+            capture.Dispose();
+        }
     }
 
+    [RelayCommand]
+    private void OpenCapturesFolder()
+    {
+        Directory.CreateDirectory(AppPaths.Captures);
+        var args = LastCaptureZip is { } zip && File.Exists(zip) ? $"/select,\"{zip}\"" : $"\"{AppPaths.Captures}\"";
+        try
+        {
+            Process.Start(new ProcessStartInfo("explorer.exe", args) { UseShellExecute = false })?.Dispose();
+        }
+        catch (System.ComponentModel.Win32Exception ex)
+        {
+            CaptureStatus = $"Couldn't open Explorer: {ex.Message}";
+        }
+    }
+
+    /// <summary>Called on app shutdown: a running capture is saved, never lost.</summary>
     public void Dispose()
     {
-        _statsTimer.Stop();
-        Interlocked.Exchange(ref _recorder, null)?.Dispose();
+        _timer.Stop();
+        var capture = Interlocked.Exchange(ref _capture, null);
+        if (capture is not null)
+        {
+            try
+            {
+                capture.Stop();
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                _logger.LogWarning(ex, "Capture could not be zipped on exit; files remain in {Directory}", capture.Directory);
+            }
+
+            capture.Dispose();
+        }
     }
 
-    private void OnSnapshotForRecording(object? sender, GameSnapshot snapshot) => Volatile.Read(ref _recorder)?.Append(snapshot);
+    private void Tick()
+    {
+        if (IsCapturing)
+        {
+            UpdateCaptureStatus();
+        }
+
+        if (IsVisible)
+        {
+            RefreshStats();
+        }
+    }
+
+    private void UpdateCaptureStatus()
+    {
+        if (_capture is not { } c)
+        {
+            return;
+        }
+
+        var game = c.IsRecordingGame ? "recording the game" : "waiting for a supported game";
+        CaptureStatus = string.Create(CultureInfo.InvariantCulture, $"Capturing — {game}. {c.Samples:N0} samples, {c.EventCount:N0} events.");
+    }
 
     private void OnStateChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (_statsTimer.IsEnabled)
+        if (IsVisible)
         {
             RefreshRawFields();
         }

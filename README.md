@@ -7,7 +7,7 @@ on PC, starting with **Resident Evil (1996), GOG release**. It reads live game s
 which build it is talking to, and is designed to grow into a trainer, overlay, world explorer and
 speedrun/challenge suite.
 
-> **Status: 0.1.0 (foundation).** Detection, fingerprinting, safe read-only attachment and live state
+> **Status: 0.1.x (foundation).** Detection, fingerprinting, safe read-only attachment and live state
 > are working and validated against the real GOG game (Chris and Jill games). See [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## What works in 0.1
@@ -19,7 +19,9 @@ speedrun/challenge suite.
 - Live values (30 Hz): session state, character, HP / max HP, stage + room, camera, position, in-game time.
 - Typed events: attached/detached, room changed, camera changed, HP changed, damaged.
 - Survives the game closing and restarting; explains access problems (e.g. elevated game).
-- Diagnostics: raw profile fields with verification level, poll statistics, live log, session recording.
+- First-time setup (game location with build check, update preferences) and automatic updates (Velopack).
+- Debug page: one-click capture of a play session (raw traces, recordings, events → zip), raw profile fields with
+  verification level, poll statistics, live log.
 - Replay mode for recordings (`--replay`), and a headless probe tool for validation.
 - Responsive UI with a compact layout for portrait / side-by-side windows.
 
@@ -33,19 +35,26 @@ Not yet: any memory writes (trainer features arrive in 0.2), overlay (0.3), worl
 
 Other builds are refused until a verified profile exists — see [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
-## Quick start
+## Install
+
+1. Download **[Lockpick-win-Setup.exe](https://github.com/mscrnt/lockpick/releases/latest/download/Lockpick-win-Setup.exe)**
+   from the [latest release](https://github.com/mscrnt/lockpick/releases/latest) and run it. It installs for your user
+   only (no administrator rights) and adds Start menu and desktop shortcuts. Windows SmartScreen may warn because the
+   build is not code-signed yet: *More info → Run anyway*.
+2. The first launch walks you through a short setup: finding the game (with a build check) and update preferences.
+3. Start Resident Evil normally (not from the GOG installer's elevated "Launch" button). Lockpick connects automatically.
+
+**Updates:** Lockpick checks GitHub for new versions 20 seconds after starting and every 6 hours (can be turned off
+in Settings). When one is available the version label in the sidebar turns green; *Settings → Update* downloads it
+and restarts. Nothing installs without your click. A portable zip (also self-updating) is on each release page.
+
+## Build from source
 
 Requirements: Windows 10/11 x64, [.NET 10 SDK](https://dotnet.microsoft.com/download).
 
 ```powershell
-git clone <repo-url> lockpick; cd lockpick
+git clone https://github.com/mscrnt/lockpick; cd lockpick
 dotnet run --project src/Lockpick.App
-```
-
-Start the game normally (not from the GOG installer's elevated "Launch" button). Lockpick attaches
-automatically.
-
-```powershell
 dotnet test tests/Lockpick.Tests                         # tests
 dotnet run --project tools/Lockpick.Probe -- identify    # check your installed build
 ```
@@ -53,7 +62,8 @@ dotnet run --project tools/Lockpick.Probe -- identify    # check your installed 
 ## Help out
 
 Lockpick verifies everything against the real game. Recording a play session (any kind; speedruns are great)
-helps the most: grab the **[capture kit](docs/CAPTURE.md)**, play, send the zip. Helpers are credited in
+helps the most: install Lockpick, open **Debug → Start capture**, play, then *Stop and save* and send the zip
+([details](docs/CAPTURE.md)). Helpers are credited in
 [CONTRIBUTORS.md](CONTRIBUTORS.md).
 
 ## Repository layout
@@ -67,7 +77,6 @@ src/
 data/games/re1/profiles/       version profiles (addresses, anchors, evidence) — source of truth
 tools/Lockpick.Probe/          headless identify / watch / trace / record
 tools/fixtures/                trace → recording fixture converter
-tools/capture-kit/             volunteer capture kit (build script + README)
 tests/Lockpick.Tests/          unit, fixture playback and Win32 integration tests
 benchmarks/                    BenchmarkDotNet suites
 docs/                          architecture, roadmap, research, compatibility, memory map, performance, development

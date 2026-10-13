@@ -14,6 +14,8 @@ public static class AppPaths
 
     public static string Profiles => Path.Combine(DataRoot, "profiles");
 
+    public static string Captures => Path.Combine(DataRoot, "captures");
+
     public static string SettingsFile => Path.Combine(DataRoot, "settings.json");
 }
 
@@ -24,6 +26,15 @@ public sealed record AppSettings
 
     /// <summary>Directory with additional/override version profiles (*.json).</summary>
     public string? ProfileDirectory { get; init; }
+
+    /// <summary>Version of the first-time setup the user has completed (0 = never). See SetupViewModel.CurrentVersion.</summary>
+    public int SetupVersion { get; init; }
+
+    /// <summary>Check GitHub releases for updates in the background (installed builds only).</summary>
+    public bool CheckForUpdates { get; init; } = true;
+
+    /// <summary>Also offer pre-release versions.</summary>
+    public bool IncludePrereleases { get; init; }
 }
 
 public sealed class SettingsStore(string path, ILogger logger)

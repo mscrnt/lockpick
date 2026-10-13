@@ -28,6 +28,7 @@ OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 |---|---|
 | Avalonia, Avalonia.Desktop, Avalonia.Themes.Fluent, Avalonia.Fonts.Inter | MIT |
 | CommunityToolkit.Mvvm | MIT |
+| Velopack | MIT |
 | Microsoft.Extensions.Logging(.Abstractions) | MIT |
 | xunit, xunit.runner.visualstudio | Apache-2.0 |
 | Microsoft.NET.Test.Sdk | MIT |

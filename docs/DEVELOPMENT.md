@@ -74,15 +74,14 @@ Never guess an offset. If a value cannot be verified, leave it unsupported.
 
 ## Volunteer captures
 
-Volunteers run the capture kit (see [CAPTURE.md](CAPTURE.md)); build it locally with
-`powershell -ExecutionPolicy Bypass -File tools/capture-kit/build-capture-kit.ps1`.
-Processing a returned `LockpickCapture-*.zip`:
+Volunteers capture from the app's Debug page (see [CAPTURE.md](CAPTURE.md)). Processing a returned
+`LockpickCapture-*.zip`:
 
 1. Read `capture-info.json`: if `Builds[].ProfileId` is null, the SHA-256/PE fields identify a new build to profile.
 2. `trace-N.txt` has every raw field change (same format as `lockpick-probe trace`); look for new evidence there.
 3. Convert interesting sessions to fixtures: `python tools/fixtures/trace_to_fixture.py trace-1.txt tests/Lockpick.Tests/Fixtures/<name>.jsonl`
    (keep the trace beside it), then add playback assertions.
-4. Credit the volunteer in `CONTRIBUTORS.md`.
+4. Credit the volunteer in `CONTRIBUTORS.md` once they have contributed and agreed to be listed.
 
 ## Coding conventions
 
@@ -104,14 +103,27 @@ Processing a returned `LockpickCapture-*.zip`:
 | `ci.yml` | push to main, PRs | Release build (warnings as errors), all tests, test results artifact; profile JSON validation; check no game binaries are tracked |
 | `codeql.yml` | push, PRs, weekly | CodeQL security analysis for C# (skipped while the repository is private) |
 | `benchmarks.yml` | manual, weekly | BenchmarkDotNet short run, results artifact |
-| `capture-kit.yml` | push to main (core/adapter/probe/data changes), manual | Tests, builds the volunteer capture kit and updates the rolling `capture-kit` pre-release (stable download link) |
-| `release.yml` | tag `v*.*.*` or manual | Test, publish self-contained win-x64 app + probe, zip + SHA-256, GitHub release with CHANGELOG notes |
+| `release.yml` | tag `v*.*.*` or manual | Test, publish the app, Velopack `pack` (Setup.exe, portable zip, update packages + feed, deltas against the previous release), `upload github` with CHANGELOG notes; attaches the probe zip |
 | `dependabot.yml` | weekly | NuGet and GitHub Actions updates |
 
 ## Release process
 
 1. Confirm every acceptance criterion for the version in `docs/ROADMAP.md` (game-specific ones live).
-2. Move `## [Unreleased]` entries in `CHANGELOG.md` under `## [x.y.z] - YYYY-MM-DD`.
+2. Move `## [Unreleased]` entries in `CHANGELOG.md` under `## [x.y.z] - YYYY-MM-DD` (these become the release notes
+   shown on GitHub).
 3. Bump `<Version>` in `Directory.Build.props`.
-4. Commit, then `git tag vx.y.z && git push --tags`. `release.yml` builds and publishes.
-5. 0.x releases are marked as pre-releases automatically.
+4. Commit, then `git tag vx.y.z && git push origin vx.y.z`. `release.yml` builds and publishes.
+5. Plain versions (`0.1.1`) are normal releases that installed copies update to. Versions with a suffix
+   (`0.2.0-beta.1`) are GitHub pre-releases, offered only to users who enable *Include pre-release versions*.
+
+Updating: the app uses Velopack's `GithubSource`; keep the `Velopack` package version and the `vpk` tool version
+(`VPK_VERSION` in `release.yml`) identical. Test packaging locally with:
+
+```powershell
+dotnet tool install -g vpk --version 1.2.161
+dotnet publish src/Lockpick.App -c Release -r win-x64 --self-contained true -p:Version=0.0.1 -o publish
+vpk pack --packId Lockpick --packVersion 0.0.1 --packDir publish --mainExe Lockpick.exe -o Releases
+```
+
+The app's settings record `setupVersion`; bump `SetupViewModel.CurrentVersion` when first-time setup gains steps
+that existing users should see.

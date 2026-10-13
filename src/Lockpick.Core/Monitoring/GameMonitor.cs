@@ -61,6 +61,8 @@ public sealed class GameMonitor : IGameStateSource
 
     public event EventHandler<GameSnapshot>? SnapshotChanged;
 
+    public event EventHandler<GameSnapshot>? Polled;
+
     public event EventHandler<GameEvent>? EventRaised;
 
     public MonitorStatus Status { get; private set; }
@@ -291,6 +293,7 @@ public sealed class GameMonitor : IGameStateSource
 
         var previous = Latest;
         Latest = snapshot;
+        Polled?.Invoke(this, snapshot);
         if (!snapshot.HasSameStateAs(previous))
         {
             SnapshotChanged?.Invoke(this, snapshot);

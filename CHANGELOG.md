@@ -6,14 +6,24 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-13
+
 ### Added
+- Installer and automatic updates (Velopack): `Lockpick-win-Setup.exe` per-user install, update checks 20 s after start
+  and every 6 hours (optional; pre-release channel optional), *Update and restart* from Settings, and a sidebar version
+  label that highlights available updates.
+- First-time setup: welcome and safety notes, game location with build check and file browser, update preferences;
+  re-runnable from Settings.
+- Debug page (replaces Diagnostics) with one-click session capture: raw field traces, recordings, events and build
+  fingerprints per game attachment, zipped on stop or on exit. No personal information recorded.
 - `GameLoaded` event (new game / save loaded), derived from in-game timer discontinuities and tested against two live
   recordings; replay now detects events on recorded timestamps so playback speed can't fake a load.
 - Second live fixture: Jill session with death, New Game, a route through 1F/2F, healing and loading a save.
 - Profile: runtime-verified inventory slots, equipped slot and inventory pointer (read-only diagnostics).
-- Volunteer capture kit: `lockpick-probe capture` / double-click `LockpickCapture.exe` records raw traces, recordings
-  and events across game restarts and zips them; built by the `capture-kit` workflow into a rolling download.
 - CONTRIBUTORS.md and docs/CAPTURE.md.
+
+### Changed
+- Releases are built with Velopack and are normal (non-pre-release) GitHub releases unless the version has a suffix.
 
 ## [0.1.0] - 2026-10-12
 

@@ -4,7 +4,7 @@
 
 ```text
                       ┌──────────────────────────── Lockpick.App (Avalonia) ───────────────────────────┐
-                      │  MainWindow ─ Dashboard / Diagnostics / Settings      LiveState (UI-thread view) │
+                      │  MainWindow ─ Dashboard / Debug / Settings / Setup    LiveState (UI-thread view) │
                       └──────────────▲───────────────────────────────────────────────▲─────────────────┘
                                      │ StatusChanged / SnapshotChanged / EventRaised  │ (Dispatcher.Post, coalesced)
                       ┌──────────────┴──────────── IGameStateSource ─────────────────┴─────────────────┐
@@ -28,7 +28,7 @@ Projects:
 | `Lockpick.Core` | Game-agnostic model (`GameSnapshot`, `Field<T>`), events + detector, adapter contract, version profiles (load/validate/match/verify), memory abstractions, `GameMonitor`, recording/replay, JSON-lines logging | M.E.Logging.Abstractions |
 | `Lockpick.Platform.Windows` | Win32 process discovery, read-only handles, `ReadProcessMemory`, high-resolution waits, GOG registry lookup | Core |
 | `Lockpick.GameAdapter.RE1` | RE1 build profiles and interpretation of raw values. **The only place that knows RE1 addresses.** | Core |
-| `Lockpick.App` | Avalonia desktop UI and composition root | all of the above |
+| `Lockpick.App` | Avalonia desktop UI and composition root; first-time setup; Velopack self-update; Debug page with capture | all of the above |
 | `tools/Lockpick.Probe` | Headless identify / watch / trace / record | Core, Platform, RE1 |
 | `tests/Lockpick.Tests` | Unit, fixture playback, Win32 integration | Core, Platform, RE1 |
 | `benchmarks/Lockpick.Benchmarks` | BenchmarkDotNet suites | Core, Platform, RE1 |
@@ -123,7 +123,20 @@ quantization). A `CREATE_WAITABLE_TIMER_HIGH_RESOLUTION` timer gives 29.9 Hz mea
 the global timer resolution.
 
 **ADR-008 — Minimal logging dependency.** A ~150-line JSON-lines provider for Microsoft.Extensions.Logging
-instead of Serilog: buffered, size-capped, non-blocking, with an in-memory ring for the Diagnostics page.
+instead of Serilog: buffered, size-capped, non-blocking, with an in-memory ring for the Debug page.
+
+**ADR-010 — Velopack for installs and updates.** Matches the owner's other app (Tauri updater: GitHub-release
+feed, signed packages, passive install, restart). Velopack gives the same for .NET: per-user `Setup.exe`, delta
+updates, a `releases.win.json` feed on GitHub releases, and `UpdateManager` for check/download/apply-and-restart.
+Checks run 20 s after start and every 6 h, failures are shown (not swallowed), and updates install only on click.
+Not yet code-signed (SmartScreen warns); `vpk pack --signParams` or Azure Trusted Signing can be added later.
+
+**ADR-011 — Explicit first-time setup.** Setup completion is stored as `setupVersion` in settings (not inferred
+from data), so it never re-triggers by accident and new steps can be shown to existing users by bumping the version.
+
+**ADR-012 — Capture is part of the app.** Research capture runs on the same `IGameStateSource` as the UI through a
+per-poll `Polled` event (raw fields change without normalized state changing, e.g. ammo). `CaptureSession` writes
+per-attachment trace/recording/event files and zips them; there is no separate tool.
 
 **ADR-009 — Responsive UI.** The window switches to an icon-rail + single-column layout below 760 px
 (window) / 780 px (dashboard content), for portrait monitors and side-by-side use with the game.

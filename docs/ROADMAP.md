@@ -9,6 +9,7 @@ Status legend: ✅ done and verified · 🟡 done, partially verified · ⬜ not
 | Version | Milestone | Status |
 |---|---|---|
 | 0.1.0 | Game detection, memory reading, application foundation | ✅ released 2026-10-12 |
+| 0.1.1 | Installer + auto-update, first-time setup, in-app capture (Debug page) | 🟡 built and tested; first Velopack release |
 | 0.2.0 | Core trainer functionality and memory modification | ⬜ |
 | 0.3.0 | Real-time overlay and customizable HUD | ⬜ |
 | 0.4.0 | Room, camera, item and enemy database | ⬜ |

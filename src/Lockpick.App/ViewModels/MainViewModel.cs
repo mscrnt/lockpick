@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Lockpick.App.Services;
 using Lockpick.Core.Monitoring;
 
@@ -7,27 +8,45 @@ namespace Lockpick.App.ViewModels;
 
 public sealed partial class MainViewModel : ObservableObject, IDisposable
 {
+    private readonly AppServices _services;
+    private readonly SettingsViewModel _settings;
+    private PageViewModel? _visiblePage;
+
     public MainViewModel(AppServices services)
     {
+        _services = services;
         State = new LiveState(services.Source);
-        Diagnostics = new DiagnosticsViewModel(services, State);
-        Pages = [new DashboardViewModel(State), Diagnostics, new SettingsViewModel(services)];
+        Debug = new DebugViewModel(services, State);
+        _settings = new SettingsViewModel(services, RunSetup);
+        Pages = [new DashboardViewModel(State), Debug, _settings];
         SelectedPage = Pages[0];
-        Version = $"v{typeof(MainViewModel).Assembly.GetName().Version?.ToString(3)}";
+        Updates = services.Updates;
         State.PropertyChanged += OnStateChanged;
         UpdateHeader();
+
+        if (services.Settings.Current.SetupVersion < SetupViewModel.CurrentVersion && !services.IsReplay)
+        {
+            RunSetup();
+        }
     }
 
     public LiveState State { get; }
 
-    public DiagnosticsViewModel Diagnostics { get; }
+    public DebugViewModel Debug { get; }
+
+    public UpdateService Updates { get; }
 
     public IReadOnlyList<PageViewModel> Pages { get; }
 
-    public string Version { get; }
-
     [ObservableProperty]
     public partial PageViewModel SelectedPage { get; set; }
+
+    /// <summary>Non-null while first-time setup is shown instead of the main UI.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsSetupVisible))]
+    public partial SetupViewModel? Setup { get; private set; }
+
+    public bool IsSetupVisible => Setup is not null;
 
     [ObservableProperty]
     public partial string HeaderStatus { get; private set; } = string.Empty;
@@ -41,9 +60,13 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     public partial bool IsReplaying { get; private set; }
 
-    public void Dispose() => Diagnostics.Dispose();
+    public void Dispose() => Debug.Dispose();
 
-    private PageViewModel? _visiblePage;
+    /// <summary>The version label in the navigation opens the update controls in Settings.</summary>
+    [RelayCommand]
+    private void OpenUpdates() => SelectedPage = _settings;
+
+    private void RunSetup() => Setup = new SetupViewModel(_services, () => Setup = null);
 
     partial void OnSelectedPageChanged(PageViewModel value)
     {

@@ -1,0 +1,123 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Lockpick.App.ViewModels"
+             xmlns:c="using:Lockpick.App.Controls"
+             x:Class="Lockpick.App.Views.DebugView"
+             x:DataType="vm:DebugViewModel">
+
+  <Grid RowDefinitions="Auto,Auto,*,*" RowSpacing="12">
+
+    <!-- Capture -->
+    <Border Grid.Row="0" Classes="card" Classes.recording="{Binding IsCapturing}">
+      <Border.Styles>
+        <Style Selector="Border.card.recording">
+          <Setter Property="BorderBrush" Value="{StaticResource LpRedBrush}" />
+        </Style>
+      </Border.Styles>
+      <StackPanel Spacing="8">
+        <StackPanel Classes="cardhead">
+          <c:LucideIcon Data="{StaticResource Icon.CircleDot}" />
+          <TextBlock Classes="caption" Text="CAPTURE A PLAY SESSION" />
+        </StackPanel>
+        <TextBlock TextWrapping="Wrap" Foreground="{StaticResource LpMutedBrush}"
+                   Text="Records what the game is doing while you play (read-only, like an autosplitter) so Lockpick can learn new rooms, items and builds. Start it, play normally — resets and game restarts are fine — then stop and send the zip. No personal information is recorded." />
+        <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
+          <Button Command="{Binding StartCaptureCommand}" AutomationProperties.Name="Start capture" Classes="accent">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <c:LucideIcon Data="{StaticResource Icon.CircleDot}" Width="14" Height="14" />
+              <TextBlock Text="Start capture" />
+            </StackPanel>
+          </Button>
+          <Button Command="{Binding StopCaptureCommand}" Content="Stop and save" />
+          <Button Command="{Binding OpenCapturesFolderCommand}" AutomationProperties.Name="Open captures folder">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <c:LucideIcon Data="{StaticResource Icon.FolderOpen}" Width="14" Height="14" />
+              <TextBlock Text="Open captures folder" />
+            </StackPanel>
+          </Button>
+        </WrapPanel>
+        <TextBlock Classes="mono" Text="{Binding CaptureStatus}" TextWrapping="Wrap" Classes.warning="{Binding IsCapturing}" />
+        <SelectableTextBlock Classes="mono" Text="{Binding LastCaptureZip}" IsVisible="{Binding LastCaptureZip, Converter={x:Static ObjectConverters.IsNotNull}}" TextWrapping="Wrap" />
+      </StackPanel>
+    </Border>
+
+    <!-- Monitor -->
+    <Border Grid.Row="1" Classes="card">
+      <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="4">
+        <StackPanel Grid.ColumnSpan="2" Classes="cardhead">
+          <c:LucideIcon Data="{StaticResource Icon.Gauge}" />
+          <TextBlock Classes="caption" Text="MONITOR" />
+        </StackPanel>
+        <TextBlock Grid.Row="1" Classes="label" Text="Polling" />
+        <TextBlock Grid.Row="1" Grid.Column="1" Classes="mono" Text="{Binding PollStats}" TextWrapping="Wrap" />
+        <TextBlock Grid.Row="2" Classes="label" Text="Timer" />
+        <TextBlock Grid.Row="2" Grid.Column="1" Classes="mono" Text="{Binding TimerInfo}" TextWrapping="Wrap" />
+        <TextBlock Grid.Row="3" Classes="label" Text="Log file" />
+        <SelectableTextBlock Grid.Row="3" Grid.Column="1" Classes="mono" Text="{Binding LogFile}" TextWrapping="Wrap" />
+      </Grid>
+    </Border>
+
+    <!-- Raw profile fields -->
+    <Border Grid.Row="2" Classes="card">
+      <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Classes="cardhead">
+          <c:LucideIcon Data="{StaticResource Icon.Fingerprint}" />
+          <TextBlock Classes="caption" Text="PROFILE FIELDS (RAW)" />
+        </StackPanel>
+        <ScrollViewer HorizontalScrollBarVisibility="Auto">
+          <StackPanel>
+            <Grid ColumnDefinitions="130,100,110,100,180,100" Margin="4,0,4,4">
+              <TextBlock Classes="label" Text="Field" />
+              <TextBlock Grid.Column="1" Classes="label" Text="Address" />
+              <TextBlock Grid.Column="2" Classes="label" Text="Type" />
+              <TextBlock Grid.Column="3" Classes="label" Text="Verification" />
+              <TextBlock Grid.Column="4" Classes="label" Text="Value" />
+              <TextBlock Grid.Column="5" Classes="label" Text="Read" />
+            </Grid>
+            <ItemsControl ItemsSource="{Binding RawFields}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:RawFieldRow">
+                  <Grid ColumnDefinitions="130,100,110,100,180,100" Margin="4,2">
+                    <TextBlock Classes="mono" Text="{Binding Name}" />
+                    <TextBlock Grid.Column="1" Classes="mono" Text="{Binding Address}" />
+                    <TextBlock Grid.Column="2" Classes="mono" Text="{Binding Type}" />
+                    <TextBlock Grid.Column="3" Classes="mono" Text="{Binding Verification}" Classes.inactive="{Binding !IsTrusted}" />
+                    <TextBlock Grid.Column="4" Classes="mono" Text="{Binding Value}" />
+                    <TextBlock Grid.Column="5" Classes="mono" Text="{Binding Status}" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </ScrollViewer>
+      </DockPanel>
+    </Border>
+
+    <!-- Log -->
+    <Border Grid.Row="3" Classes="card">
+      <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Classes="cardhead">
+          <c:LucideIcon Data="{StaticResource Icon.ScrollText}" />
+          <TextBlock Classes="caption" Text="LOG" />
+        </StackPanel>
+        <ListBox ItemsSource="{Binding LogRows}" Background="Transparent">
+          <ListBox.Styles>
+            <Style Selector="ListBoxItem">
+              <Setter Property="Padding" Value="4,2" />
+              <Setter Property="MinHeight" Value="0" />
+            </Style>
+          </ListBox.Styles>
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:LogRow">
+              <Grid ColumnDefinitions="96,80,*">
+                <TextBlock Classes="mono" Text="{Binding Time}" Foreground="{StaticResource LpMutedBrush}" FontSize="11.5" />
+                <TextBlock Grid.Column="1" Classes="mono" Text="{Binding Level}" Classes.warning="{Binding IsWarning}" FontSize="11.5" />
+                <TextBlock Grid.Column="2" Text="{Binding Message}" TextWrapping="Wrap" Classes.warning="{Binding IsWarning}" />
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </DockPanel>
+    </Border>
+  </Grid>
+</UserControl>

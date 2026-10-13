@@ -18,7 +18,15 @@
     <Style Selector="Grid#Shell.compact TextBlock.tagline"><Setter Property="IsVisible" Value="False" /></Style>
     <Style Selector="Grid#Shell.compact Border.navpane"><Setter Property="Width" Value="56" /></Style>
     <Style Selector="Grid#Shell.compact TextBlock.navlabel"><Setter Property="IsVisible" Value="False" /></Style>
-    <Style Selector="Grid#Shell.compact TextBlock.version"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="Grid#Shell.compact Button.version"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="Button.version">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Padding" Value="6,2" />
+      <Setter Property="Foreground" Value="{StaticResource LpMutedBrush}" />
+    </Style>
+    <Style Selector="Button.version.update">
+      <Setter Property="Foreground" Value="{StaticResource LpGreenBrush}" />
+    </Style>
     <Style Selector="Grid#Shell.compact ListBox.nav ListBoxItem"><Setter Property="Padding" Value="10,10" /></Style>
     <Style Selector="Grid#Shell.compact ContentControl.page"><Setter Property="Margin" Value="8" /></Style>
     <Style Selector="Grid#Shell.compact TextBlock.wordmark"><Setter Property="FontSize" Value="18" /><Setter Property="LetterSpacing" Value="4" /></Style>
@@ -55,11 +63,17 @@
       </DockPanel>
     </Border>
 
-    <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+    <!-- First-time setup replaces the main UI until completed. -->
+    <ContentControl Grid.Row="1" Content="{Binding Setup}" IsVisible="{Binding IsSetupVisible}" />
+
+    <Grid Grid.Row="1" ColumnDefinitions="Auto,*" IsVisible="{Binding !IsSetupVisible}">
       <!-- Navigation -->
       <Border Grid.Column="0" Classes="navpane" Background="{StaticResource LpPanelBrush}" BorderBrush="{StaticResource LpBorderBrush}" BorderThickness="0,0,1,0" Padding="8,12">
         <DockPanel>
-          <TextBlock DockPanel.Dock="Bottom" Text="{Binding Version}" Classes="label version" Margin="10,0" FontSize="11" TextTrimming="CharacterEllipsis" />
+          <Button DockPanel.Dock="Bottom" Classes="version" Command="{Binding OpenUpdatesCommand}" Classes.update="{Binding Updates.HasUpdate}"
+                  ToolTip.Tip="{Binding Updates.Status}" AutomationProperties.Name="Version and updates" HorizontalAlignment="Left" Margin="4,0">
+            <TextBlock Text="{Binding Updates.VersionLabel}" FontSize="11" TextTrimming="CharacterEllipsis" />
+          </Button>
           <ListBox Classes="nav" ItemsSource="{Binding Pages}" SelectedItem="{Binding SelectedPage}">
             <ListBox.ItemTemplate>
               <DataTemplate x:DataType="vm:PageViewModel">

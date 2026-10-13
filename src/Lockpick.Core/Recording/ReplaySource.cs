@@ -15,6 +15,8 @@ public sealed class ReplaySource(RecordingHeader header, IReadOnlyList<RecordedF
 
     public event EventHandler<GameSnapshot>? SnapshotChanged;
 
+    public event EventHandler<GameSnapshot>? Polled;
+
     public event EventHandler<GameEvent>? EventRaised;
 
     public MonitorStatus Status { get; private set; } = MonitorStatus.Stopped(DateTimeOffset.UtcNow);
@@ -78,6 +80,7 @@ public sealed class ReplaySource(RecordingHeader header, IReadOnlyList<RecordedF
                 var snapshot = frame.Snapshot with { CapturedAt = now };
                 Latest = snapshot;
                 Interlocked.Increment(ref _played);
+                Polled?.Invoke(this, snapshot);
                 SnapshotChanged?.Invoke(this, snapshot);
                 foreach (var gameEvent in detector.Detect(previous, frame.Snapshot))
                 {

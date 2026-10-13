@@ -44,11 +44,14 @@
     <DataTemplate DataType="vm:DashboardViewModel">
       <views:DashboardView />
     </DataTemplate>
-    <DataTemplate DataType="vm:DiagnosticsViewModel">
-      <views:DiagnosticsView />
+    <DataTemplate DataType="vm:DebugViewModel">
+      <views:DebugView />
     </DataTemplate>
     <DataTemplate DataType="vm:SettingsViewModel">
       <views:SettingsView />
+    </DataTemplate>
+    <DataTemplate DataType="vm:SetupViewModel">
+      <views:SetupView />
     </DataTemplate>
   </Application.DataTemplates>
 
@@ -163,6 +166,36 @@
     </Style>
     <Style Selector="ListBox.nav ListBoxItem:selected TextBlock">
       <Setter Property="Foreground" Value="{StaticResource LpGreenBrush}" />
+    </Style>
+
+    <!-- Primary action button in the Lockpick palette (Fluent's accent is blue). -->
+    <Style Selector="Button.accent /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource LpGreenBrush}" />
+      <Setter Property="Foreground" Value="#07130B" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="Button.accent:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="#68D292" />
+      <Setter Property="Foreground" Value="#07130B" />
+    </Style>
+    <Style Selector="Button.accent:pressed /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="#3E9F62" />
+    </Style>
+
+    <Style Selector="Button.accent:disabled /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource LpGreenDimBrush}" />
+      <Setter Property="Foreground" Value="{StaticResource LpMutedBrush}" />
+    </Style>
+
+    <Style Selector="ToggleSwitch:checked /template/ Border#SwitchKnobBounds">
+      <Setter Property="Background" Value="{StaticResource LpGreenBrush}" />
+      <Setter Property="BorderBrush" Value="{StaticResource LpGreenBrush}" />
+    </Style>
+    <Style Selector="ToggleSwitch:checked:pointerover /template/ Border#SwitchKnobBounds">
+      <Setter Property="Background" Value="#68D292" />
+    </Style>
+    <Style Selector="ToggleSwitch:checked /template/ Ellipse#SwitchKnobOn">
+      <Setter Property="Fill" Value="#07130B" />
     </Style>
 
     <Style Selector="ProgressBar.health">

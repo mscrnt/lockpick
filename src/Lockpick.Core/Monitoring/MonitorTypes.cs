@@ -94,6 +94,12 @@ public interface IGameStateSource : IAsyncDisposable
     /// <summary>Raised on the monitor thread when game-facing state differs from the previous snapshot.</summary>
     event EventHandler<GameSnapshot>? SnapshotChanged;
 
+    /// <summary>
+    /// Raised on the monitor thread after every poll (≈30 Hz), including polls whose game-facing state did not
+    /// change. For diagnostics and capture only; handlers must be fast.
+    /// </summary>
+    event EventHandler<GameSnapshot>? Polled;
+
     /// <summary>Raised on the monitor thread for each detected event, in order.</summary>
     event EventHandler<GameEvent>? EventRaised;
 

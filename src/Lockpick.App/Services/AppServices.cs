@@ -24,6 +24,7 @@ public sealed class AppServices : IAsyncDisposable
         HighResolutionWaitStrategy? wait,
         string? replayPath)
     {
+        Updates = new UpdateService(settings, loggerFactory.CreateLogger("Updates"));
         LogProvider = logProvider;
         LoggerFactory = loggerFactory;
         Settings = settings;
@@ -45,6 +46,10 @@ public sealed class AppServices : IAsyncDisposable
     public IGameStateSource Source { get; }
 
     public FileFingerprintProvider Fingerprints { get; }
+
+    public UpdateService Updates { get; }
+
+    public string AppVersion => Updates.CurrentVersion;
 
     public string? ReplayPath { get; }
 
@@ -98,6 +103,7 @@ public sealed class AppServices : IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         await Source.DisposeAsync();
+        Updates.Dispose();
         _wait?.Dispose();
         LoggerFactory.Dispose();
         LogProvider.Dispose();

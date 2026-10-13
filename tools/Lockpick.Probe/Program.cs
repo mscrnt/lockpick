@@ -4,17 +4,12 @@ using Lockpick.Core.Monitoring;
 using Lockpick.Core.Recording;
 using Lockpick.Core.State;
 using Lockpick.GameAdapter.RE1;
-using Lockpick.Probe;
 using Lockpick.Platform.Windows;
 
 // lockpick-probe identify [exe-path]
 // lockpick-probe watch [--seconds N] [--record file.jsonl] [--raw]
 // lockpick-probe trace [--seconds N] [--quiet f1,f2]   (prints every raw profile-field change at 30 Hz)
-// lockpick-probe capture [--out dir] [--seconds N]   (volunteer capture: waits for the game, records until Ctrl+C, zips the session)
-// Double-clicking the volunteer build (renamed LockpickCapture.exe) goes straight into capture mode.
-var isCaptureKit = Path.GetFileNameWithoutExtension(Environment.ProcessPath ?? string.Empty)
-    .Equals("LockpickCapture", StringComparison.OrdinalIgnoreCase);
-var command = args.Length > 0 ? args[0] : isCaptureKit ? "capture" : "help";
+var command = args.Length > 0 ? args[0] : "help";
 var adapter = new Re1Adapter();
 
 switch (command)
@@ -25,10 +20,8 @@ switch (command)
         return await WatchAsync(args.Skip(1).ToArray());
     case "trace":
         return Trace(args.Skip(1).ToArray());
-    case "capture":
-        return Capture.Run(adapter, args.Skip(1).ToArray(), interactive: args.Length == 0);
     default:
-        Console.WriteLine("usage: lockpick-probe identify [exe-path] | watch [--seconds N] [--record file.jsonl] [--raw] | trace [--seconds N] | capture [--out dir]");
+        Console.WriteLine("usage: lockpick-probe identify [exe-path] | watch [--seconds N] [--record file.jsonl] [--raw] | trace [--seconds N]");
         return command == "help" ? 0 : 2;
 }
 
@@ -192,7 +185,7 @@ int Trace(string[] options)
             : raw.Keys.Where(k => !quiet.Contains(k) && raw[k] != last[k]).ToList();
         if (changed.Count > 0)
         {
-            Console.WriteLine(Capture.TraceLine(DateTime.Now, raw, changed));
+            Console.WriteLine(CaptureSession.TraceLine(DateTime.Now, raw, changed));
         }
 
         last = raw;

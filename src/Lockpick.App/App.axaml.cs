@@ -23,6 +23,7 @@ public partial class App : Application
             _main = new MainViewModel(_services);
             desktop.MainWindow = new MainWindow { DataContext = _main };
             _services.Source.Start();
+            _services.Updates.StartBackgroundChecks();
             desktop.ShutdownRequested += (_, _) => Shutdown();
         }
 

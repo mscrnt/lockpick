@@ -1,13 +1,16 @@
 name: Release
 
-# Push a tag like v0.1.0 to build, test and publish a GitHub release.
+# Push a tag like v0.1.1 (or run manually) to test, build and publish a release with Velopack:
+#   Lockpick-win-Setup.exe     installer (per-user, no admin) with automatic updates
+#   Lockpick-win-Portable.zip  portable build (also self-updating)
+#   *.nupkg, releases.win.json  update packages and feed read by the in-app updater
 on:
   push:
     tags: ['v*.*.*']
   workflow_dispatch:
     inputs:
       version:
-        description: Version to build (without the leading v), e.g. 0.1.0
+        description: Version to release (without the leading v), e.g. 0.1.1
         required: true
 
 permissions:
@@ -16,6 +19,7 @@ permissions:
 env:
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
+  VPK_VERSION: 1.2.161 # keep in step with the Velopack package in Directory.Packages.props
 
 jobs:
   release:
@@ -34,34 +38,16 @@ jobs:
         run: |
           $v = if ('${{ github.event_name }}' -eq 'workflow_dispatch') { '${{ inputs.version }}' } else { '${{ github.ref_name }}'.TrimStart('v') }
           "value=$v" >> $env:GITHUB_OUTPUT
+          # Versions with a suffix (0.2.0-beta.1) are pre-releases; plain versions are normal releases the updater offers.
+          "pre=$(if ($v.Contains('-')) { '--pre' } else { '' })" >> $env:GITHUB_OUTPUT
 
       - name: Test
         run: dotnet test tests/Lockpick.Tests -c Release -p:Version=${{ steps.version.outputs.value }}
 
-      - name: Publish app (self-contained, win-x64)
-        run: >
-          dotnet publish src/Lockpick.App -c Release -r win-x64 --self-contained true
-          -p:Version=${{ steps.version.outputs.value }}
-          -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
-          -o publish/Lockpick
+      - name: Publish app
+        run: dotnet publish src/Lockpick.App -c Release -r win-x64 --self-contained true -p:Version=${{ steps.version.outputs.value }} -o publish/app
 
-      - name: Publish probe tool
-        run: >
-          dotnet publish tools/Lockpick.Probe -c Release -r win-x64 --self-contained false
-          -p:Version=${{ steps.version.outputs.value }} -o publish/Lockpick/tools
-
-      - name: Package
-        shell: pwsh
-        run: |
-          Copy-Item README.md, LICENSE, CHANGELOG.md, THIRD_PARTY_NOTICES.md publish/Lockpick/
-          Compress-Archive -Path publish/Lockpick/* -DestinationPath "Lockpick-${{ steps.version.outputs.value }}-win-x64.zip"
-          (Get-FileHash "Lockpick-${{ steps.version.outputs.value }}-win-x64.zip" -Algorithm SHA256).Hash | Out-File -Encoding ascii "Lockpick-${{ steps.version.outputs.value }}-win-x64.zip.sha256"
-
-      - name: Build capture kit
-        shell: pwsh
-        run: ./tools/capture-kit/build-capture-kit.ps1 -Version ${{ steps.version.outputs.value }} -OutDir .
-
-      - name: Extract release notes
+      - name: Release notes from CHANGELOG
         shell: pwsh
         run: |
           $v = '${{ steps.version.outputs.value }}'
@@ -69,14 +55,32 @@ jobs:
           $m = [regex]::Match($text, "(?ms)^## \[$([regex]::Escape($v))\].*?(?=^## \[|\z)")
           ($(if ($m.Success) { $m.Value } else { "Lockpick $v" })) | Out-File -Encoding utf8 release-notes.md
 
-      - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ steps.version.outputs.value }}
-          name: Lockpick ${{ steps.version.outputs.value }}
-          body_path: release-notes.md
-          prerelease: ${{ startsWith(steps.version.outputs.value, '0.') }}
-          files: |
-            Lockpick-${{ steps.version.outputs.value }}-win-x64.zip
-            Lockpick-${{ steps.version.outputs.value }}-win-x64.zip.sha256
-            LockpickCapture-${{ steps.version.outputs.value }}.zip
+      - name: Install vpk
+        run: dotnet tool install -g vpk --version ${{ env.VPK_VERSION }}
+
+      - name: Download previous release (for delta updates)
+        continue-on-error: true
+        run: vpk download github --repoUrl https://github.com/${{ github.repository }} --token ${{ secrets.GITHUB_TOKEN }} -o Releases
+
+      - name: Pack
+        run: >
+          vpk pack --packId Lockpick --packVersion ${{ steps.version.outputs.value }}
+          --packDir publish/app --mainExe Lockpick.exe
+          --packTitle "Lockpick Trainer" --packAuthors "Lockpick contributors"
+          --releaseNotes release-notes.md -o Releases
+
+      - name: Publish GitHub release
+        run: >
+          vpk upload github -o Releases --repoUrl https://github.com/${{ github.repository }}
+          --token ${{ secrets.GITHUB_TOKEN }} --publish --merge
+          --releaseName "Lockpick ${{ steps.version.outputs.value }}" --tag v${{ steps.version.outputs.value }}
+          ${{ steps.version.outputs.pre }}
+
+      - name: Attach probe tool (developer validation)
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          dotnet publish tools/Lockpick.Probe -c Release -r win-x64 --self-contained false -p:Version=${{ steps.version.outputs.value }} -o publish/probe
+          Compress-Archive -Path publish/probe/* -DestinationPath lockpick-probe-${{ steps.version.outputs.value }}-win-x64.zip
+          gh release upload v${{ steps.version.outputs.value }} lockpick-probe-${{ steps.version.outputs.value }}-win-x64.zip --clobber
