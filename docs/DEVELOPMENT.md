@@ -72,6 +72,18 @@ Never guess an offset. If a value cannot be verified, leave it unsupported.
   normalization rules as the RE1 session; keep the trace beside the fixture as provenance).
 - Fixtures under `tests/Lockpick.Tests/Fixtures/` are played back through the real event detector in tests.
 
+## Volunteer captures
+
+Volunteers run the capture kit (see [CAPTURE.md](CAPTURE.md)); build it locally with
+`powershell -ExecutionPolicy Bypass -File tools/capture-kit/build-capture-kit.ps1`.
+Processing a returned `LockpickCapture-*.zip`:
+
+1. Read `capture-info.json`: if `Builds[].ProfileId` is null, the SHA-256/PE fields identify a new build to profile.
+2. `trace-N.txt` has every raw field change (same format as `lockpick-probe trace`); look for new evidence there.
+3. Convert interesting sessions to fixtures: `python tools/fixtures/trace_to_fixture.py trace-1.txt tests/Lockpick.Tests/Fixtures/<name>.jsonl`
+   (keep the trace beside it), then add playback assertions.
+4. Credit the volunteer in `CONTRIBUTORS.md`.
+
 ## Coding conventions
 
 - C# latest, nullable enabled, file-scoped namespaces, `_camelCase` private fields, warnings as errors
@@ -92,6 +104,7 @@ Never guess an offset. If a value cannot be verified, leave it unsupported.
 | `ci.yml` | push to main, PRs | Release build (warnings as errors), all tests, test results artifact; profile JSON validation; check no game binaries are tracked |
 | `codeql.yml` | push, PRs, weekly | CodeQL security analysis for C# (skipped while the repository is private) |
 | `benchmarks.yml` | manual, weekly | BenchmarkDotNet short run, results artifact |
+| `capture-kit.yml` | push to main (core/adapter/probe/data changes), manual | Tests, builds the volunteer capture kit and updates the rolling `capture-kit` pre-release (stable download link) |
 | `release.yml` | tag `v*.*.*` or manual | Test, publish self-contained win-x64 app + probe, zip + SHA-256, GitHub release with CHANGELOG notes |
 | `dependabot.yml` | weekly | NuGet and GitHub Actions updates |
 

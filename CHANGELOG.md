@@ -11,6 +11,9 @@ All notable changes to this project are documented here. The format follows
   recordings; replay now detects events on recorded timestamps so playback speed can't fake a load.
 - Second live fixture: Jill session with death, New Game, a route through 1F/2F, healing and loading a save.
 - Profile: runtime-verified inventory slots, equipped slot and inventory pointer (read-only diagnostics).
+- Volunteer capture kit: `lockpick-probe capture` / double-click `LockpickCapture.exe` records raw traces, recordings
+  and events across game restarts and zips them; built by the `capture-kit` workflow into a rolling download.
+- CONTRIBUTORS.md and docs/CAPTURE.md.
 
 ## [0.1.0] - 2026-10-12
 

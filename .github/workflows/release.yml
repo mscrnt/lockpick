@@ -57,6 +57,10 @@ jobs:
           Compress-Archive -Path publish/Lockpick/* -DestinationPath "Lockpick-${{ steps.version.outputs.value }}-win-x64.zip"
           (Get-FileHash "Lockpick-${{ steps.version.outputs.value }}-win-x64.zip" -Algorithm SHA256).Hash | Out-File -Encoding ascii "Lockpick-${{ steps.version.outputs.value }}-win-x64.zip.sha256"
 
+      - name: Build capture kit
+        shell: pwsh
+        run: ./tools/capture-kit/build-capture-kit.ps1 -Version ${{ steps.version.outputs.value }} -OutDir .
+
       - name: Extract release notes
         shell: pwsh
         run: |
@@ -75,3 +79,4 @@ jobs:
           files: |
             Lockpick-${{ steps.version.outputs.value }}-win-x64.zip
             Lockpick-${{ steps.version.outputs.value }}-win-x64.zip.sha256
+            LockpickCapture-${{ steps.version.outputs.value }}.zip

@@ -50,6 +50,12 @@ dotnet test tests/Lockpick.Tests                         # tests
 dotnet run --project tools/Lockpick.Probe -- identify    # check your installed build
 ```
 
+## Help out
+
+Lockpick verifies everything against the real game. Recording a play session (any kind; speedruns are great)
+helps the most: grab the **[capture kit](docs/CAPTURE.md)**, play, send the zip. Helpers are credited in
+[CONTRIBUTORS.md](CONTRIBUTORS.md).
+
 ## Repository layout
 
 ```text
@@ -61,6 +67,7 @@ src/
 data/games/re1/profiles/       version profiles (addresses, anchors, evidence) — source of truth
 tools/Lockpick.Probe/          headless identify / watch / trace / record
 tools/fixtures/                trace → recording fixture converter
+tools/capture-kit/             volunteer capture kit (build script + README)
 tests/Lockpick.Tests/          unit, fixture playback and Win32 integration tests
 benchmarks/                    BenchmarkDotNet suites
 docs/                          architecture, roadmap, research, compatibility, memory map, performance, development
@@ -91,6 +98,8 @@ docs/                          architecture, roadmap, research, compatibility, m
 - If the game runs elevated, Lockpick must also run elevated to read it.
 
 ## Credits
+
+Contributors and capture volunteers are listed in [CONTRIBUTORS.md](CONTRIBUTORS.md).
 
 Research builds on the work of the RE1 decompilation (ecruells), the RE1 Mod SDK and Classic REbirth
 (Gemini-Loboto3), the RE1 autosplitter (deserteagle417 / Dchaps), BioRand (Ted John) and
