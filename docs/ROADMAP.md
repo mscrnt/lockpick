@@ -124,5 +124,5 @@ Acceptance criteria:
 ## Backlog / ideas
 
 - Lockpick window: remember size/position per monitor; "compact" always-on-top mode for a side screen.
-- Diagnostics: one-click "export support bundle" (log + recording + fingerprint, no game files).
+- Debug: one-click "export support bundle" (log + recording + fingerprint, no game files).
 - Investigate why the game window cannot be dragged (window style `0x14C80000` has a caption; the 1997 window procedure likely swallows the move).
