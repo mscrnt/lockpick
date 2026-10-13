@@ -8,8 +8,7 @@ Thank you to everyone who has helped Lockpick learn the game.
 
 ## Gameplay captures and testing
 
-- **carcinogenSDA** — speedrun capture sessions (Resident Evil, GOG)
-
+Volunteers who send capture sessions are listed here (with their permission).
 Want to help? See [docs/CAPTURE.md](docs/CAPTURE.md).
 
 ## Research acknowledgements
