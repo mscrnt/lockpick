@@ -10,7 +10,8 @@ namespace Lockpick.GameAdapter.RE1;
 /// </summary>
 public sealed class Re1DisplayConfig(string iniPath, string backupDirectory) : IGameDisplayConfig
 {
-    private string BackupPath => System.IO.Path.Combine(backupDirectory, "dxcfg.ini");
+    // Named after the file, so GOG's dxcfg.ini and Steam's launcher ini keep their own backups.
+    private string BackupPath => System.IO.Path.Combine(backupDirectory, System.IO.Path.GetFileName(iniPath));
 
     public IReadOnlyList<DisplayOption> Options { get; } =
     [

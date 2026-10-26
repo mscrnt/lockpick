@@ -3,6 +3,9 @@ r"""Writes an address profile for another build of RE1 from a verified one, by s
     python tools/re1/port_profile.py data/games/re1/profiles/re1-gog-usa-hotfix4.json "G:\GOG Games\Resident Evil\ResidentEvil.exe" ^
         <other build's exe> --id re1-jpn-101 --name "Biohazard (Japanese PC 1.01)" --out data/games/re1/profiles/re1-jpn-101.json
 
+A build packed on disk (Steam) is ported from its unpacked image: tools/re1/dump_image.py <pid> image.exe, then
+image.exe as the other build's exe with --identity <the shipped exe>.
+
 Rules (CLAUDE.md: never guess offsets):
 - A field or named address is "static" only when the code that uses it in the source build is found in the other
   build and those sites agree on the new address (at least 90% of the votes, every disagreement listed).
@@ -63,6 +66,8 @@ def main() -> int:
                     help="use another source instruction for an anchor (e.g. one a patch like Classic REbirth rewrites in memory)")
     ap.add_argument("--live", type=Path, help="live evidence for this build (data/games/re1/profiles/live/<id>.json): "
                     "fields and addresses seen behaving as described in a trace become runtime")
+    ap.add_argument("--identity", help="the exe as shipped, when target_exe is its unpacked image (tools/re1/dump_image.py): "
+                    "the profile matches this file's name, size and hash, and the image's headers")
     args = ap.parse_args()
 
     source = read_profile(args.source_profile)
@@ -195,14 +200,15 @@ def main() -> int:
                                     f"(tools/re1/xmap.py); " + (translate(anchor.get("evidence")) or "")})
 
     pe = pefile.PE(args.target_exe, fast_load=True)
-    data = Path(args.target_exe).read_bytes()
+    shipped = Path(args.identity or args.target_exe)
+    data = shipped.read_bytes()
     profile = {
         "schemaVersion": 1,
         "id": args.id,
         "gameId": source["gameId"],
         "displayName": args.name,
         "executable": {
-            "fileName": Path(args.target_exe).name,
+            "fileName": shipped.name,
             "fileSize": len(data),
             "sha256": hashlib.sha256(data).hexdigest().upper(),
             "machine": "x86",

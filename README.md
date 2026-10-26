@@ -139,8 +139,8 @@ Challenge mode records what Lockpick did. It is not an anti-cheat system.
 
 ## Known limitations
 
-- Supported: GOG's English and Japanese releases and the Japanese 1.01 version with Classic REbirth. Not yet: Steam,
-  emulators. On the Japanese versions, cheats only cover what has been checked in play so far: health, and ammo in
+- Supported: GOG's and Steam's English and Japanese releases, and the Japanese 1.01 version with Classic REbirth. Not
+  yet: emulators. On the Japanese versions, cheats only cover what has been checked in play so far: health, and ammo in
   the first four slots on GOG's Japanese release. The rest follows as it's tested.
 - Resident Evil pauses and goes black whenever it isn't the active window (that's the original game). An OBS capture
   shows black while you click elsewhere, and in exclusive fullscreen the game minimizes instead.

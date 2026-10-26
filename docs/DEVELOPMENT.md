@@ -261,7 +261,9 @@ Never guess an offset. If a value cannot be verified, leave it unsupported.
    --id <id> --name "<name>" --out data/games/re1/profiles/<id>.json`. It finds the code that uses each address
    in the new exe and keeps only what the code sites agree on (static); anchors must all be found. Check the
    "not carried over" list it prints. `python tools/re1/xmap.py A.exe B.exe targets.txt` shows the votes for any
-   address list.
+   address list. An exe that is packed on disk (Steam's wraps GOG's) is ported from its unpacked image: start the
+   game, `python tools/re1/dump_image.py <pid> image.exe` (read-only; keep the dump out of the repo), then pass
+   `image.exe` as the new exe and `--identity <the shipped exe>` so the profile matches the file players have.
 3. Run the build and `lockpick-probe trace` against it; raise each field to `runtime` only after it behaves as
    described in play, with the date in its evidence (and only then restore `write` bounds for the trainer).
 4. Profiles are embedded at build time; users can also drop profiles in `%LOCALAPPDATA%\Lockpick\profiles\`.

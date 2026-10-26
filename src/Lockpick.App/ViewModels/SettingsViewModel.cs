@@ -71,10 +71,7 @@ public sealed partial class SettingsViewModel : PageViewModel
 
             return row;
         })];
-        var gog = GogInstallLocator.Find(Re1Adapter.GogProductId);
-        DetectedInstall = gog is null
-            ? "No GOG install of Resident Evil found in the registry."
-            : $"GOG: {gog.InstallPath} (version {gog.Version ?? "unknown"})";
+        DetectedInstall = GameInstalls.Describe("No GOG or Steam install of Resident Evil found.");
         ProfileDirectory = current.ProfileDirectory ?? AppPaths.Profiles;
         LoadedProfiles = string.Join(Environment.NewLine, services.Adapter.Profiles.Select(p => $"{p.Id} — {p.DisplayName}"));
         CheckInstalledBuild();

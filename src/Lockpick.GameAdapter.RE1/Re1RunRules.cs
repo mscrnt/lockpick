@@ -116,6 +116,11 @@ public sealed class Re1RunRules : IRunRules
     {
         var directory = Path.GetDirectoryName(executablePath) ?? ".";
         var install = Re1Install.Inspect(directory);
+        if (install.Steam is { } steam && install.Rebirth is null)
+        {
+            return CheckSteam(directory, executablePath, steam);
+        }
+
         var japanese = string.Equals(Path.GetFileName(executablePath), "Biohazard.exe", StringComparison.OrdinalIgnoreCase);
         var expected = japanese ? JapaneseManifest.Value : EnglishManifest.Value;
         var other = japanese ? EnglishManifest.Value : JapaneseManifest.Value;
@@ -185,6 +190,53 @@ public sealed class Re1RunRules : IRunRules
 
         // FilesCompared false: the findings say how the data compared (the executable and wrapper are REbirth's).
         return new InstallCheck($"the Japanese PC game with Classic REbirth{(rebirth.Version is { } v ? " " + v : string.Empty)}", [], [], extra, findings, FilesCompared: false);
+    }
+
+    /// <summary>
+    /// Steam's release (data/games/re1/install/steam.json): a language folder holds GOG's data for that language and
+    /// GOG's executable inside Steam's wrapper. The data is compared against GOG's manifest, the executable by Steam's
+    /// hash; dxcfg.exe is GOG's settings tool, which Steam's launcher replaces.
+    /// </summary>
+    private static InstallCheck CheckSteam(string directory, string executablePath, SteamInstall steam)
+    {
+        var known = Re1Install.KnownSteam;
+        var language = known.Executables.First(e => string.Equals(e.Folder, steam.Language, StringComparison.OrdinalIgnoreCase));
+        var expected = language.Manifest == "gog-jpn-hotfix4.sha256" ? JapaneseManifest.Value : EnglishManifest.Value;
+        bool Skipped(string relative) =>
+            Varies(relative) || relative.Equals(language.File, StringComparison.OrdinalIgnoreCase) || relative.Equals("dxcfg.exe", StringComparison.OrdinalIgnoreCase);
+
+        var changed = new List<string>();
+        var missing = new List<string>();
+        foreach (var (relative, digest) in expected.Where(e => !Skipped(e.Key)))
+        {
+            var path = Path.Combine(directory, relative.Replace('/', Path.DirectorySeparatorChar));
+            if (!File.Exists(path))
+            {
+                missing.Add(relative);
+            }
+            else if (!string.Equals(Re1Install.Hash(path), digest, StringComparison.OrdinalIgnoreCase))
+            {
+                changed.Add(relative);
+            }
+        }
+
+        var extra = Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories)
+            .Select(p => Path.GetRelativePath(directory, p).Replace(Path.DirectorySeparatorChar, '/'))
+            .Where(r => !expected.ContainsKey(r) && !Skipped(r))
+            .Order(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        var file = Path.GetFileName(executablePath);
+        var hash = Re1Install.Hash(executablePath);
+        var release = known.Executables.FirstOrDefault(e => string.Equals(e.Sha256, hash, StringComparison.OrdinalIgnoreCase));
+        List<InstallFinding> findings =
+        [
+            release is not null
+                ? new(InstallFindingLevel.Pass, $"{file} is the one {release.Release} ships, unchanged.")
+                : new(InstallFindingLevel.Fail,
+                    $"{file} ({(hash is null ? "unreadable" : hash[..12] + "…")}) isn't Steam's: in Steam, check the game's files (Properties → Installed Files → Verify integrity)."),
+        ];
+        return new InstallCheck(language.Release, changed, missing, extra, findings);
     }
 
     private static List<InstallFinding> RebirthFindings(string directory, RebirthInstall rebirth)

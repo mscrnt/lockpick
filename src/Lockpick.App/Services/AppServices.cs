@@ -408,11 +408,11 @@ public sealed class AppServices : IAsyncDisposable
         return new AppServices(logProvider, loggerFactory, settings, adapter, monitor, fingerprints, wait, null, host);
     }
 
-    /// <summary>The executable to inspect offline: the configured path, else the GOG install.</summary>
+    /// <summary>The executable to inspect offline: the configured path, else the GOG install, else Steam's.</summary>
     public string? ResolveInstalledExecutable() =>
         Settings.Current.GameExecutablePath is { Length: > 0 } configured
             ? configured
-            : GogInstallLocator.Find(Re1Adapter.GogProductId)?.ExecutablePath;
+            : GameInstalls.Executable();
 
     public async ValueTask DisposeAsync()
     {

@@ -1,0 +1,8 @@
+{
+  "comment": "Steam's Resident Evil (1996), app 4249100 (Capcom with GOG.com, released 2026-04-01; read from the owner's install 2026-10-26, Steam build 21744136). One folder per language beside <appId>_Launcher.exe, whose <appId>_Launcher.ini picks the language and holds the DirectDraw wrapper settings it copies into every folder's dxcfg.ini at each start. Each executable is GOG's inside a wrapper that unpacks it at start; its data folder matches the GOG manifest named here (the English 2,938 of 2,951 files, the Japanese 2,988 of 2,990; the rest are GOG's own extras and dxcfg.exe, which Steam's launcher replaces).",
+  "appId": "4249100",
+  "executables": [
+    { "folder": "english", "file": "ResidentEvil.exe", "sha256": "184D08583D2CDA4E6BBC4A8514465846BCB5D2DE64802B4A6795CDDC93AEF59A", "release": "Steam's English release (app 4249100)", "manifest": "gog-hotfix4.sha256" },
+    { "folder": "japanese", "file": "Biohazard.exe", "sha256": "E6984B586325664E7E4002BF946D0AFD41A4F9712A20FA42288114C5646D2F6C", "release": "Steam's Japanese release (app 4249100)", "manifest": "gog-jpn-hotfix4.sha256" }
+  ]
+}

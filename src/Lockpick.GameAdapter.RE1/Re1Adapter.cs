@@ -15,6 +15,9 @@ public sealed class Re1Adapter : IGameAdapter
     /// <summary>GOG product id of "Resident Evil" (used to locate the install via the registry).</summary>
     public const string GogProductId = "1580232252";
 
+    /// <summary>Steam app id of "Resident Evil (1996)" (used to locate the install via Steam's library folders).</summary>
+    public static string SteamAppId => Re1Install.KnownSteam.AppId;
+
     private const string ResourcePrefix = "Lockpick.GameAdapter.RE1.Profiles.";
 
     private static readonly Re1RunRules RunRules = new();
@@ -94,11 +97,12 @@ public sealed class Re1Adapter : IGameAdapter
     /// With Classic REbirth (its own DirectDraw replacement) the wrapper's file doesn't apply: the picture is taken as fitted.
     /// </summary>
     public Core.Display.GameDisplaySettings DisplaySettings(string installDirectory) =>
-        Re1Install.Inspect(installDirectory).GogDisplaySettings is { } ini ? Re1Display.Read(ini) : Re1Display.Default;
+        Re1Install.Inspect(installDirectory).DisplaySettings is { } ini ? Re1Display.Read(ini) : Re1Display.Default;
 
-    /// <summary>GOG's wrapper settings to change from Lockpick; none with Classic REbirth (it has its own setup).</summary>
+    /// <summary>GOG's wrapper settings to change from Lockpick (on Steam, in its launcher's ini); none with Classic
+    /// REbirth (it has its own setup).</summary>
     public Core.Display.IGameDisplayConfig? DisplayConfig(string installDirectory, string backupDirectory) =>
-        Re1Install.Inspect(installDirectory).GogDisplaySettings is { } ini ? new Re1DisplayConfig(ini, backupDirectory) : null;
+        Re1Install.Inspect(installDirectory).DisplaySettings is { } ini ? new Re1DisplayConfig(ini, backupDirectory) : null;
 
     public Core.Insight.IProgressTracker CreateProgressTracker(VersionProfile profile) =>
         new Re1ProgressTracker(Re1Knowledge.LoadEmbedded());

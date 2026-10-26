@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- **Steam's Resident Evil (1996)**, English and Japanese: each is GOG's game inside Steam's wrapper, so everything that
+  works on GOG works on Steam. Lockpick finds the Steam install, its leaderboard checks compare Steam's files, and its display
+  settings change Steam's launcher settings (the launcher rewrites the game's own file at every start).
+
 ### Changed
 - **One page for running:** Challenges is now a tab on the Runs page. Starting a challenge switches to the splits, with
   the challenge (and Try again / Stop) above the timer; whether a leaderboard run is ready shows there too. LiveSplit's

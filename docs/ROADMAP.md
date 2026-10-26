@@ -320,7 +320,10 @@ MediaKite game with Classic REbirth; GOG and Steam are allowed (docs/COMPATIBILI
    three real setups (GOG English, GOG Japanese, REbirth) checked against it.
 3. 🟡 **GOG Japanese and Steam** — GOG Japanese hotfix4 (`re1-gog-jpn-hotfix4`): ported and live-verified 2026-10-17
    (a Chris game, probe trace; `port_profile.py --live` keeps the live evidence when it's regenerated); the trainer
-   writes what the trace confirmed. Steam (app 4249100): not yet, needs its executables.
+   writes what the trace confirmed. Steam (app 4249100) English (`re1-steam-usa`): GOG's English exe in a wrapper,
+   ported from the image read from the running game 2026-10-26 (`tools/re1/dump_image.py`; code identical to GOG's,
+   every address the same), install found from Steam's libraries, leaderboard check (`steam.json`), display settings
+   in the launcher's ini. Steam Japanese (`re1-steam-jpn`): GOG's Japanese exe wrapped, the same way.
 4. ⬜ **EMU board** — read the PS1 game inside DuckStation (and BizHawk / PSXjin): find the console RAM in the
    emulator, identify the disc, a profile per PS1 version (Director's Cut first, the board's fast version). Needs a PS1
    disc image the owner owns for the research; console boards (PS, PSN, Saturn) stay out of reach.

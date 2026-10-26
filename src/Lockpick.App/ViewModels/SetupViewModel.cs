@@ -28,11 +28,11 @@ public sealed partial class SetupViewModel : ObservableObject
         _onFinished = onFinished;
         var current = services.Settings.Current;
 
-        var gog = GogInstallLocator.Find(Re1Adapter.GogProductId);
-        _detectedExecutable = gog?.ExecutablePath;
-        DetectedInstall = gog is null
-            ? "No GOG install of Resident Evil was found automatically."
-            : $"Found the GOG install: {gog.InstallPath} (version {gog.Version ?? "unknown"})";
+        var installs = GameInstalls.Find();
+        _detectedExecutable = installs.Select(i => i.Executable).FirstOrDefault(e => e is not null);
+        DetectedInstall = installs.Count == 0
+            ? "No GOG or Steam install of Resident Evil was found automatically."
+            : "Found " + string.Join(" and ", installs.Select(i => i.Describe()));
         GameExecutablePath = current.GameExecutablePath ?? _detectedExecutable ?? string.Empty;
         CheckForUpdates = current.CheckForUpdates;
         IncludePrereleases = current.IncludePrereleases;
