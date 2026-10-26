@@ -86,6 +86,7 @@ public sealed partial class StreamViewModel : PageViewModel
     {
         SetSections(new PageSection("widgets", "Widgets"), new PageSection("obs", "OBS"));
         _services = services;
+        Obs = new ObsLinkViewModel(services);
         Windows = services.WidgetWindows;
         Load(services.Settings.Current.StreamWidgets ?? Defaults);
         RefreshAddable();
@@ -99,6 +100,9 @@ public sealed partial class StreamViewModel : PageViewModel
     }
 
     public WidgetWindows Windows { get; }
+
+    /// <summary>Lockpick's own connection to OBS (its WebSocket server).</summary>
+    public ObsLinkViewModel Obs { get; }
 
     /// <summary>Browser-source addresses for OBS, one per widget (empty while the API is off).</summary>
     [ObservableProperty]

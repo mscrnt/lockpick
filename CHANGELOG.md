@@ -10,6 +10,12 @@ All notable changes to this project are documented here. The format follows
 - **Steam's Resident Evil (1996)**, English and Japanese: each is GOG's game inside Steam's wrapper, so everything that
   works on GOG works on Steam. Lockpick finds the Steam install, its leaderboard checks compare Steam's files, and its display
   settings change Steam's launcher settings (the launcher rewrites the game's own file at every start).
+- **OBS through its WebSocket server** (Stream → OBS, optional, #65): Lockpick records each run, adds chapter markers,
+  saves the replay buffer and switches to a "paused" scene itself, the same as the OBS script, so it works with OBS on
+  another PC (a streaming PC) or without installing the script. **Set up OBS** makes a "Lockpick" scene with the
+  widgets (and a Game Capture when OBS is on this PC). **Fill in from OBS on this PC** takes OBS's port and password;
+  the password is kept encrypted for your Windows account and never sent, only the answer to OBS's challenge. While
+  Lockpick drives this PC's OBS, the script leaves those parts to it (its hotkeys keep working).
 
 ### Changed
 - **One page for running:** Challenges is now a tab on the Runs page. Starting a challenge switches to the splits, with
@@ -21,6 +27,9 @@ All notable changes to this project are documented here. The format follows
   then item names; splits left without a rule are listed above the timer with a way to fix them.
 
 ### Fixed
+- The OBS script no longer stops a recording you started yourself when a run ends, or the next attempt's recording
+  when you try again within the stop delay, and a run's first chapter marker is no longer lost when the script
+  starts the recording; its Game Capture finds the Japanese and Steam versions' executable too.
 - The game's own demo (left at the title) no longer starts an attempt, or an OBS recording.
 - The overlay shows one attempt number, the run's.
 

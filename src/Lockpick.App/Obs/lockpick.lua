@@ -2,7 +2,9 @@
 Lockpick for OBS (#66). Add it in OBS: Tools -> Scripts -> + -> this file (it ships next to Lockpick.exe).
 
 Lockpick writes two files for it in %LOCALAPPDATA%\Lockpick\obs (OBS's Lua has no network):
-  connection.json - the API's port and token: "Add Lockpick to this scene" makes the browser sources with them
+  connection.json - the API's port and token: "Add Lockpick to this scene" makes the browser sources with them;
+                    "websocket": true while Lockpick drives this OBS through its WebSocket server (Stream -> OBS),
+                    when the script leaves recording, chapters, the replay buffer and the scene to Lockpick
   events.txt      - one line per moment: time-ms <TAB> kind <TAB> detail
                     (run-start, split, run-end, finished, new-best, death, challenge-fail, game-active, game-inactive)
 and reads one the script writes:
@@ -17,8 +19,11 @@ obs = obslua
 local folder = (os.getenv("LOCALAPPDATA") or "") .. "\\Lockpick\\obs\\"
 local options = {}
 local offset = nil          -- how far events.txt has been read (nil: not yet opened; start at its end)
-local stop_pending = false
+local run = 0               -- counts runs: a stop still waiting from the run before isn't this one's
+local started_recording = false -- the recording is the script's (one the player started is left alone)
 local scene_before_pause = nil
+local pending_chapter = nil -- the run's chapter, waiting for the recording just started to run (a few ticks at most)
+local pending_ticks = 0
 
 -- OBS hotkeys for Lockpick's own actions (bound in OBS: Settings -> Hotkeys, "Lockpick: ...").
 local hotkeys = {
@@ -66,6 +71,8 @@ local function connection()
     port = obs.obs_data_get_int(data, "port"),
     token = obs.obs_data_get_string(data, "token"),
     livesplit = obs.obs_data_get_bool(data, "livesplit"),
+    websocket = obs.obs_data_get_bool(data, "websocket"),
+    executable = obs.obs_data_get_string(data, "executable"),
   }
   obs.obs_data_release(data)
   return c
@@ -110,12 +117,13 @@ local function save_replay()
 end
 
 local function stop_recording_later()
-  if stop_pending then return end
-  stop_pending = true
+  local this_run = run
   obs.timer_add(function()
     obs.remove_current_callback()
-    stop_pending = false
-    if obs.obs_frontend_recording_active() then obs.obs_frontend_recording_stop() end
+    if this_run == run and started_recording then
+      started_recording = false
+      if obs.obs_frontend_recording_active() then obs.obs_frontend_recording_stop() end
+    end
   end, math.max(0, options.stop_delay) * 1000)
 end
 
@@ -138,8 +146,16 @@ end
 local function on_event(e)
   local k = e.kind
   if k == "run-start" then
-    if options.record_with_runs and not obs.obs_frontend_recording_active() then obs.obs_frontend_recording_start() end
-    chapter("Run: " .. e.detail)
+    run = run + 1
+    if options.record_with_runs and not started_recording and not obs.obs_frontend_recording_active() then
+      obs.obs_frontend_recording_start()
+      started_recording = true
+      -- The recording starts a moment later, and a chapter before then is lost: tick adds it once it runs.
+      pending_chapter = "Run: " .. e.detail
+      pending_ticks = 12
+    else
+      chapter("Run: " .. e.detail)
+    end
   elseif k == "split" then
     chapter(e.detail)
   elseif k == "death" then
@@ -155,7 +171,7 @@ local function on_event(e)
     chapter("Run finished: " .. e.detail)
   elseif k == "run-end" then
     chapter(e.detail)
-    if options.record_with_runs and obs.obs_frontend_recording_active() then stop_recording_later() end
+    if started_recording then stop_recording_later() end
   elseif k == "game-inactive" then
     if options.pause_scene_enabled and options.pause_scene ~= "" then
       local now = current_scene_name()
@@ -171,7 +187,20 @@ local function on_event(e)
 end
 
 local function tick()
-  for _, e in ipairs(new_events()) do on_event(e) end
+  if pending_chapter then
+    if obs.obs_frontend_recording_active() then
+      chapter(pending_chapter)
+      pending_chapter = nil
+    else
+      pending_ticks = pending_ticks - 1
+      if pending_ticks <= 0 then pending_chapter = nil end
+    end
+  end
+  local events = new_events()
+  if #events == 0 then return end
+  local c = connection()
+  if c and c.websocket then return end -- Lockpick does these itself through OBS's WebSocket
+  for _, e in ipairs(events) do on_event(e) end
 end
 
 -- ---------------------------------------------------------------- "Add Lockpick to this scene"
@@ -227,7 +256,8 @@ local function add_to_scene(props, prop)
   if options.add_game then
     local settings = obs.obs_data_create()
     obs.obs_data_set_string(settings, "capture_mode", "window")
-    obs.obs_data_set_string(settings, "window", "Resident Evil:RESIDENT EVIL:ResidentEvil.exe")
+    local exe = (c.executable ~= nil and c.executable ~= "") and c.executable or "ResidentEvil.exe"
+    obs.obs_data_set_string(settings, "window", "Resident Evil:RESIDENT EVIL:" .. exe)
     obs.obs_data_set_int(settings, "priority", 2) -- match the executable
     fit_to_canvas(add_source(scene, "game_capture", "Resident Evil (game)", settings, 0, 0), w, h)
     obs.obs_data_release(settings)

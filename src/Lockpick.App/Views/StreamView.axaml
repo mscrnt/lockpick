@@ -102,6 +102,63 @@
         </WrapPanel>
       </StackPanel>
     </Border>
+
+    <!-- Lockpick's own connection to OBS (its WebSocket server, #65) -->
+    <Border Classes="card" DataContext="{Binding Obs}">
+      <StackPanel Spacing="8" x:DataType="vm:ObsLinkViewModel">
+        <TextBlock Classes="caption" Text="OBS WEBSOCKET (OPTIONAL)" />
+        <TextBlock TextWrapping="Wrap" Foreground="{StaticResource LpMutedBrush}"
+                   Text="The script's automation from Lockpick's side, through OBS's WebSocket server: for OBS on another PC (a streaming PC), or without installing the script. While Lockpick is connected to OBS on this PC, the script leaves these to Lockpick (its hotkeys keep working), so nothing happens twice. In OBS: Tools → WebSocket Server Settings → Enable WebSocket server." />
+        <CheckBox Content="Connect to OBS" IsChecked="{Binding Enabled}" AutomationProperties.Name="Connect to OBS's WebSocket server" />
+        <WrapPanel ItemSpacing="8" LineSpacing="6">
+          <TextBlock Classes="label" Text="OBS on" VerticalAlignment="Center" />
+          <TextBox Text="{Binding Host}" Watermark="127.0.0.1 (this PC)" MinWidth="200" AutomationProperties.Name="The PC OBS runs on" />
+          <TextBlock Classes="label" Text="Port" VerticalAlignment="Center" />
+          <NumericUpDown Value="{Binding Port}" Minimum="1" Maximum="65535" Increment="1" FormatString="0" MinWidth="130"
+                         AutomationProperties.Name="OBS WebSocket port" />
+          <Button Content="Connect" Command="{Binding ConnectCommand}" />
+        </WrapPanel>
+        <WrapPanel ItemSpacing="8" LineSpacing="6">
+          <TextBox Text="{Binding PasswordInput}" PasswordChar="•" Watermark="OBS's WebSocket password" MinWidth="260"
+                   AutomationProperties.Name="OBS WebSocket password" />
+          <Button Content="Save password" Command="{Binding SavePasswordCommand}" Classes="accent" />
+          <Button Content="Remove password" Command="{Binding RemovePasswordCommand}" IsVisible="{Binding HasPassword}" />
+          <Button Content="Fill in from OBS on this PC" Command="{Binding FillFromObsCommand}"
+                  ToolTip.Tip="Reads the port and password from OBS's own settings on this PC" />
+        </WrapPanel>
+        <TextBlock Text="{Binding PasswordStatus}" TextWrapping="Wrap"
+                   IsVisible="{Binding PasswordStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        <TextBlock Text="{Binding Status}" TextWrapping="Wrap" Classes.warning="{Binding Problem}" />
+        <TextBlock Text="{Binding Note}" TextWrapping="Wrap" Classes="warning"
+                   IsVisible="{Binding Note, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+        <TextBlock Classes="label" Text="What Lockpick does in OBS" Margin="0,6,0,0" />
+        <CheckBox Content="Record each run (start with the run, stop when it ends)" IsChecked="{Binding RecordWithRuns}" />
+        <WrapPanel ItemSpacing="8" LineSpacing="6" IsEnabled="{Binding RecordWithRuns}">
+          <TextBlock Text="Keep recording after a run ends (seconds)" VerticalAlignment="Center" />
+          <NumericUpDown Value="{Binding StopDelay}" Minimum="0" Maximum="120" Increment="1" FormatString="0" MinWidth="110"
+                         AutomationProperties.Name="Seconds to keep recording after a run" />
+        </WrapPanel>
+        <CheckBox Content="Chapter markers at splits, deaths and fails (Hybrid MP4, OBS 30.2+)" IsChecked="{Binding Chapters}" />
+        <CheckBox Content="Save the replay buffer on a death" IsChecked="{Binding ReplayOnDeath}" />
+        <CheckBox Content="Save the replay buffer when a challenge fails" IsChecked="{Binding ReplayOnFail}" />
+        <CheckBox Content="Save the replay buffer on a new personal best" IsChecked="{Binding ReplayOnBest}" />
+        <WrapPanel ItemSpacing="8" LineSpacing="6">
+          <CheckBox Content="Switch scene while the game isn't in front:" IsChecked="{Binding PauseSceneEnabled}" />
+          <ComboBox ItemsSource="{Binding Scenes}" SelectedItem="{Binding PauseScene}" MinWidth="200" IsEnabled="{Binding PauseSceneEnabled}"
+                    AutomationProperties.Name="The paused scene" />
+        </WrapPanel>
+
+        <TextBlock Classes="label" Text="Lockpick scene" Margin="0,6,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{StaticResource LpMutedBrush}"
+                   Text="Makes a &quot;Lockpick&quot; scene in OBS with the widgets as browser sources and, for OBS on this PC, a Game Capture of the game. Sources already there keep where you put them. Needs Lockpick's API on (and, for OBS on another PC, allowed on your network)." />
+        <WrapPanel ItemSpacing="8" LineSpacing="6">
+          <Button Content="Set up OBS" Command="{Binding SetUpSceneCommand}" />
+        </WrapPanel>
+        <TextBlock Text="{Binding SetUpResult}" TextWrapping="Wrap"
+                   IsVisible="{Binding SetUpResult, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+      </StackPanel>
+    </Border>
     </StackPanel>
     </Panel>
   </ScrollViewer>

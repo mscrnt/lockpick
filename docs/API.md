@@ -73,6 +73,24 @@ challenge, toggle the overlay, change the map's view or zoom, or drop a capture 
 cheat. A popped-out widget
 window (Settings → Overlay → Pop out) can be captured with Window Capture too.
 
+`connection.json` also says `"websocket": true` while Lockpick drives this PC's OBS through its WebSocket server
+(below): the script then leaves recording, chapters, the replay buffer and the scene to Lockpick, and its hotkeys keep
+working. `"executable"` is the game's executable name (the running one, else the installed one), for the Game Capture.
+
+### Lockpick's OBS WebSocket connection
+
+Optional (Stream → OBS → OBS WebSocket, #65): Lockpick connects to the WebSocket server built into OBS 28+
+(obs-websocket 5, default port 4455; checked against OBS 32.2.2 / WebSocket 5.7.4) and does what the script does, from
+its side: `StartRecord` / `StopRecord` with runs (only a recording Lockpick started is stopped; a new attempt within
+the stop delay keeps it going), `CreateRecordChapter` at the same moments as the script, `SaveReplayBuffer` on the
+moments chosen, and `SetCurrentProgramScene` to the "paused" scene and back. **Set up OBS** makes a `Lockpick` scene
+(`CreateScene`, `CreateInput`, `SetSceneItemTransform`) with the same source names as the script's button; sources
+already there keep their place, only their address (and the game's executable) is updated. No OBS events are
+subscribed to. The password is kept with Windows DPAPI (`%LOCALAPPDATA%\Lockpick\secrets`, never in settings) and
+only the challenge answer is sent; **Fill in from OBS on this PC** reads OBS's own
+`%APPDATA%\obs-studio\plugin_config\obs-websocket\config.json` when pressed. For OBS on another PC, the widgets'
+address is this PC's on the network, so the API must allow other devices.
+
 Lockpick's in-game overlay (Settings → Overlay) is not part of any OBS capture — it's a window of its own on top of
 the game — so use these pages for the stream. Game Capture of the game works in every display mode
 ([DISPLAY.md](DISPLAY.md)).

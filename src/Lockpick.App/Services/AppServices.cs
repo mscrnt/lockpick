@@ -57,10 +57,13 @@ public sealed class AppServices : IAsyncDisposable
         RunLibrary = new RunLibrary(Runs, adapter, Runs.History!, settings, loggerFactory.CreateLogger("Runs"));
         LiveSplitEngine = new LiveSplitEngine(Runs, source, AppPaths.Runs, loggerFactory.CreateLogger("LiveSplitCore"), settings.Current.RunComparison);
         SpeedrunCom = new SpeedrunCom(Updates.CurrentVersion);
-        SpeedrunAccount = new SpeedrunAccount(SpeedrunCom, new SecretStore(AppPaths.Secrets), settings);
+        Secrets = new SecretStore(AppPaths.Secrets);
+        SpeedrunAccount = new SpeedrunAccount(SpeedrunCom, Secrets, settings);
         LiveSplit = new LiveSplitLink(Runs, source, settings.Current.LiveSplitMode, settings.Current.LiveSplitPort, loggerFactory.CreateLogger("LiveSplit"));
         LeaderboardGuard = new LeaderboardGuard(this, loggerFactory.CreateLogger("Leaderboard"));
+        Obs = new ObsLink(() => Settings.Current.Obs, () => Secrets.Load(ObsPasswordName), loggerFactory.CreateLogger("ObsWebSocket"));
         ObsEvents = new ObsEvents(this, loggerFactory.CreateLogger("Obs"));
+        ObsEvents.Happened += (_, moment) => Obs.Post(moment);
         SpeedrunCom.ShownChanged += (_, _) => LiveSplitEngine.SetRecord(SpeedrunCom.Shown?.Record is { } wr
             ? string.Create(System.Globalization.CultureInfo.InvariantCulture, $"{(int)wr.Time.TotalMinutes}:{wr.Time.Seconds:D2}.{wr.Time.Milliseconds / 100} {wr.Runner}")
             : null);
@@ -147,6 +150,20 @@ public sealed class AppServices : IAsyncDisposable
 
     /// <summary>The files Lockpick's OBS script reads (the API's address, the run's moments).</summary>
     public ObsEvents ObsEvents { get; }
+
+    /// <summary>The optional connection to OBS's WebSocket server (Stream → OBS): the script's automation from Lockpick's side.</summary>
+    public ObsLink Obs { get; }
+
+    /// <summary>The name OBS's WebSocket password is kept under in <see cref="Secrets"/>.</summary>
+    public const string ObsPasswordName = "obs-websocket-password";
+
+    /// <summary>Secrets kept encrypted for this Windows user (the speedrun.com key, OBS's password); never in settings.</summary>
+    public SecretStore Secrets { get; }
+
+    /// <summary>The game's executable name for OBS's Game Capture: the one running, else the installed one.</summary>
+    public string GameExecutableName() =>
+        Source.Status.Profile?.Executable.FileName
+        ?? (ResolveInstalledExecutable() is { } path ? Path.GetFileName(path) : "ResidentEvil.exe");
 
     /// <summary>Overlay widgets open in their own windows (pop-outs).</summary>
     public WidgetWindows WidgetWindows { get; } = new();
@@ -424,6 +441,7 @@ public sealed class AppServices : IAsyncDisposable
         }
 
         ObsEvents.Dispose();
+        Obs.Dispose();
         Challenges.Dispose();
         LiveSplit.Dispose();
         LiveSplitEngine.Dispose();

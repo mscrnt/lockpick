@@ -18,7 +18,7 @@ Status legend: ✅ done and verified · 🟡 done, partially verified · ⬜ not
 | 0.2.0 | Core trainer (Trainer Mode, HP/ammo/inventory, hotkeys), Challenges tab, API for other tools, branding | ✅ released 2026-10-15 |
 | 0.3.0 | Play and stream with one app: overlay, runs (timer, splits, LiveSplit), OBS sources, training captures | 🟡 released 2026-10-16 (live checks pending) |
 | 0.3.1 | Every PC version runners use: the Japanese game with Classic REbirth, GOG's Japanese release (Steam and emulators to follow) | ✅ released 2026-10-17 (Steam and EMU next) |
-| 0.3.2 | OBS WebSocket automation and keep-running | ⬜ |
+| 0.3.2 | OBS WebSocket automation and keep-running | 🟡 OBS WebSocket done 2026-10-26 (checked in OBS here and on another PC, and from the app); keep-running next |
 | 0.4.0 | Room, camera, item and enemy database | ⬜ |
 | 0.5.0 | Object highlighting and ESP | ⬜ |
 | 0.6.0 | Advanced trainer and gameplay manipulation | ⬜ |
@@ -332,7 +332,27 @@ MediaKite game with Classic REbirth; GOG and Steam are allowed (docs/COMPATIBILI
 
 - **OBS WebSocket (optional, for setups the script can't cover, e.g. OBS on another PC; the password kept with
   Windows DPAPI):** the same automation as `lockpick.lua` from Lockpick's side — scene setup, recording with runs,
-  chapters (`CreateRecordChapter`), replay buffer, the "paused" scene.
+  chapters (`CreateRecordChapter`), replay buffer, the "paused" scene. **Done 2026-10-26 (#65):** `ObsWebSocket`
+  (obs-websocket 5 client: Hello / Identify with the challenge answer / requests) and `ObsLink` (the script's
+  on_event, plus "Set up OBS": a Lockpick scene with the widgets and, for OBS on this PC, a Game Capture; for OBS on
+  another PC the widgets use this PC's address and need the API open to the network). Stream → OBS → OBS WebSocket;
+  "Fill in from OBS on this PC" reads OBS's own port and password. While it drives this PC's OBS, the script stands
+  aside (`websocket` in connection.json) so nothing happens twice. Tests against a stand-in server (handshake,
+  wrong password, recording, chapters, replay buffer, paused scene, set-up). **Live 2026-10-26 against OBS 32.2.2 /
+  WebSocket 5.7.4 on the owner's PC** (ObsLink driven with the run's moments by hand): the wrong password refused,
+  "Set up OBS" made the Lockpick scene from the script's sources, the recording started with the run and stopped 2 s
+  after it ended, the "paused" scene and back, and the Hybrid MP4 held the chapters (Run, split, Death, end; ffprobe).
+  Found there: StartRecord answers before the recording runs, so the run's chapter was refused — both Lockpick and
+  the script now wait for it. **OBS on another PC, live 2026-10-26:** OBS 29.1.3 / WebSocket 5.2.3 in a container on
+  the owner's server: seen as another PC, set-up refused while the API is this-PC-only and otherwise made the scene
+  without a Game Capture, the widgets at this PC's LAN address; recording and the paused scene worked; that OBS has
+  no chapters (no CreateRecordChapter before WebSocket 5.5) and no replay buffer, and each is noted once in the card
+  while the rest goes on. Replay buffer, live here 2026-10-26: a death, a failed challenge and a new best each saved
+  a replay (three files); a buffer turned on but not started is noted once in the card (the script stays silent).
+  In the app, 2026-10-26: the owner connected from Stream → OBS to the local OBS and to the server's (password saved
+  by Connect), and Set up OBS completed the scene on both; the server's browser sources reached Lockpick's API over
+  the network (firewall allowed). **Not yet seen:** the widgets drawn in the other PC's OBS during gameplay, and the
+  card's automation with real game events (a run, a split, a death) rather than moments sent by hand.
 - **Keep the game running when it isn't the active window** (opt-in, Trainer Mode only, never in challenges; the
   in-process focus patch `0x44126B`, MEMORY_MAP "Focus and input"; chosen by the owner 2026-10-13) — the alternative
   to the OBS "paused" scene for people who aren't running a challenge.

@@ -25,6 +25,7 @@ public sealed class ObsEvents : IDisposable
     private readonly Timer _timer;
     private bool? _gameActive;
     private long _commandsRead;
+    private bool _websocketWritten;
 
     /// <summary>What an OBS hotkey may ask for (the same actions as Lockpick's own keys; no cheats).</summary>
     private static readonly HashSet<string> Commands =
@@ -50,6 +51,7 @@ public sealed class ObsEvents : IDisposable
         }
 
         WriteConnection();
+        services.Obs.StatusChanged += OnObsStatus;
         services.Runs.EventRaised += OnRunEvent;
         services.Runs.AttemptEnded += OnAttemptEnded;
         services.Runs.Died += OnDied;
@@ -59,6 +61,9 @@ public sealed class ObsEvents : IDisposable
 
     /// <summary>Where the files are (the script finds them in %LOCALAPPDATA%\Lockpick\obs).</summary>
     public string Directory { get; }
+
+    /// <summary>Each moment as it is written to events.txt (Lockpick's WebSocket link to OBS acts on the same ones).</summary>
+    public event EventHandler<ObsMoment>? Happened;
 
     /// <summary>Writes connection.json again (the API was switched on or off, or its port or token changed).</summary>
     public void WriteConnection()
@@ -75,6 +80,10 @@ public sealed class ObsEvents : IDisposable
                 version = _services.AppVersion,
                 events = Path.Combine(Directory, "events.txt"),
                 livesplit = _services.LiveSplitEngine.Available,
+                // Lockpick drives this PC's OBS through its WebSocket: the script leaves recording, chapters, the replay
+                // buffer and the scene to it (its hotkeys still work), so nothing is done twice.
+                websocket = _services.Obs.Connected && _services.Obs.ThisPc,
+                executable = _services.GameExecutableName(),
             };
             File.WriteAllText(Path.Combine(Directory, "connection.json"), JsonSerializer.Serialize(connection, Json));
         }
@@ -87,10 +96,21 @@ public sealed class ObsEvents : IDisposable
     public void Dispose()
     {
         _timer.Dispose();
+        _services.Obs.StatusChanged -= OnObsStatus;
         _services.Runs.EventRaised -= OnRunEvent;
         _services.Runs.AttemptEnded -= OnAttemptEnded;
         _services.Runs.Died -= OnDied;
         _services.Challenges.EventRaised -= OnChallengeEvent;
+    }
+
+    private void OnObsStatus(object? sender, EventArgs e)
+    {
+        var driving = _services.Obs.Connected && _services.Obs.ThisPc;
+        if (driving != _websocketWritten)
+        {
+            _websocketWritten = driving;
+            WriteConnection();
+        }
     }
 
     private void OnRunEvent(object? sender, GameEvent e)
@@ -202,7 +222,12 @@ public sealed class ObsEvents : IDisposable
         }
     }
 
-    private void Add(string kind, string detail) => Write(truncate: false, $"{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(CultureInfo.InvariantCulture)}\t{kind}\t{detail.Replace('\t', ' ').Replace('\n', ' ')}");
+    private void Add(string kind, string detail)
+    {
+        detail = detail.Replace('\t', ' ').Replace('\n', ' ');
+        Write(truncate: false, $"{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(CultureInfo.InvariantCulture)}\t{kind}\t{detail}");
+        Happened?.Invoke(this, new ObsMoment(kind, detail));
+    }
 
     private void Write(bool truncate, string? line)
     {

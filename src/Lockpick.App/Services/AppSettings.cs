@@ -28,7 +28,7 @@ public static class AppPaths
     /// <summary>Every run attempt, a JSON-lines file per split set.</summary>
     public static string Runs => Path.Combine(DataRoot, "runs");
 
-    /// <summary>Secrets (the speedrun.com API key), each encrypted for the Windows user (DPAPI); never in settings.</summary>
+    /// <summary>Secrets (the speedrun.com API key, OBS's WebSocket password), each encrypted for the Windows user (DPAPI); never in settings.</summary>
     public static string Secrets => Path.Combine(DataRoot, "secrets");
 }
 
@@ -122,6 +122,9 @@ public sealed record AppSettings
 
     /// <summary>LiveSplit's TCP server port (its default).</summary>
     public int LiveSplitPort { get; init; } = 16834;
+
+    /// <summary>The connection to OBS's WebSocket server and what Lockpick does there (Stream → OBS); its password is a secret.</summary>
+    public ObsSettings Obs { get; init; } = new();
 
     /// <summary>Lockpick's window per monitor setup (the screens' layout → where the window was), #63.</summary>
     public IReadOnlyDictionary<string, WindowPlacement> WindowPlacements { get; init; } = new Dictionary<string, WindowPlacement>();

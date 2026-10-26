@@ -92,7 +92,8 @@ It never changes your game files. It only changes the running game if you switch
 - **Keep the game clean:** pop any widget out into its own window, or show them all on the Stream page instead.
 - **OBS:** every widget can be its own OBS source. Lockpick's OBS script adds them with one click, records each run,
   adds chapter markers at splits and deaths, saves your replay buffer on a death or a new best, switches to a
-  "paused" scene when the game isn't in front, and gives you OBS hotkeys for Lockpick.
+  "paused" scene when the game isn't in front, and gives you OBS hotkeys for Lockpick. Or Lockpick does the same
+  through OBS's WebSocket server, for OBS on another PC too.
 - **Streamer mode** blurs file paths and other private details if you show Lockpick's window on stream.
 
 **Also new:** a death counter, sounds when you fail a challenge or die (Windows sounds or your own), every page

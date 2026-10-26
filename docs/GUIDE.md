@@ -143,6 +143,15 @@ The overlay is drawn over the game on your screen, so OBS doesn't see it. For yo
   Lockpick (OBS Settings → Hotkeys, "Lockpick: …"): split, undo, skip, reset, try again, the overlay and the map.
   For chapter markers, set OBS *Settings → Output → Recording → Recording Format* to **Hybrid MP4**: plain MP4 and
   MKV recordings get no chapters.
+- **Lockpick's own OBS connection** (Stream → *OBS* → *OBS WebSocket*, optional): the same as the script, done from
+  Lockpick through OBS's WebSocket server, so it also works with OBS on another PC (a streaming PC). In OBS, turn on
+  *Tools → WebSocket Server Settings → Enable WebSocket server*; in Lockpick, tick **Connect to OBS** and press
+  **Fill in from OBS on this PC** (or type the other PC's address, the port and the password from *Show Connect
+  Info*). Pick what Lockpick does (the same options as the script), and **Set up OBS** makes a "Lockpick" scene with
+  the widgets (and a Game Capture of the game when OBS is on this PC). For OBS on another PC, allow other devices on
+  your network in Lockpick's API settings so it can show the widgets. The password is kept encrypted for your Windows
+  account. If you also use the script on this PC, it leaves these to Lockpick while Lockpick is connected; its
+  hotkeys keep working.
 - **Window Capture** of a popped-out widget window works too (use its green background with a chroma key).
 - **Streamer mode** (Settings → General) blurs file paths, process ids and the API token in Lockpick's window, if you
   show the app on stream.
