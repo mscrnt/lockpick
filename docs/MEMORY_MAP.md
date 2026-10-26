@@ -231,8 +231,19 @@ Y status `0x800`, Back options `0x900`, RT aim `0x08`, d-pad and left stick move
 stick clicks unmapped. **The game finds controllers only at startup** — a pad plugged in later is ignored. The keyboard
 map at `0xAC4030` is rewritten ~2 s after launch with the player's table (and presumably on save load).
 
+**Keep-running in the app (#21, 2026-10-26) is data-only, no code patch:** while the game isn't the active window,
+Lockpick holds `windowFocused` (`0x4BCB2C`) at 1 and blanks the keyboard map (`keyMap0`-`keyMap7`, `0xAC4030`, 32
+bytes); the player's map goes back when the game is in front and whenever the feature ends (Trainer → Cheats; both are
+profile fields with `anyTime` write bounds, so it works at the title too). The main loop polls messages with
+`PeekMessageA` and never waits (0x441D71-0x441EA3), so the flag alone restarts it. **Live 2026-10-26 (GOG English,
+owner):** in the background the flag read 0 and the timer stood still; after 1 was written the timer ran at 30 ticks a
+second, the picture moving, no sound (WM_ACTIVATE pauses the game's sounds; DirectSound mutes unfocused buffers). With
+the map intact the game read A typed in Notepad (input word `0x1000`, Jill moved); blanked, nothing. In the app the
+switch held the flag within half a second of each focus loss, put the map back on each return and when switched off,
+and A in Notepad did nothing. The Japanese builds have the fields at `0x4B3274` / `0x4CFD40` (cross-mapped, static).
+
 Planned patches (Trainer Mode, opt-in, reversible, read back, never in Challenge Mode):
-- **Keep running unfocused:** `0x44126B` `C7 05 2C CB 4B 00 00 00 00 00` → `E9 C6 00 00 00 90 90 90 90 90`
+- **Keep running unfocused (the code-patch variant; not used, the app's is data-only above):** `0x44126B` `C7 05 2C CB 4B 00 00 00 00 00` → `E9 C6 00 00 00 90 90 90 90 90`
   (`WM_ACTIVATE` goes straight to `DefWindowProcA`; the flag stays 1, sounds aren't paused). Data-only alternative:
   write 1 to `0x4BCB2C` after each deactivation. **Live 2026-10-14 (dev harness `--background`):** with the patch,
   the flag set to 1 and the key map blanked, the game ran with another window in front, read every controller input

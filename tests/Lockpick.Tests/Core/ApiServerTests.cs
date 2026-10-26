@@ -231,6 +231,10 @@ public sealed class ApiServerTests : IAsyncLifetime
 
         public Func<GameSnapshot, IReadOnlyList<FieldWrite>> CreateInfiniteAmmoRule() => _ => [];
 
+        public IReadOnlyList<string> KeepRunningFields => [];
+
+        public TrainerRule CreateKeepRunningRule(Func<bool> inFront) => new("Keep running", _ => []);
+
         public IReadOnlyList<GivableItem> GivableItems => [];
 
         public bool HasQuantity(int itemId) => false;

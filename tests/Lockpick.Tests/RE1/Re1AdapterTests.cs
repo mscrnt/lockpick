@@ -362,7 +362,7 @@ public class Re1AdapterTests
     public void Fields_are_read_in_a_few_block_reads_when_memory_is_mapped()
     {
         // Real process memory is fully mapped; make the fake contiguous over the field clusters.
-        foreach (var (start, end) in new (ulong, ulong)[] { (0xBE41C0, 0xBE41F0), (0xBE62E0, 0xBE9960), (0xD22730, 0xD22780) })
+        foreach (var (start, end) in new (ulong, ulong)[] { (0x4BCB2C, 0x4BCB30), (0xAC4030, 0xAC4050), (0xBE41C0, 0xBE41F0), (0xBE62E0, 0xBE9960), (0xD22730, 0xD22780) })
         {
             _memory.Write(start, new byte[end - start]);
         }
@@ -374,8 +374,9 @@ public class Re1AdapterTests
 
         // A few block reads for the fields, plus - once a second - the room's placed items (the action table; the fake
         // has no entries, so no record reads), the inventory (pointer, held count, slots) and the item box, and one
-        // block for the enemy/NPC slots.
-        Assert.InRange(session.LastReadCalls, 1, 10);
+        // block for the enemy/NPC slots. Two of the field blocks are keep-running's: the window's focus flag and the
+        // keyboard map, each far from the other fields.
+        Assert.InRange(session.LastReadCalls, 1, 12);
         Assert.Equal(new Health(140, 140), s.Health.Value);
         Assert.Equal("106", s.Location.Value.Id);
         Assert.Equal(0x0F02, s.RawFields["inv1"].Value);

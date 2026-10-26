@@ -16,7 +16,8 @@ namespace Lockpick.Core.Trainer;
 /// <item>Every write names a profile field that is runtime-verified and declares bounds (<see cref="WriteSpec"/>), is
 /// checked against them (and against another field's live value, e.g. HP ≤ max HP), is read back, and is logged with
 /// the old and new value.</item>
-/// <item>Locks and rules (infinite ammo) are re-applied on each poll while the player is in a game.</item>
+/// <item>Locks and rules (infinite ammo) are re-applied on each poll while the player is in a game; a rule may also
+/// apply outside it (keep-running) and put the game back when it ends.</item>
 /// <item>A run (from a new game or a loaded save) that the trainer changed raises <see cref="RunInvalidated"/> once.</item>
 /// </list>
 /// </summary>
@@ -28,7 +29,7 @@ public sealed class TrainerService : IDisposable
     private readonly TimeProvider _time;
     private readonly object _gate = new();
     private readonly Dictionary<string, long> _locks = new(StringComparer.OrdinalIgnoreCase);
-    private readonly Dictionary<string, (string Name, Func<GameSnapshot, IReadOnlyList<FieldWrite>> Rule)> _rules = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, TrainerRule> _rules = new(StringComparer.Ordinal);
     private IProcessWriter? _writer;
     private VersionProfile? _profile;
     private int? _processId;
@@ -106,16 +107,19 @@ public sealed class TrainerService : IDisposable
                 return;
             }
 
-            Mode = mode;
             if (mode != TrainerMode.Trainer)
             {
-                // Leaving Trainer Mode stops everything that writes; nothing is carried over.
+                // Leaving Trainer Mode stops everything that writes; nothing is carried over. Rules put the game back
+                // first, while the write handle is still open.
+                RestoreRules(TrainerSource.User);
+                Mode = mode;
                 _locks.Clear();
                 _rules.Clear();
                 CloseWriter();
             }
             else
             {
+                Mode = mode;
                 OpenWriter();
             }
 
@@ -177,17 +181,26 @@ public sealed class TrainerService : IDisposable
     /// Turns on a rule (e.g. infinite ammo): on every poll in a game, <paramref name="rule"/> says which fields to write.
     /// Refused unless Trainer Mode is on with write access.
     /// </summary>
-    public TrainerAction SetRule(string id, string name, Func<GameSnapshot, IReadOnlyList<FieldWrite>> rule, TrainerSource source = TrainerSource.User)
+    public TrainerAction SetRule(string id, string name, Func<GameSnapshot, IReadOnlyList<FieldWrite>> rule, TrainerSource source = TrainerSource.User) =>
+        SetRule(id, new TrainerRule(name, rule), source);
+
+    /// <summary>Turns on a rule; one already on under <paramref name="id"/> puts the game back first and is replaced.</summary>
+    public TrainerAction SetRule(string id, TrainerRule rule, TrainerSource source = TrainerSource.User)
     {
         TrainerAction result;
         lock (_gate)
         {
             var refusal = WriteRefusal();
-            result = new TrainerAction(_time.GetUtcNow(), $"{name} on", null, null, null, source,
+            result = new TrainerAction(_time.GetUtcNow(), $"{rule.Name} on", null, null, null, source,
                 refusal is null ? TrainerResult.Applied : TrainerResult.Refused, refusal);
             if (refusal is null)
             {
-                _rules[id] = (name, rule);
+                if (_rules.TryGetValue(id, out var before))
+                {
+                    Restore(before, source);
+                }
+
+                _rules[id] = rule;
             }
 
             Record(result);
@@ -203,6 +216,7 @@ public sealed class TrainerService : IDisposable
         {
             if (_rules.Remove(id, out var removed))
             {
+                Restore(removed, source);
                 Record(new TrainerAction(_time.GetUtcNow(), $"{removed.Name} off", null, null, null, source, TrainerResult.Applied));
             }
         }
@@ -223,6 +237,7 @@ public sealed class TrainerService : IDisposable
         _source.EventRaised -= OnEvent;
         lock (_gate)
         {
+            RestoreRules(TrainerSource.User); // Lockpick closing: the game goes back to how it was
             CloseWriter();
         }
     }
@@ -264,25 +279,31 @@ public sealed class TrainerService : IDisposable
         lock (_gate)
         {
             _latest = snapshot;
-            if (_writer is null || Mode != TrainerMode.Trainer || snapshot.InGameplay is not { HasValue: true, Value: true })
+            if (_writer is null || Mode != TrainerMode.Trainer)
             {
                 return;
             }
 
+            var inGame = snapshot.InGameplay is { HasValue: true, Value: true };
             foreach (var (field, value) in _locks)
             {
-                if (Raw(snapshot, field) is { } current && current != value)
+                if (inGame && Raw(snapshot, field) is { } current && current != value)
                 {
                     WriteCore(field, value, TrainerSource.Lock, "Lock held");
                     changed = true;
                 }
             }
 
-            foreach (var (_, (name, rule)) in _rules)
+            foreach (var rule in _rules.Values)
             {
-                foreach (var write in rule(snapshot))
+                if (!inGame && !rule.OutsideGameplay)
                 {
-                    WriteCore(write.Field, write.Value, TrainerSource.Rule, name);
+                    continue;
+                }
+
+                foreach (var write in rule.Writes(snapshot))
+                {
+                    WriteCore(write.Field, write.Value, TrainerSource.Rule, rule.Name);
                     changed = true;
                 }
             }
@@ -330,7 +351,7 @@ public sealed class TrainerService : IDisposable
             return Refuse($"{field} can't be written (not a verified, writable field of this game build)");
         }
 
-        if (_latest?.InGameplay is not { HasValue: true, Value: true })
+        if (!bounds.AnyTime && _latest?.InGameplay is not { HasValue: true, Value: true })
         {
             return Refuse("not in a game");
         }
@@ -388,6 +409,28 @@ public sealed class TrainerService : IDisposable
         }
 
         return applied;
+    }
+
+    /// <summary>Puts back what each rule changed (before the write handle closes).</summary>
+    private void RestoreRules(TrainerSource source)
+    {
+        foreach (var rule in _rules.Values)
+        {
+            Restore(rule, source);
+        }
+    }
+
+    private void Restore(TrainerRule rule, TrainerSource source)
+    {
+        if (rule.Restore is not { } restore || _writer is null || Mode != TrainerMode.Trainer)
+        {
+            return;
+        }
+
+        foreach (var write in restore())
+        {
+            WriteCore(write.Field, write.Value, source, $"{rule.Name} off: put back");
+        }
     }
 
     private TrainerAction Record(TrainerAction action)

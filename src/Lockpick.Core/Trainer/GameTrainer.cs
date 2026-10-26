@@ -21,6 +21,16 @@ public interface IGameTrainer
     /// </summary>
     Func<GameSnapshot, IReadOnlyList<FieldWrite>> CreateInfiniteAmmoRule();
 
+    /// <summary>The fields keep-running writes: it is offered only where the profile has them all writable.</summary>
+    IReadOnlyList<string> KeepRunningFields { get; }
+
+    /// <summary>
+    /// A rule that keeps the game running while it isn't the active window (<paramref name="inFront"/> says whether it
+    /// is) and keeps keys typed in other windows away from it; it puts the game's own state back when the window is in
+    /// front again and when the rule ends. Each rule keeps its own memory, so create a new one each time.
+    /// </summary>
+    TrainerRule CreateKeepRunningRule(Func<bool> inFront);
+
     /// <summary>Items the player can be given (through <see cref="AddToStorage"/>), by id, with their names.</summary>
     IReadOnlyList<GivableItem> GivableItems { get; }
 

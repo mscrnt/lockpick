@@ -18,7 +18,7 @@ Status legend: ✅ done and verified · 🟡 done, partially verified · ⬜ not
 | 0.2.0 | Core trainer (Trainer Mode, HP/ammo/inventory, hotkeys), Challenges tab, API for other tools, branding | ✅ released 2026-10-15 |
 | 0.3.0 | Play and stream with one app: overlay, runs (timer, splits, LiveSplit), OBS sources, training captures | 🟡 released 2026-10-16 (live checks pending) |
 | 0.3.1 | Every PC version runners use: the Japanese game with Classic REbirth, GOG's Japanese release (Steam and emulators to follow) | ✅ released 2026-10-17 (Steam and EMU next) |
-| 0.3.2 | OBS WebSocket automation and keep-running | 🟡 OBS WebSocket done 2026-10-26 (checked in OBS here and on another PC, and from the app); keep-running next |
+| 0.3.2 | OBS WebSocket automation and keep-running (and Steam's English and Japanese releases) | ✅ released 2026-10-26 (keep-running on GOG English; other builds after their live checks) |
 | 0.4.0 | Room, camera, item and enemy database | ⬜ |
 | 0.5.0 | Object highlighting and ESP | ⬜ |
 | 0.6.0 | Advanced trainer and gameplay manipulation | ⬜ |
@@ -353,9 +353,15 @@ MediaKite game with Classic REbirth; GOG and Steam are allowed (docs/COMPATIBILI
   by Connect), and Set up OBS completed the scene on both; the server's browser sources reached Lockpick's API over
   the network (firewall allowed). **Not yet seen:** the widgets drawn in the other PC's OBS during gameplay, and the
   card's automation with real game events (a run, a split, a death) rather than moments sent by hand.
-- **Keep the game running when it isn't the active window** (opt-in, Trainer Mode only, never in challenges; the
-  in-process focus patch `0x44126B`, MEMORY_MAP "Focus and input"; chosen by the owner 2026-10-13) — the alternative
-  to the OBS "paused" scene for people who aren't running a challenge.
+- **Keep the game running when it isn't the active window** (opt-in, Trainer Mode only, never in challenges; chosen
+  by the owner 2026-10-13) — the alternative to the OBS "paused" scene for people who aren't running a challenge.
+  **Done 2026-10-26 (#21), data-only instead of the code patch:** a trainer rule holds the game's focus flag at 1 and
+  blanks its keyboard map while it is in the background, and puts the map back when it's in front and whenever the
+  rule ends (switched off, a challenge or leaderboard run, Lockpick closing); rules can now restore and run outside
+  gameplay (`anyTime` write bounds). Live on GOG English with the owner (MEMORY_MAP "Focus and input"): the game ran
+  in the background with the picture moving and no sound, and A typed in Notepad didn't reach it. Not yet checked:
+  a controller in the background through the app (the dev harness showed it 2026-10-14), and the other builds — the
+  fields reached every port (static) and the switch says "not checked" there until each gets a live check.
 
 Known HUD data (already understood, read-only) for sprint 2 and #42:
 - HP status as the game rates it — Jill Fine 73–96 / Caution 25–48 / Danger 0–24, Chris 106 / 36 / 0

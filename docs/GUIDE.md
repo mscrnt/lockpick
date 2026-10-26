@@ -107,6 +107,12 @@ inventory. Cheats are off every time Lockpick starts, every change is checked an
 changes is marked as such, and nothing can be changed while a challenge runs. Keys and controller buttons for the
 common cheats are in Settings → Hotkeys.
 
+**Keep the game running when it isn't in front** (*In the background*): the game normally pauses, and goes black in
+OBS, when you click another window. With this on it keeps playing behind other windows, and keys you type there don't
+reach it; your controller still does. The game is silent in the background (it mutes itself). It goes off for a
+challenge or a leaderboard run and when Lockpick closes, and your keyboard is put back each time the game comes to
+the front. So far it's checked on GOG's English release; on other versions the switch says it isn't checked yet.
+
 ## The overlay and its widgets
 
 Settings → *Overlay*: **Overlay on** shows widgets on top of the game's picture. Clicks go through them and they never

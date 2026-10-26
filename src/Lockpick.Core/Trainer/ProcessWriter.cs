@@ -1,4 +1,5 @@
 using Lockpick.Core.Memory;
+using Lockpick.Core.State;
 
 namespace Lockpick.Core.Trainer;
 
@@ -88,6 +89,22 @@ public sealed record TrainerAction(
 public static class TrainerRules
 {
     public const string InfiniteAmmo = "infinite-ammo";
+
+    public const string KeepRunning = "keep-running";
+}
+
+/// <summary>
+/// A trainer feature that writes on every poll (<see cref="TrainerService.SetRule(string, TrainerRule, TrainerSource)"/>):
+/// <paramref name="Writes"/> says which fields the latest snapshot calls for (none when the game is already right).
+/// </summary>
+public sealed record TrainerRule(string Name, Func<GameSnapshot, IReadOnlyList<FieldWrite>> Writes)
+{
+    /// <summary>Also applies outside gameplay (at the title, in menus); its fields must allow it (<see cref="Profiles.WriteSpec.AnyTime"/>).</summary>
+    public bool OutsideGameplay { get; init; }
+
+    /// <summary>The writes that put the game back when the rule ends: switched off, Trainer Mode left (a challenge, a
+    /// leaderboard run) or Lockpick closing.</summary>
+    public Func<IReadOnlyList<FieldWrite>>? Restore { get; init; }
 }
 
 /// <summary>One field value a trainer feature wants written.</summary>

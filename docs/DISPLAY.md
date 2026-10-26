@@ -72,15 +72,15 @@ The game draws through GOG's DirectDraw wrapper (`ddraw.dll`), configured by `dx
 
 ## Focus: the game pauses when it isn't the active window
 
-Without the focus patch (MEMORY_MAP "Focus and input"; the dev harness applies it, the app does not yet), clicking
+Without keep-running (Trainer → Cheats since 0.3.2, data-only; MEMORY_MAP "Focus and input"), clicking
 another window **pauses the game and blacks out its window** — both a window grab and a screen grab of it are black —
 until it is active again. Measured in windowed 1280×720 and 1920×1080. Consequences for 0.3.0:
 
 - **Every OBS capture breaks while the game is inactive:** measured windowed 1920×1080 with OBS — focused, Game
   Capture and both Window Captures show the game; after clicking another window, Window Capture (WGC and BitBlt)
   is black and Game Capture has no frame to render (the game stops presenting). Streamers who click into OBS,
-  Lockpick or a browser lose the picture until they click back. The planned opt-in keep-running patch (Trainer Mode
-  only, never in challenges) avoids it; challenge runners need to keep the game focused.
+  Lockpick or a browser lose the picture until they click back. The opt-in keep-running switch (Trainer Mode only,
+  never in challenges) avoids it; challenge runners need to keep the game focused.
 - With the patch the game kept running and rendering behind other windows; window capture kept working.
 
 ## Capture

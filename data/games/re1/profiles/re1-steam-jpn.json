@@ -365,6 +365,124 @@
       ]
     },
     {
+      "name": "windowFocused",
+      "address": "0x4B3274",
+      "type": "u32",
+      "description": "The game's only 'window focused' flag (decomp g_bWindowFocused): WM_ACTIVATE clears it when the window loses focus and sets it when it comes back, and the main loop skips the game (input, logic, drawing) while it is 0 - the original pause in the background. Keep-running (Trainer Mode) holds it at 1 while the game isn't in front.",
+      "verification": "static",
+      "evidence": "Cross-mapped from re1-gog-jpn-hotfix4 (0x4B3274) by tools/re1/xmap.py: 4 of 4 code sites that use it there are found here and use 0x4B3274 at the same instruction.",
+      "sources": [
+        "static cross-map from re1-gog-jpn-hotfix4",
+        "re1-gog-jpn-hotfix4: static cross-map from re1-gog-usa-hotfix4",
+        "re1-gog-jpn-hotfix4: re1-gog-usa-hotfix4: static analysis of this executable",
+        "re1-gog-jpn-hotfix4: re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp g_bWindowFocused"
+      ]
+    },
+    {
+      "name": "keyMap0",
+      "address": "0x4CFD40",
+      "type": "u32",
+      "description": "The keyboard map, bytes 0-3 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
+      "verification": "static",
+      "evidence": "Cross-mapped from re1-gog-jpn-hotfix4 (0x4CFD40) by tools/re1/xmap.py: 6 of 8 code sites that use it there are found here and use 0x4CFD40 at the same instruction.",
+      "sources": [
+        "static cross-map from re1-gog-jpn-hotfix4",
+        "re1-gog-jpn-hotfix4: static cross-map from re1-gog-usa-hotfix4",
+        "re1-gog-jpn-hotfix4: re1-gog-usa-hotfix4: static analysis of this executable"
+      ]
+    },
+    {
+      "name": "keyMap1",
+      "address": "0x4CFD44",
+      "type": "u32",
+      "description": "The keyboard map, bytes 4-7 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
+      "verification": "static",
+      "evidence": "Cross-mapped from re1-gog-jpn-hotfix4 (0x4CFD44) by tools/re1/xmap.py: 4 of 4 code sites that use it there are found here and use 0x4CFD44 at the same instruction.",
+      "sources": [
+        "static cross-map from re1-gog-jpn-hotfix4",
+        "re1-gog-jpn-hotfix4: static cross-map from re1-gog-usa-hotfix4",
+        "re1-gog-jpn-hotfix4: re1-gog-usa-hotfix4: static analysis of this executable"
+      ]
+    },
+    {
+      "name": "keyMap2",
+      "address": "0x4CFD48",
+      "type": "u32",
+      "description": "The keyboard map, bytes 8-11 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
+      "verification": "static",
+      "evidence": "Not used directly by code in re1-gog-jpn-hotfix4 (0x4CFD48); it lies between 0x4CFD44 and 0x4CFD54, which both map by +0x0 from their own code (4 and 4 sites), so the layout carries over (tools/re1/xmap.py).",
+      "sources": [
+        "static cross-map from re1-gog-jpn-hotfix4",
+        "re1-gog-jpn-hotfix4: static cross-map from re1-gog-usa-hotfix4",
+        "re1-gog-jpn-hotfix4: re1-gog-usa-hotfix4: static analysis of this executable"
+      ]
+    },
+    {
+      "name": "keyMap3",
+      "address": "0x4CFD4C",
+      "type": "u32",
+      "description": "The keyboard map, bytes 12-15 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
+      "verification": "static",
+      "evidence": "Not used directly by code in re1-gog-jpn-hotfix4 (0x4CFD4C); it lies between 0x4CFD44 and 0x4CFD54, which both map by +0x0 from their own code (4 and 4 sites), so the layout carries over (tools/re1/xmap.py).",
+      "sources": [
+        "static cross-map from re1-gog-jpn-hotfix4",
+        "re1-gog-jpn-hotfix4: static cross-map from re1-gog-usa-hotfix4",
+        "re1-gog-jpn-hotfix4: re1-gog-usa-hotfix4: static analysis of this executable"
+      ]
+    },
+    {
+      "name": "keyMap4",
+      "address": "0x4CFD50",
+      "type": "u32",
+      "description": "The keyboard map, bytes 16-19 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
+      "verification": "static",
+      "evidence": "Not used directly by code in re1-gog-jpn-hotfix4 (0x4CFD50); it lies between 0x4CFD44 and 0x4CFD54, which both map by +0x0 from their own code (4 and 4 sites), so the layout carries over (tools/re1/xmap.py).",
+      "sources": [
+        "static cross-map from re1-gog-jpn-hotfix4",
+        "re1-gog-jpn-hotfix4: static cross-map from re1-gog-usa-hotfix4",
+        "re1-gog-jpn-hotfix4: re1-gog-usa-hotfix4: static analysis of this executable"
+      ]
+    },
+    {
+      "name": "keyMap5",
+      "address": "0x4CFD54",
+      "type": "u32",
+      "description": "The keyboard map, bytes 20-23 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
+      "verification": "static",
+      "evidence": "Cross-mapped from re1-gog-jpn-hotfix4 (0x4CFD54) by tools/re1/xmap.py: 4 of 4 code sites that use it there are found here and use 0x4CFD54 at the same instruction.",
+      "sources": [
+        "static cross-map from re1-gog-jpn-hotfix4",
+        "re1-gog-jpn-hotfix4: static cross-map from re1-gog-usa-hotfix4",
+        "re1-gog-jpn-hotfix4: re1-gog-usa-hotfix4: static analysis of this executable"
+      ]
+    },
+    {
+      "name": "keyMap6",
+      "address": "0x4CFD58",
+      "type": "u32",
+      "description": "The keyboard map, bytes 24-27 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
+      "verification": "static",
+      "evidence": "Cross-mapped from re1-gog-jpn-hotfix4 (0x4CFD58) by tools/re1/xmap.py: 4 of 4 code sites that use it there are found here and use 0x4CFD58 at the same instruction.",
+      "sources": [
+        "static cross-map from re1-gog-jpn-hotfix4",
+        "re1-gog-jpn-hotfix4: static cross-map from re1-gog-usa-hotfix4",
+        "re1-gog-jpn-hotfix4: re1-gog-usa-hotfix4: static analysis of this executable"
+      ]
+    },
+    {
+      "name": "keyMap7",
+      "address": "0x4CFD5C",
+      "type": "u32",
+      "description": "The keyboard map, bytes 28-31 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
+      "verification": "static",
+      "evidence": "Cross-mapped from re1-gog-jpn-hotfix4 (0x4CFD5C) by tools/re1/xmap.py: 4 of 4 code sites that use it there are found here and use 0x4CFD5C at the same instruction.",
+      "sources": [
+        "static cross-map from re1-gog-jpn-hotfix4",
+        "re1-gog-jpn-hotfix4: static cross-map from re1-gog-usa-hotfix4",
+        "re1-gog-jpn-hotfix4: re1-gog-usa-hotfix4: static analysis of this executable"
+      ]
+    },
+    {
       "name": "yaw",
       "address": "0xC35228",
       "type": "i16",

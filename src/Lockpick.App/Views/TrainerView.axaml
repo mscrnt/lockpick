@@ -73,6 +73,22 @@
                          Text="The equipped weapon's rounds never go down: each shot is put back, and a reload raises the count it keeps." />
             </StackPanel>
           </Border>
+
+          <!-- Keep the game running while it isn't the active window (#21) -->
+          <Border Classes="card" IsEnabled="{Binding CanWrite}">
+            <StackPanel Spacing="8">
+              <StackPanel Classes="cardhead">
+                <c:LucideIcon Data="{StaticResource Icon.PanelsTopLeft}" />
+                <TextBlock Classes="caption" Text="IN THE BACKGROUND" />
+              </StackPanel>
+              <CheckBox Content="Keep the game running when it isn't in front" IsChecked="{Binding KeepRunning}"
+                        IsEnabled="{Binding KeepRunningAvailable}" AutomationProperties.Name="Keep the game running in the background" />
+              <TextBlock TextWrapping="Wrap" Foreground="{StaticResource LpMutedBrush}"
+                         Text="The game normally pauses (and goes black in OBS) when you click another window. With this on it keeps playing, silently (the game mutes itself in the background), and keys you type in other windows don't reach it; your controller still does. It goes off for a challenge or a leaderboard run, and when Lockpick closes." />
+              <TextBlock Text="{Binding KeepRunningNote}" TextWrapping="Wrap" Classes="warning"
+                         IsVisible="{Binding KeepRunningNote, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            </StackPanel>
+          </Border>
         </c:CardColumns>
 
         <c:CardColumns MinColumnWidth="420" MaxColumns="3" IsVisible="{Binding SelectedSection, Converter={x:Static c:SectionIs.Instance}, ConverterParameter=inventory}">

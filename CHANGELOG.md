@@ -6,7 +6,16 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-10-26
+
+Steam's Resident Evil, OBS from Lockpick's side, and the game kept running when you click away.
+
 ### Added
+- **Keep the game running when it isn't in front** (Trainer → Cheats, opt-in, #21): Resident Evil normally pauses, and
+  goes black in OBS, when you click another window. With this on it keeps playing, and keys you type in other windows
+  don't reach it (your controller still does). It's silent in the background (the game mutes itself), goes off for
+  a challenge or a leaderboard run and when Lockpick closes, and puts your keyboard back every time. Checked live on
+  GOG's English release; the other versions follow once each is checked.
 - **Steam's Resident Evil (1996)**, English and Japanese: each is GOG's game inside Steam's wrapper, so everything that
   works on GOG works on Steam. Lockpick finds the Steam install, its leaderboard checks compare Steam's files, and its display
   settings change Steam's launcher settings (the launcher rewrites the game's own file at every start).

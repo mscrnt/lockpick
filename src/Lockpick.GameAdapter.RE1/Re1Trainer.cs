@@ -4,8 +4,9 @@ using Lockpick.Core.Trainer;
 namespace Lockpick.GameAdapter.RE1;
 
 /// <summary>
-/// RE1's trainer features as profile fields: HP (bounded by max HP) and, for infinite ammo, the quantity byte of the
-/// equipped slot in the inventory the game is using (Chris's and Jill's at 0xBE9944, Rebecca's at 0xBE9950).
+/// RE1's trainer features as profile fields: HP (bounded by max HP); for infinite ammo, the quantity byte of the
+/// equipped slot in the inventory the game is using (Chris's and Jill's at 0xBE9944, Rebecca's at 0xBE9950); and for
+/// keep-running, the window's focus flag and the keyboard map (docs/MEMORY_MAP.md "Focus and input").
 /// </summary>
 internal sealed class Re1Trainer(Func<int, string?> itemName) : IGameTrainer, Lockpick.Core.Challenges.IChallengeRules
 {
@@ -61,6 +62,57 @@ internal sealed class Re1Trainer(Func<int, string?> itemName) : IGameTrainer, Lo
             }
 
             return [new FieldWrite(field, mark.Rounds)];
+        };
+    }
+
+    public IReadOnlyList<string> KeepRunningFields { get; } = [Re1Session.Fields.WindowFocused, .. Re1Session.Fields.KeyMap];
+
+    public TrainerRule CreateKeepRunningRule(Func<bool> inFront)
+    {
+        // The game pauses while its focus flag is 0 (its WM_ACTIVATE clears it); held at 1, it runs on in the background.
+        // It reads the keyboard with GetAsyncKeyState, which sees keys typed in any window, so the keyboard map is
+        // blanked while the game is in the background and the player's map put back when it's in front again (live
+        // 2026-10-26: blanked, the game read no keys typed in Notepad; the controller isn't in the map). The game
+        // rewrites the map when it loads its settings or a save: the latest one seen is the one put back.
+        long[]? keys = null;
+        IReadOnlyList<FieldWrite> PutBack()
+        {
+            var back = keys;
+            keys = null;
+            return back is null ? [] : [.. Re1Session.Fields.KeyMap.Select((f, i) => new FieldWrite(f, back[i]))];
+        }
+
+        return new TrainerRule("Keep running in the background", snapshot =>
+        {
+            var map = Re1Session.Fields.KeyMap.Select(f => Raw(snapshot, f)).ToArray();
+            if (map.Any(v => v is null) || Raw(snapshot, Re1Session.Fields.WindowFocused) is not { } focused)
+            {
+                return [];
+            }
+
+            var blank = map.All(v => v == 0);
+            if (inFront())
+            {
+                return blank ? PutBack() : [];
+            }
+
+            var writes = new List<FieldWrite>();
+            if (focused == 0)
+            {
+                writes.Add(new FieldWrite(Re1Session.Fields.WindowFocused, 1));
+            }
+
+            if (!blank)
+            {
+                keys = [.. map.Select(v => v!.Value)];
+                writes.AddRange(Re1Session.Fields.KeyMap.Select(f => new FieldWrite(f, 0)));
+            }
+
+            return writes;
+        })
+        {
+            OutsideGameplay = true, // the flag and the map mean the same at the title: it keeps running there too
+            Restore = PutBack,
         };
     }
 

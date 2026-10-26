@@ -26,6 +26,7 @@ public sealed record TrainerActionRow(string Time, string Text, bool Applied)
 public sealed partial class TrainerViewModel : PageViewModel
 {
     private const string AmmoRule = TrainerRules.InfiniteAmmo;
+    private const string KeepRunningRule = TrainerRules.KeepRunning;
     private const int MaxRows = 200;
 
     private readonly TrainerService? _trainer;
@@ -97,6 +98,17 @@ public sealed partial class TrainerViewModel : PageViewModel
 
     [ObservableProperty]
     public partial bool InfiniteAmmo { get; set; }
+
+    /// <summary>The game keeps running (and ignores keys typed elsewhere) while it isn't the active window.</summary>
+    [ObservableProperty]
+    public partial bool KeepRunning { get; set; }
+
+    /// <summary>This version of the game has keep-running's fields checked live (writable in its profile).</summary>
+    [ObservableProperty]
+    public partial bool KeepRunningAvailable { get; private set; }
+
+    [ObservableProperty]
+    public partial string KeepRunningNote { get; private set; } = string.Empty;
 
     [ObservableProperty]
     public partial string LastResult { get; private set; } = string.Empty;
@@ -254,6 +266,28 @@ public sealed partial class TrainerViewModel : PageViewModel
         Sync();
     }
 
+    partial void OnKeepRunningChanged(bool value)
+    {
+        if (_syncing || _trainer is null || Game() is not { } game)
+        {
+            return;
+        }
+
+        if (value)
+        {
+            Show(_trainer.SetRule(KeepRunningRule, game.CreateKeepRunningRule(GameInFront)));
+        }
+        else
+        {
+            _trainer.ClearRule(KeepRunningRule); // puts the keyboard back if the game is in the background
+        }
+
+        Sync();
+    }
+
+    /// <summary>The game is the active window and showing (no window seen yet counts as in front: nothing to do).</summary>
+    private bool GameInFront() => _services.GameWindow() is not { } window || (window.Foreground && !window.Minimized);
+
     partial void OnModeChanged(TrainerMode value)
     {
         OnPropertyChanged(nameof(CheatsButtonText));
@@ -380,6 +414,13 @@ public sealed partial class TrainerViewModel : PageViewModel
 
             HealthLocked = game is not null && _trainer.Locks.ContainsKey(game.HealthField);
             InfiniteAmmo = _trainer.HasRule(AmmoRule);
+            KeepRunning = _trainer.HasRule(KeepRunningRule);
+            var profile = State.Status.Profile;
+            KeepRunningAvailable = game is not null && profile is not null
+                && game.KeepRunningFields.All(f => profile.FindField(f) is { IsWritable: true });
+            KeepRunningNote = KeepRunningAvailable || profile is null
+                ? string.Empty
+                : $"Not checked on this version of the game yet ({profile.DisplayName}); so far it works on GOG's English release.";
         }
         finally
         {

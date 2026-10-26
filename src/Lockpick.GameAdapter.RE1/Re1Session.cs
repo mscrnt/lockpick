@@ -23,6 +23,10 @@ internal sealed class Re1Session : IGameSession
         public const string PositionX = "positionX";
         public const string PositionY = "positionY";
         public const string PositionZ = "positionZ";
+        public const string WindowFocused = "windowFocused";
+
+        /// <summary>The keyboard map (32 virtual-key codes at 0xAC4030 in GOG English), four to a field.</summary>
+        public static readonly string[] KeyMap = [.. Enumerable.Range(0, 8).Select(i => $"keyMap{i}")];
     }
 
     internal const int FramesPerSecond = 30;

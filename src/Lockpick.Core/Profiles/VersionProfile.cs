@@ -185,6 +185,12 @@ public sealed record WriteSpec
     public long Max { get; init; }
 
     public string? MaxField { get; init; }
+
+    /// <summary>
+    /// May be written outside gameplay too (at the title, in menus): a value that means the same everywhere, such as the
+    /// window's focus flag or the keyboard map. Other fields are written only in a game.
+    /// </summary>
+    public bool AnyTime { get; init; }
 }
 
 internal sealed class HexUInt64Converter : JsonConverter<ulong>
