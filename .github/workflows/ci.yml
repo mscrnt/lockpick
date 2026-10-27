@@ -89,6 +89,9 @@ jobs:
       - name: Bounty tooling tests
         run: python3 -m unittest discover -s tools/bounties -v
 
+      - name: Route simulator tests (no game files needed)
+        run: python3 -m unittest discover -s tools/routesim -v
+
       - name: No game binaries or assets are committed
         run: |
           bad=$(git ls-files | grep -iE '\.(exe|dll|rdt|pak|pix|tim|emd|emw|tmd|bss|dat|wav|avi|xa|vh|vb|bmp)$' || true)

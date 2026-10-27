@@ -1,0 +1,384 @@
+{
+  "comment": [
+    "What the room scripts don't say, for tools/routesim/sim.py. Flags are [bank, flag] (bank 0/1 scenario, 2 locks,",
+    "7 room items; flag n = bit 31 - n % 32 of word n / 32). Each entry names its source: a labelled flag in",
+    "data/games/re1/flag-labels.json, the decomp (facts), a live trace, or the walkthrough (facts only)."
+  ],
+  "newGame": {
+    "jill": {
+      "room": "106",
+      "set": [
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          11
+        ],
+        [
+          1,
+          170
+        ]
+      ],
+      "why": "set by the time Jill enters the main hall in a new game (live flag log 2026-10-27, run 3); B[11] is the decomp's GameStart first-playthrough marker"
+    },
+    "chris": {
+      "room": "106",
+      "why": "Chris's start flags aren't logged yet (B[0] alone, as in Jill's game, leaves him stuck at the crest door): to check with a flag log of a Chris new game"
+    }
+  },
+  "jill": {
+    "keep": [
+      1,
+      29,
+      30,
+      48,
+      49,
+      77
+    ],
+    "keyAlias": {
+      "51": 49
+    },
+    "gates": [
+      {
+        "room": "10F",
+        "item": 32,
+        "needs": [
+          [
+            1,
+            165
+          ]
+        ],
+        "why": "behind the wall the piano opens (flag-labels B[165])"
+      },
+      {
+        "room": "10C",
+        "item": 52,
+        "needs": [
+          [
+            1,
+            169
+          ]
+        ],
+        "why": "past the plant the herbicide kills (flag-labels B[169])"
+      }
+    ],
+    "use": [
+      {
+        "item": 35,
+        "room": "10F",
+        "set": [
+          [
+            1,
+            165
+          ]
+        ],
+        "why": "playing the piano opens the secret room (init reads B[165]; the event that sets it isn't decoded yet)"
+      }
+    ],
+    "ways": [
+      {
+        "room": "301",
+        "to": "302",
+        "needs": [
+          [
+            0,
+            47
+          ]
+        ],
+        "why": "across the pool: the crank drains it (flag-labels A[47]; walkthrough)"
+      },
+      {
+        "room": "301",
+        "slot": 7,
+        "needs": [
+          [
+            0,
+            47
+          ]
+        ],
+        "why": "the lift down to the falls is across the pool (flag-labels A[48] is the lift)"
+      },
+      {
+        "room": "302",
+        "to": "307",
+        "why": "the ladder between the pools: after the battery (A[50], 302 event 6) and while the pool is full (302 init blocks it while A[47] is set); walkthrough order: battery, crank back, lift, ladder. The falls' two levels and lifts aren't modelled.",
+        "without": [
+          [
+            0,
+            47
+          ]
+        ],
+        "needs": [
+          [
+            0,
+            50
+          ]
+        ]
+      },
+      {
+        "room": "302",
+        "slot": 10,
+        "why": "the ladder between the pools: after the battery (A[50], 302 event 6) and while the pool is full (302 init blocks it while A[47] is set); walkthrough order: battery, crank back, lift, ladder. The falls' two levels and lifts aren't modelled.",
+        "without": [
+          [
+            0,
+            47
+          ]
+        ],
+        "needs": [
+          [
+            0,
+            50
+          ]
+        ]
+      },
+      {
+        "room": "305",
+        "to": "310",
+        "needs": [
+          [
+            0,
+            29
+          ]
+        ],
+        "why": "the steps down the fountain are under water until both medals are in (305 main sets A[29] once A[27] and A[28] are)"
+      }
+    ],
+    "examine": [
+      {
+        "item": 64,
+        "give": [
+          [
+            36,
+            1
+          ]
+        ],
+        "take": [
+          64
+        ],
+        "why": "a Doom book opens to a medal (walkthrough; which book holds which isn't checked)"
+      },
+      {
+        "item": 63,
+        "give": [
+          [
+            37,
+            1
+          ]
+        ],
+        "take": [
+          63
+        ],
+        "why": "as above"
+      }
+    ],
+    "kills": [
+      {
+        "room": "40C",
+        "set": [
+          [
+            0,
+            41
+          ]
+        ],
+        "why": "Plant 42 defeated (flag-labels A[41]; decomp SCENARIO_FLAGS.md: set when Plant 42 dies)"
+      }
+    ],
+    "spots": [
+      {
+        "room": "506",
+        "slot": 1,
+        "set": [
+          [
+            0,
+            52
+          ],
+          [
+            0,
+            53
+          ],
+          [
+            0,
+            54
+          ],
+          [
+            2,
+            37
+          ]
+        ],
+        "why": "the lab computer's password screens (exe): log in, then B2's password, then open B3 (walkthrough); 508 main turns A[52..54] into the door events' sys[5..7]. Lock 37 (503's door to the visual data room 504, a 'locked' message until it's set; no script sets it) opens with them: the walkthrough goes there right after."
+      }
+    ]
+  },
+  "chris": {
+    "keep": [
+      1,
+      29,
+      30,
+      48,
+      49,
+      77
+    ],
+    "gates": [
+      {
+        "room": "10C",
+        "item": 52,
+        "needs": [
+          [
+            1,
+            169
+          ]
+        ],
+        "why": "past the plant the herbicide kills (flag-labels B[169])"
+      },
+      {
+        "room": "10F",
+        "item": 32,
+        "needs": [
+          [
+            1,
+            162
+          ]
+        ],
+        "why": "behind the wall the piano opens; in Chris's game Rebecca plays it (his 10F init reads B[162] where Jill's reads B[165])"
+      }
+    ],
+    "use": [],
+    "ways": [
+      {
+        "room": "301",
+        "to": "302",
+        "needs": [
+          [
+            0,
+            47
+          ]
+        ],
+        "why": "across the pool: the crank drains it (flag-labels A[47]; walkthrough)"
+      },
+      {
+        "room": "301",
+        "slot": 7,
+        "needs": [
+          [
+            0,
+            47
+          ]
+        ],
+        "why": "the lift down to the falls is across the pool (flag-labels A[48] is the lift)"
+      },
+      {
+        "room": "302",
+        "to": "307",
+        "why": "the ladder between the pools: after the battery (A[50], 302 event 6) and while the pool is full (302 init blocks it while A[47] is set); walkthrough order: battery, crank back, lift, ladder. The falls' two levels and lifts aren't modelled.",
+        "without": [
+          [
+            0,
+            47
+          ]
+        ],
+        "needs": [
+          [
+            0,
+            50
+          ]
+        ]
+      },
+      {
+        "room": "302",
+        "slot": 10,
+        "why": "the ladder between the pools: after the battery (A[50], 302 event 6) and while the pool is full (302 init blocks it while A[47] is set); walkthrough order: battery, crank back, lift, ladder. The falls' two levels and lifts aren't modelled.",
+        "without": [
+          [
+            0,
+            47
+          ]
+        ],
+        "needs": [
+          [
+            0,
+            50
+          ]
+        ]
+      },
+      {
+        "room": "305",
+        "to": "310",
+        "needs": [
+          [
+            0,
+            29
+          ]
+        ],
+        "why": "the steps down the fountain are under water until both medals are in (305 main sets A[29] once A[27] and A[28] are)"
+      }
+    ],
+    "examine": [
+      {
+        "item": 64,
+        "give": [
+          [
+            36,
+            1
+          ]
+        ],
+        "take": [
+          64
+        ],
+        "why": "a Doom book opens to a medal (walkthrough; which book holds which isn't checked)"
+      },
+      {
+        "item": 63,
+        "give": [
+          [
+            37,
+            1
+          ]
+        ],
+        "take": [
+          63
+        ],
+        "why": "as above"
+      }
+    ],
+    "kills": [
+      {
+        "room": "40C",
+        "set": [
+          [
+            0,
+            41
+          ]
+        ],
+        "why": "Plant 42 defeated (flag-labels A[41]; decomp SCENARIO_FLAGS.md: set when Plant 42 dies)"
+      }
+    ],
+    "spots": [
+      {
+        "room": "506",
+        "slot": 1,
+        "set": [
+          [
+            0,
+            52
+          ],
+          [
+            0,
+            53
+          ],
+          [
+            0,
+            54
+          ],
+          [
+            2,
+            37
+          ]
+        ],
+        "why": "the lab computer's password screens (exe): log in, then B2's password, then open B3 (walkthrough); 508 main turns A[52..54] into the door events' sys[5..7]. Lock 37 (503's door to the visual data room 504, a 'locked' message until it's set; no script sets it) opens with them: the walkthrough goes there right after."
+      }
+    ]
+  }
+}

@@ -20,7 +20,7 @@ Status legend: ✅ done and verified · 🟡 done, partially verified · ⬜ not
 | 0.3.1 | Every PC version runners use: the Japanese game with Classic REbirth, GOG's Japanese release (Steam and emulators to follow) | ✅ released 2026-10-17 (Steam and EMU next) |
 | 0.3.2 | OBS WebSocket automation and keep-running (and Steam's English and Japanese releases) | ✅ released 2026-10-26 (keep-running on GOG English; other builds after their live checks) |
 | 0.3.3 | The portable zip keeps its data in its own folder (several copies side by side) | ✅ released 2026-10-26 |
-| 0.4.0 | Room, camera, item and enemy database | ⬜ |
+| 0.4.0 | Route guide (on the maps and in the game picture) and the world model: the room and event scripts read and run, full-game routes for Jill and Chris | 🟡 released 2026-10-27 (routes not yet followed in a real game) |
 | 0.5.0 | Object highlighting and ESP | ⬜ |
 | 0.6.0 | Advanced trainer and gameplay manipulation | ⬜ |
 | 0.7.0 | Contextual warnings and route guidance | ⬜ |
@@ -411,7 +411,14 @@ players play the game themselves; Lockpick enhances their play.
   committed as `room-index.json` with ids and numbers only); still to do: port to C# for in-app use, and cameras.
 - **Event-script parser** (RDT `offsets[8]`): cutscene scripts set the story flags room scripts don't, hand over items
   (Barry's lockpick, Richard's radio) and play voice lines — parsing them names events without asking and tells the
-  subtitles which line plays when.
+  subtitles which line plays when. **Done for the route simulator** (`tools/routesim/world.py`, 2026-10-27: 1020 of
+  Jill's and 949 of Chris's event scripts, 21 and 20 with an opcode left unread).
+- **World model / route simulator — done 2026-10-27** (`tools/routesim`): the room and event scripts run against the
+  game's state, a playthrough found from a new game to the heliport for both characters, written out as the two
+  full-game routes (`build_routes.py`); checked against two live flag logs of Jill's opening and against the hand-made
+  Jill route (all its get/use steps). Next: the collision changes (`0x30`) instead of hand rules for walls and water,
+  Chris's start flags from a live log, a shortest order instead of the nearest-first one, then port to C# so the app
+  can route any split set.
 - Room/camera names database in `data/games/re1/` (JSON), keyed by room id — areas done (`rooms.json`), names so far
   for rooms identified in play; the rest via ask mode / community.
 - Rooms-visited and map/document flags: done (the game's table at `0x4D31E0`; maps = item + 46, documents = item + 35).

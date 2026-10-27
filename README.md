@@ -65,6 +65,16 @@ It never changes your game files. It only changes the running game if you switch
 - **Installs and updates itself**, with a short first-time setup, and fits any window: ultrawide, 1080p, side by side
   with the game, or portrait.
 
+## New in 0.4
+
+- **Route guide:** pick a route and Lockpick shows the next step, the way there (round the furniture, through the doors
+  you can open) on the maps and on the floor of the game's own picture, and the buttons to press when you get there,
+  for the controller you're using. Steps tick off by themselves from the game's flags, so a loaded save starts at the
+  right one.
+- **Full-game routes for Jill and Chris**, worked out by playing the game through in a simulator built on the game's
+  own room scripts, plus a draft of Jill's any% route. All are drafts until they've been followed through real runs.
+- **Locked doors on the map** (red, or yellow when you can open them) and Richard's serum timer.
+
 ## New in 0.3
 
 **Speedrunning and practice**

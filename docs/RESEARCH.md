@@ -129,6 +129,24 @@ header bytes `nSprite, nCut, nOmodel, nItem, nDoor, nRoom_at`; 19 int32 offsets 
 SCD opcodes: `0x0C door_aot_set` (26 bytes; target = stage<<5 | room), `0x18 item_aot_set` (26 bytes),
 `0x1B` enemy set (22 bytes). Some stage-1 rooms are read from stage+5 (`MissingRooms`).
 
+Room-script facts settled while building the route simulator (`tools/routesim`, 2026-10-27; static, from every
+retail room file, checked against two live story-flag logs of Jill's opening):
+- **Event inline blocks** (event opcode `0x06`): the payload starts with a u16 block size (counting itself) before the
+  first command (the decomp's `tools/evt_disasm.py`); reading the size as an opcode desynchronised most event scripts.
+  A single command (`0x07`) is read at its own size, which some length bytes understate.
+- **`0x12` re-arms a room action** (handler, probe flags, words) and leaves the zone alone; `0x13` writes the handler
+  and probe flags only. Scripts turn doors into "it's locked" messages or cutscene triggers this way, and arm items
+  (the Wind crest in 10D, the Helmet key at Plant 42's fireplace, the lab key behind the panel).
+- **Probe flags**: a door record's `+0x19` and an item record's `+0x17` are the entry's probe byte; without `0x01`
+  the entry is dead until a script arms it (`0x81` = the player's action key). Lifts are doors with a dead probe that
+  an event uses with a room-action call (`0x24`, handler 1 `door_try_enter`).
+- **State byte 3** holds the room the player came from: scripts compare it with the neighbours' room numbers (305:
+  15/16 for 30F/310; 302: 0/1 for 300/301, where the lifts arrive). The decomp names it attractMode_RoomCameraId.
+- **Item use**: `g_itemUseFlags` bit `item − 0x1B` is armed by a zone's `flag_bank_set`; the main script tests
+  "item used is" (`0x10`) or state byte 18 (the used item), state byte 19 (the item just picked up), state byte 16
+  (the room action the player stands at).
+- A door's target stage (`+0x0F >> 5`) is 1-based, 0 = this stage.
+
 ## 6. Overlays / HUD
 
 - REbirth mods draw in-process through the REbirth SDK. Not applicable to GOG. The GOG wrapper renders via

@@ -6,7 +6,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-27
+
 ### Added
+- **Full-game routes for Jill and Chris** (Map page → Route guide): from a new game to the heliport, every step with
+  where to go, what to do and the story flag that ticks it off. Made by a simulator that plays the game through from
+  the room files' own scripts (`tools/routesim`): it isn't a speedrun order (it takes the nearest next thing), and
+  neither route has been followed in a real game yet, so both show as drafts.
 - **Route guide** (Map page → Route guide, and an overlay widget): pick a route and Lockpick shows the next step, the
   way there drawn on the room and floor maps (round the furniture, through the doors you can open), and the buttons to
   press as you get near: pick up, open the door, use the item, push a puzzle's switches in order (the gallery's
@@ -24,6 +30,11 @@ All notable changes to this project are documented here. The format follows
   (Settings → Overlay). Drawn with each room camera's own projection from the room files.
 - **Locked doors on the map**: red while locked, yellow when you can open them (you hold the key, or it opens from
   your side).
+
+### Changed
+- The event feed names the enemy behind the game's shared "not remembered" kill flag ("Zombie died") instead of "an
+  enemy the room doesn't remember died", and no longer says people appear (Barry is with you in those scenes).
+- Jill's any% route: the search upstairs for Wesker ends at the top of the stairs, so the way back down is drawn.
 
 ## [0.3.3] - 2026-10-26
 

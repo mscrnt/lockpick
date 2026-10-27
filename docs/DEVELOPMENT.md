@@ -188,6 +188,8 @@ look Which menu is open, and which entry is highlighted?
 - `rag.py index <run-dir>` / `ask …` — retrieval on the local stack (TEI embeddings, Qdrant collection `lockpick`,
   reranker): flag labels, names, room-script facts, pickup results, the atlas; grounded vision questions use it
   (`context.py`). Env: `LOCKPICK_EMBED_URL`, `LOCKPICK_RERANK_URL`, `LOCKPICK_QDRANT_URL`.
+- `tools/routesim`: the route simulator (plays the game through from the room and event scripts; `plan.py`,
+  `build_routes.py`, `check_log.py` against a live story-flag log). See its README.
 - `tools/rdt`: `scd.py` (room scripts with their conditions), `events.py` (event scripts), `rdt_map.py` (geometry),
   `render_map.py` / `floor_map.py` (room and floor maps, local HTML), `tools/bounties/flag_timeline.py` (when each saved
   flag turns on across practice saves).
@@ -322,6 +324,17 @@ a local install (ids and numbers only; the game files themselves are never commi
 ```powershell
 python tools/rdt/rdt_index.py "G:\GOG Games\Resident Evil"
 python tools/rdt/rdt_index.py "G:\GOG Games\Resident Evil" --dump 105   # one room
+```
+
+The two full-game routes in `data/games/re1/routes.json` (`re1-jill-full-sim`, `re1-chris-full-sim`) are written by
+the route simulator from the same install (tools/routesim/README.md). After changing `tools/routesim` or its
+`rules.json`, regenerate them and commit the result; CI can't (it has no game files), so run the check locally
+before a release:
+
+```powershell
+python tools/routesim/build_routes.py "G:\GOG Games\Resident Evil"           # play both through, write the routes
+python tools/routesim/build_routes.py "G:\GOG Games\Resident Evil" --check   # fails if routes.json is stale
+python tools/routesim/plan.py "G:\GOG Games\Resident Evil" chris --verbose   # one playthrough, every move
 ```
 
 ## Voice transcripts (local research)

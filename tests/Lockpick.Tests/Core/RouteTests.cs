@@ -353,20 +353,25 @@ public class RouteTests
     {
         var adapter = new Re1Adapter();
         var routes = adapter.CreateRunRules(adapter.Profiles[0]).Routes;
-        var jill = Assert.Single(routes, r => r.Id == "re1-jill-any-nmg");
-        Assert.Equal(PlayableCharacter.Jill, jill.Character);
-        Assert.False(jill.Verified);
-        Assert.Equal(RouteStepKind.End, jill.Steps[^1].Kind);
-        foreach (var step in jill.Steps)
+        Assert.Equal(PlayableCharacter.Jill, Assert.Single(routes, r => r.Id == "re1-jill-any-nmg").Character);
+        // The full-game routes the simulator writes (tools/routesim/build_routes.py), one per character.
+        Assert.Equal(PlayableCharacter.Jill, Assert.Single(routes, r => r.Id == "re1-jill-full-sim").Character);
+        Assert.Equal(PlayableCharacter.Chris, Assert.Single(routes, r => r.Id == "re1-chris-full-sim").Character);
+        foreach (var route in routes)
         {
-            if (step.Item is { } item)
+            Assert.False(route.Verified);
+            Assert.Equal(RouteStepKind.End, route.Steps[^1].Kind);
+            foreach (var step in route.Steps)
             {
-                Assert.NotNull(adapter.ItemName(item));
-            }
+                if (step.Item is { } item)
+                {
+                    Assert.NotNull(adapter.ItemName(item));
+                }
 
-            if (step.Room is { } room)
-            {
-                Assert.NotNull(adapter.RoomName(room));
+                if (step.Room is { } room)
+                {
+                    Assert.NotNull(adapter.RoomName(room));
+                }
             }
         }
     }

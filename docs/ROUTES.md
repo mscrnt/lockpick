@@ -39,6 +39,16 @@ reachable from the last with only the keys collected so far, scratch `walk.cs`, 
 through a run**. Items placed by scripts (the serum in 100, the battery in 719) have no zone in the room file, so the
 guide leads to the room.
 
+**Full-game routes (simulated): Jill and Chris.** `re1-jill-full-sim` and `re1-chris-full-sim` are written by the route
+simulator (`tools/routesim`, its README): it plays the game through from a new game using the room and event
+scripts of the player's own room files, taking the nearest thing that moves the story on, and keeps the steps a
+player needs, each with the story flag that says it's done, the spot the line points at and the flag's label as the
+hint. Both reach the flare at the heliport (Jill 110 steps, Chris 102). Jill's covers every get and use step of the
+hand-made route above, in a different order (nearest first, not the fastest). What the scripts don't say (walls,
+water, the lab computer, Plant 42's death, the Doom books) is in `tools/routesim/rules.json`, each rule with its
+source. Regenerate with `python tools/routesim/build_routes.py <install>` after changing the tools or the rules
+(`--check` compares). **Not followed in a real game yet.**
+
 **Time limits:** a route's `timers` count down in game time from when a start flag goes on until a stop flag is set:
 Richard's serum, 15 minutes from "serum errand starts" (`flagScenarioA2` 0x40000) to "serum given" (`flagScenarioB3`
 0x04000000). The 15 minutes come from the owner's answer in ask mode and a walkthrough; the game's own deadline isn't
