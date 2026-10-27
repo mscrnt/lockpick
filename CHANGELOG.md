@@ -6,10 +6,16 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.3] - 2026-10-26
+
+The portable zip keeps its own data, so you can keep several copies.
+
 ### Changed
 - **The portable zip keeps everything in its own folder**: settings, logs, runs, captures and secrets now go in a
   `data` folder beside `Lockpick Trainer.exe` instead of `%LOCALAPPDATA%\Lockpick`, so several unzipped copies stay
-  separate. Neither the zip nor the app writes to the registry. Installed copies are unchanged.
+  separate. Neither the zip nor the app writes to the registry. Installed copies are unchanged. If you already use the
+  portable zip, copy what's in `%LOCALAPPDATA%\Lockpick` into the new `data` folder to keep your settings and runs
+  (saved passwords only work for the same Windows user).
 
 ## [0.3.2] - 2026-10-26
 

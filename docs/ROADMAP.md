@@ -19,6 +19,7 @@ Status legend: ✅ done and verified · 🟡 done, partially verified · ⬜ not
 | 0.3.0 | Play and stream with one app: overlay, runs (timer, splits, LiveSplit), OBS sources, training captures | 🟡 released 2026-10-16 (live checks pending) |
 | 0.3.1 | Every PC version runners use: the Japanese game with Classic REbirth, GOG's Japanese release (Steam and emulators to follow) | ✅ released 2026-10-17 (Steam and EMU next) |
 | 0.3.2 | OBS WebSocket automation and keep-running (and Steam's English and Japanese releases) | ✅ released 2026-10-26 (keep-running on GOG English; other builds after their live checks) |
+| 0.3.3 | The portable zip keeps its data in its own folder (several copies side by side) | ✅ released 2026-10-26 |
 | 0.4.0 | Room, camera, item and enemy database | ⬜ |
 | 0.5.0 | Object highlighting and ESP | ⬜ |
 | 0.6.0 | Advanced trainer and gameplay manipulation | ⬜ |
