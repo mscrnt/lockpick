@@ -55,6 +55,62 @@ public partial class OverlayWindow : Window
         }
     }
 
+    /// <summary>Fills the route widget: the step, where it is, its hint, the buttons to press and what comes next.</summary>
+    public void ShowRoute(ViewModels.RouteViewModel guide)
+    {
+        RouteList.Children.Clear();
+        if (!guide.HasStep)
+        {
+            return;
+        }
+
+        var muted = Brush("LpMutedBrush");
+        RouteList.Children.Add(new TextBlock { Text = guide.Step, FontSize = 12, FontWeight = FontWeight.SemiBold, Foreground = MainText, TextWrapping = TextWrapping.Wrap });
+        RouteList.Children.Add(new TextBlock { Text = guide.Where, FontSize = 9, Foreground = muted, TextWrapping = TextWrapping.Wrap });
+        if (guide.Clocks.Length > 0)
+        {
+            RouteList.Children.Add(new TextBlock { Text = guide.Clocks, FontSize = 11, FontWeight = FontWeight.SemiBold, Foreground = Brush("LpAmberBrush"), TextWrapping = TextWrapping.Wrap });
+        }
+        if (guide.Hint.Length > 0)
+        {
+            RouteList.Children.Add(new TextBlock { Text = guide.Hint, FontSize = 10, Foreground = MainText, TextWrapping = TextWrapping.Wrap });
+        }
+
+        foreach (var prompt in guide.Prompts)
+        {
+            var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 3, Margin = new Thickness(0, 1, 0, 0) };
+            foreach (var button in prompt.Buttons)
+            {
+                row.Children.Add(button.Image is { } image
+                    ? new Image { Source = image, Width = 18, Height = 18, VerticalAlignment = VerticalAlignment.Center }
+                    : new Border
+                    {
+                        Background = Brush("LpPanelAltBrush"),
+                        BorderBrush = Brush("LpBorderBrush"),
+                        BorderThickness = new Thickness(1),
+                        CornerRadius = new CornerRadius(2),
+                        Padding = new Thickness(4, 0),
+                        MinWidth = 16,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Child = new TextBlock { Text = button.Label, FontSize = 10, FontWeight = FontWeight.SemiBold, Foreground = MainText, HorizontalAlignment = HorizontalAlignment.Center },
+                    });
+            }
+
+            row.Children.Add(new TextBlock { Text = prompt.Text, FontSize = 10, Foreground = MainText, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(3, 0, 0, 0) });
+            RouteList.Children.Add(row);
+        }
+
+        if (guide.Note.Length > 0)
+        {
+            RouteList.Children.Add(new TextBlock { Text = guide.Note, FontSize = 9, Foreground = Brush("LpAmberBrush"), TextWrapping = TextWrapping.Wrap });
+        }
+
+        if (guide.Next.Length > 0)
+        {
+            RouteList.Children.Add(new TextBlock { Text = guide.Next, FontSize = 9, Foreground = muted, TextWrapping = TextWrapping.Wrap });
+        }
+    }
+
     /// <summary>Fills the event feed widget: a line per thing that happened, the newest brightest.</summary>
     public void ShowFeed(IReadOnlyList<string> lines)
     {

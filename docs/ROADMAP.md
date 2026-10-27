@@ -441,6 +441,10 @@ players play the game themselves; Lockpick enhances their play.
 ## 0.7.0 — Contextual guidance
 
 - Missed-item warnings, puzzle-state tracking, route guidance, warnings under 100 ms.
+- **Route guide prototype pulled forward (owner, 2026-10-27; docs/ROUTES.md):** the next step, the way there on the maps
+  and the buttons to press, with a draft Jill any% route. Still to do: follow the draft through a whole run and fix its
+  order; check a PlayStation pad's buttons one by one; Chris's route; lines in the game picture itself (needs the
+  camera projection, B401/B402).
 - **Progress tracker** (read-only, Challenge-safe — can ship before 0.7, it needs no new memory research): per room
   and area, items still there vs taken (room index + item flags), documents and maps collected, rooms explored (the
   map's own flags), enemies killed for good, and story/puzzle progress from the named flags.

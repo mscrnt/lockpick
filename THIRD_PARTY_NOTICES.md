@@ -82,6 +82,44 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER I
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 
+### Controller and keyboard button pictures
+The route guide's button prompts (`src/Lockpick.App/Assets/Buttons`). Rendered to PNG at a fixed size; the PlayStation
+and Xbox pictures are otherwise unchanged, the keyboard ones are inverted to light keys for the dark overlay.
+
+- **PlayStation buttons** (`playstation/`): by VictorPines, from Wikimedia Commons
+  (https://commons.wikimedia.org/wiki/Category:PlayStation_controller_buttons), licensed under
+  **CC BY-SA 4.0** (https://creativecommons.org/licenses/by-sa/4.0/). The PNGs are adaptations (format and size) and are
+  shared under the same licence. PlayStation is a trademark of Sony Interactive Entertainment.
+- **Xbox buttons** (`xbox/`): by Nicolae (Xelu) Berbece, from Wikimedia Commons
+  (https://commons.wikimedia.org/wiki/Category:Xbox_Series_Controller_icons), dedicated to the public domain (**CC0**).
+  Xbox is a trademark of Microsoft.
+- **Keyboard keys** (`keyboard/`): George Black's SVG keyboard icons (https://github.com/georgemblack/svg-keyboard-icons),
+  MIT License:
+
+```
+MIT License
+
+Copyright (c) 2022 George Black
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
 ### NuGet packages (referenced, not vendored)
 
 | Package | License |

@@ -34,10 +34,14 @@ public sealed partial class MapViewModel : PageViewModel
     {
         _services = services;
         State = state;
+        Guide = new RouteViewModel(services);
         state.PropertyChanged += OnStateChanged;
     }
 
     public LiveState State { get; }
+
+    /// <summary>The route guide: its step and buttons in the route card, its way on the maps.</summary>
+    public RouteViewModel Guide { get; }
 
     [ObservableProperty]
     public partial RoomMap? Map { get; private set; }
@@ -47,6 +51,14 @@ public sealed partial class MapViewModel : PageViewModel
 
     [ObservableProperty]
     public partial double PlayerZ { get; private set; }
+
+    /// <summary>The player's height (room units; −Y is up): the floor the route is drawn on in the game picture.</summary>
+    [ObservableProperty]
+    public partial double PlayerY { get; private set; }
+
+    /// <summary>The camera the game shows now (index into the room's cameras).</summary>
+    [ObservableProperty]
+    public partial int CameraId { get; private set; }
 
     [ObservableProperty]
     public partial double PlayerAngle { get; private set; }
@@ -99,6 +111,11 @@ public sealed partial class MapViewModel : PageViewModel
     /// <summary>Room-file items already taken in this game.</summary>
     [ObservableProperty]
     public partial IReadOnlySet<MapItem>? TakenItems { get; private set; }
+
+    /// <summary>Doors still locked in this game (this room's and the floor's): true when the player can open it (holds
+    /// the key, or it unlocks from this side).</summary>
+    [ObservableProperty]
+    public partial IReadOnlyDictionary<MapDoor, bool>? LockedDoors { get; private set; }
 
     /// <summary>Use spots whose item has been put in place in this game.</summary>
     [ObservableProperty]
@@ -241,6 +258,7 @@ public sealed partial class MapViewModel : PageViewModel
         }
 
         var map = maps.Load(room, character);
+        UpdateLocks(maps, s, map);
         if (!ReferenceEquals(map, Map))
         {
             Map = map;
@@ -295,13 +313,32 @@ public sealed partial class MapViewModel : PageViewModel
         if (s.Position.TryGet(out var p))
         {
             PlayerX = p.X;
+            PlayerY = p.Y;
             PlayerZ = p.Z;
+            CameraId = s.Camera.TryGet(out var camera) ? camera : 0;
             PlayerAngle = s.RawFields.TryGetValue("yaw", out var yaw) && yaw.HasValue ? (short)yaw.Value : 0;
             HasPlayer = true;
         }
         else
         {
             HasPlayer = false;
+        }
+    }
+
+    /// <summary>
+    /// Which doors are locked (the game's lock flags; both sides of a door share one) and whether the player holds the
+    /// key. A door whose state the game doesn't report is drawn as open.
+    /// </summary>
+    private void UpdateLocks(IRoomMapSource maps, GameSnapshot s, RoomMap? map)
+    {
+        var held = s.Inventory.TryGet(out var inventory) ? inventory.Select(i => i.ItemId).ToHashSet() : [];
+        held.UnionWith(maps.HeldElsewhere(s));
+        var doors = (Floor?.Rooms.Select(r => r.Map) ?? []).Append(map).OfType<RoomMap>().SelectMany(m => m.Doors).Distinct();
+        var locked = doors.Where(d => d.LockFlag is not null && maps.IsUnlocked(d, s) == false)
+            .ToDictionary(d => d, d => d.Unlock == MapUnlock.ThisSide || (d.Key is { } key && held.Contains(key)));
+        if (LockedDoors is null || locked.Count != LockedDoors.Count || locked.Any(l => !LockedDoors.TryGetValue(l.Key, out var k) || k != l.Value))
+        {
+            LockedDoors = locked;
         }
     }
 

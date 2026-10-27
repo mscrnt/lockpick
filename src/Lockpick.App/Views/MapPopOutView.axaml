@@ -13,7 +13,9 @@
                        PlayerX="{Binding Map.PlayerX}" PlayerZ="{Binding Map.PlayerZ}" PlayerAngle="{Binding Map.PlayerAngle}" HasPlayer="{Binding Map.HasPlayer}"
                        FloorBrush="#E0202B27" WallBrush="#5C6B65" SoftBrush="#33423C"
                        DoorBrush="{StaticResource LpGreenBrush}" ItemBrush="{StaticResource LpAmberBrush}" PlayerBrush="{StaticResource LpRedBrush}"
-                       LabelBrush="{StaticResource LpTextBrush}" HighlightBrush="{StaticResource LpRedBrush}" />
+                       LabelBrush="{StaticResource LpTextBrush}" HighlightBrush="{StaticResource LpRedBrush}"
+                       Route="{Binding Map.Guide.Plan}" RouteBrush="{StaticResource LpRouteBrush}"
+                       LockedDoors="{Binding Map.LockedDoors}" LockedBrush="{StaticResource LpRedBrush}" KeyBrush="{StaticResource LpKeyBrush}" />
     <c:RoomMapControl IsVisible="{Binding !IsFloor}" FloorBrush="#E0202B27" ClipToBounds="True"
                       ShowLabels="{Binding RoomNames}" ViewRadius="{Binding ViewRadius}"
                       Map="{Binding Map.Map}" PlacedItems="{Binding Map.PlacedItems}" TakenItems="{Binding Map.TakenItems}"
@@ -22,7 +24,9 @@
                       WallBrush="#5C6B65" SoftBrush="#33423C"
                       DoorBrush="{StaticResource LpGreenBrush}" ItemBrush="{StaticResource LpAmberBrush}"
                       PlayerBrush="{StaticResource LpRedBrush}" FaintTextBrush="{StaticResource LpMutedBrush}"
-                      LabelPlateBrush="{StaticResource LpBgBrush}" />
+                      LabelPlateBrush="{StaticResource LpBgBrush}"
+                      Route="{Binding Map.Guide.Plan}" RouteBrush="{StaticResource LpRouteBrush}"
+                      LockedDoors="{Binding Map.LockedDoors}" LockedBrush="{StaticResource LpRedBrush}" KeyBrush="{StaticResource LpKeyBrush}" />
     </Panel>
     <TextBlock IsVisible="{Binding !HasMap}" Text="The map appears once you're in a game. Right-click for the view."
                Foreground="{StaticResource LpMutedBrush}" TextWrapping="Wrap" TextAlignment="Center"

@@ -73,6 +73,26 @@
     </Border>
   </LayoutTransformControl>
 
+  <!-- The route guide: the step, where, the buttons to press; rows are built in code (OverlayWindow.ShowRoute). -->
+  <LayoutTransformControl x:Name="RoutePanel" TextElement.FontFamily="{Binding PanelFont}">
+    <Border Background="{Binding PanelBackground}" BorderBrush="{StaticResource LpBorderBrush}" BorderThickness="1" CornerRadius="3" Padding="7,5" MaxWidth="270">
+      <StackPanel x:Name="RouteList" Spacing="3" />
+    </Border>
+  </LayoutTransformControl>
+
+  <!-- The route guide in the game's own picture: the way on the floor, the ring, a puzzle's numbers, the buttons
+       (WorldRouteControl projects them with the room's camera). Covers the whole picture, less the overlay's margin. -->
+  <LayoutTransformControl x:Name="RoutePicturePanel">
+    <c:WorldRouteControl Width="{Binding RoutePictureWidth}" Height="{Binding RoutePictureHeight}"
+                         PictureWidth="{Binding PictureWidth}" PictureHeight="{Binding PictureHeight}" Inset="{Binding PictureInset}"
+                         Map="{Binding Map.Map}" CameraId="{Binding Map.CameraId}" HasPlayer="{Binding Map.HasPlayer}"
+                         PlayerX="{Binding Map.PlayerX}" PlayerY="{Binding Map.PlayerY}" PlayerZ="{Binding Map.PlayerZ}"
+                         Route="{Binding Map.Guide.Plan}" Prompts="{Binding Map.Guide.Prompts}"
+                         ShowLine="{Binding Map.Guide.LineInPicture}" ShowPrompts="{Binding Map.Guide.PromptsInPicture}"
+                         RouteBrush="{StaticResource LpRouteBrush}" TextBrush="{StaticResource LpTextBrush}" PlateBrush="#E00B0F0E"
+                         Clocks="{Binding Map.Guide.Clocks}" ClockBrush="{StaticResource LpAmberBrush}" />
+  </LayoutTransformControl>
+
   <!-- Map: north-up. The minimap (the area around the player, framed, no names) or the whole room over the picture,
        framed or see-through (the map key cycles the player's chosen views). -->
   <LayoutTransformControl x:Name="MinimapPanel">
@@ -84,8 +104,12 @@
                          PlayerX="{Binding Map.PlayerX}" PlayerZ="{Binding Map.PlayerZ}" PlayerAngle="{Binding Map.PlayerAngle}" HasPlayer="{Binding Map.HasPlayer}"
                          FloorBrush="{Binding MinimapFloor}" WallBrush="{Binding MinimapWalls}" SoftBrush="#33423C"
                          DoorBrush="{StaticResource LpGreenBrush}" ItemBrush="{StaticResource LpAmberBrush}" PlayerBrush="{StaticResource LpRedBrush}"
-                         LabelBrush="{StaticResource LpTextBrush}" HighlightBrush="{StaticResource LpRedBrush}" />
+                         LabelBrush="{StaticResource LpTextBrush}" HighlightBrush="{StaticResource LpRedBrush}"
+                         Route="{Binding Map.Guide.Plan}" RouteBrush="{StaticResource LpRouteBrush}"
+                         LockedDoors="{Binding Map.LockedDoors}" LockedBrush="{StaticResource LpRedBrush}" KeyBrush="{StaticResource LpKeyBrush}" />
       <c:RoomMapControl IsVisible="{Binding !MinimapIsFloor}" FloorBrush="{Binding MinimapFloor}" ClipToBounds="True"
+                        LockedDoors="{Binding Map.LockedDoors}" LockedBrush="{StaticResource LpRedBrush}" KeyBrush="{StaticResource LpKeyBrush}"
+                        Route="{Binding Map.Guide.Plan}" RouteBrush="{StaticResource LpRouteBrush}"
                         ShowLabels="{Binding MinimapNames}" Opacity="{Binding MinimapOpacity}"
                         ViewRadius="{Binding MinimapViewRadius}"
                         Map="{Binding Map.Map}" PlacedItems="{Binding Map.PlacedItems}" TakenItems="{Binding Map.TakenItems}"

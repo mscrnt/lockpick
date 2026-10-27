@@ -68,6 +68,8 @@ public sealed class AppServices : IAsyncDisposable
             ? string.Create(System.Globalization.CultureInfo.InvariantCulture, $"{(int)wr.Time.TotalMinutes}:{wr.Time.Seconds:D2}.{wr.Time.Milliseconds / 100} {wr.Runner}")
             : null);
         TrainerHotkeys = new TrainerHotkeys(_log);
+        Route = new RouteService(source, adapter, settings, ResolveInstalledExecutable, loggerFactory.CreateLogger("Route"));
+        EnsureGamepad();
         TrainerHotkeys.Pressed += (_, action) =>
         {
             switch (action)
@@ -132,6 +134,9 @@ public sealed class AppServices : IAsyncDisposable
 
     /// <summary>Run timing and splits (Runs page, overlay, API).</summary>
     public Core.Runs.RunService Runs { get; }
+
+    /// <summary>The route guide (docs/ROUTES.md).</summary>
+    public RouteService Route { get; }
 
     /// <summary>The split sets, attempt records and comparisons.</summary>
     public RunLibrary RunLibrary { get; }
@@ -336,10 +341,11 @@ public sealed class AppServices : IAsyncDisposable
         }
     }
 
-    /// <summary>Reads the controllers only while a button is bound or being bound.</summary>
-    private void EnsureGamepad()
+    /// <summary>Reads the controllers only while a button is bound or being bound, or the route guide shows the pad in use.</summary>
+    public void EnsureGamepad()
     {
-        var needed = !_markerButton.IsOff || _binding is not null || !_actionButtons.IsEmpty;
+        var needed = !_markerButton.IsOff || _binding is not null || !_actionButtons.IsEmpty
+            || (Settings.Current.RouteId is not null && Settings.Current.ButtonStyle == ButtonStyles.Auto);
         if (needed && _gamepad is null)
         {
             _gamepad = new GamepadButtons();
@@ -359,6 +365,7 @@ public sealed class AppServices : IAsyncDisposable
 
     private void OnGamepadButton(object? sender, GamepadButton button)
     {
+        Route?.Pressed(button);
         if (_binding is { } binding)
         {
             binding.TrySetResult(button);
@@ -446,6 +453,7 @@ public sealed class AppServices : IAsyncDisposable
         LiveSplit.Dispose();
         LiveSplitEngine.Dispose();
         SpeedrunCom.Dispose();
+        Route.Dispose();
         Runs.Dispose();
         Feed.Dispose();
         Trainer?.Dispose();

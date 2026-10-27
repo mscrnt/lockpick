@@ -32,6 +32,7 @@
     <AvaloniaResource Include="Assets\lockpick.ico" />
     <AvaloniaResource Include="Assets\lockpick-256.png" />
     <AvaloniaResource Include="Assets\Fonts\*.ttf" />
+    <AvaloniaResource Include="Assets\Buttons\**\*.png" />
   </ItemGroup>
   <ItemGroup>
     <!-- Single source for the in-app credits (Settings -> Credits). -->

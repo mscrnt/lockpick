@@ -24,6 +24,10 @@
     <Color x:Key="LpAmberDim">#3A2D12</Color>
     <Color x:Key="LpRed">#E0533F</Color>
     <Color x:Key="LpRedDim">#3D1913</Color>
+    <!-- The route guide's way on the maps: a colour no map marker uses. -->
+    <Color x:Key="LpRoute">#4FC3F7</Color>
+    <!-- A locked door whose key the player holds (yellow, apart from the items' amber). -->
+    <Color x:Key="LpKey">#F2DE4A</Color>
     <SolidColorBrush x:Key="LpBgBrush" Color="{StaticResource LpBg}" />
     <SolidColorBrush x:Key="LpPanelBrush" Color="{StaticResource LpPanel}" />
     <SolidColorBrush x:Key="LpPanelAltBrush" Color="{StaticResource LpPanelAlt}" />
@@ -36,6 +40,8 @@
     <SolidColorBrush x:Key="LpAmberDimBrush" Color="{StaticResource LpAmberDim}" />
     <SolidColorBrush x:Key="LpRedBrush" Color="{StaticResource LpRed}" />
     <SolidColorBrush x:Key="LpRedDimBrush" Color="{StaticResource LpRedDim}" />
+    <SolidColorBrush x:Key="LpRouteBrush" Color="{StaticResource LpRoute}" />
+    <SolidColorBrush x:Key="LpKeyBrush" Color="{StaticResource LpKey}" />
     <FontFamily x:Key="LpMono">Cascadia Mono, Consolas, Courier New</FontFamily>
     <!-- Wordmark: Special Elite (typewriter, Apache 2.0, Assets/Fonts/LICENSE.txt). -->
     <FontFamily x:Key="LpWordmark">avares://Lockpick/Assets/Fonts#Special Elite</FontFamily>

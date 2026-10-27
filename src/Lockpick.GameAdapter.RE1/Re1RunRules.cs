@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Lockpick.Core.Routes;
 using Lockpick.Core.Runs;
 using Lockpick.Core.State;
 
@@ -17,8 +18,17 @@ public sealed class Re1RunRules : IRunRules
 
     private static readonly Lazy<IReadOnlyList<SplitSet>> Sets = new(LoadEmbedded);
     private static readonly Lazy<LeaderboardDefinition> Board = new(LoadBoard);
+    private static readonly Lazy<IReadOnlyList<Route>> RouteList = new(() =>
+    {
+        using var stream = typeof(Re1RunRules).Assembly.GetManifestResourceStream("Lockpick.GameAdapter.RE1.Data.routes.json")
+            ?? throw new InvalidOperationException("Missing embedded RE1 data routes.json.");
+        return RouteFile.Parse(stream);
+    });
 
     public IReadOnlyList<SplitSet> SplitSets => Sets.Value;
+
+    /// <summary>The built-in routes (data/games/re1/routes.json).</summary>
+    public IReadOnlyList<Route> Routes => RouteList.Value;
 
     /// <summary>RE1 PC on speedrun.com (data/games/re1/speedrun-com.json).</summary>
     public LeaderboardDefinition Leaderboard => Board.Value;

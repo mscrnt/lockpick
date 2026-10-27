@@ -52,7 +52,7 @@ public partial class MapView : UserControl
         HeaderButtons.Margin = narrow ? new Thickness(0, 6, 0, 0) : new Thickness(8, 0, 0, 0);
         HeaderButtons.HorizontalAlignment = narrow ? Avalonia.Layout.HorizontalAlignment.Left : Avalonia.Layout.HorizontalAlignment.Right;
 
-        Grid.SetRow(LegendCard, wide ? 1 : 2);
+        Grid.SetRow(LegendCard, wide ? 2 : 3);
         Grid.SetColumn(LegendCard, wide ? 1 : 0);
         Grid.SetColumnSpan(LegendCard, wide ? 1 : 2);
         Grid.SetColumnSpan(MapCard, wide ? 1 : 2);

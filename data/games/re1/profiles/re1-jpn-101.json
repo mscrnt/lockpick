@@ -1265,6 +1265,30 @@
       ]
     },
     {
+      "name": "flagSys0",
+      "address": "0xC33098",
+      "type": "u32",
+      "description": "Script flag bank 4 ('sys' in room scripts), word 0: per-room puzzle state, e.g. the gallery's switches (117: sys 26, 28, 29, 27, 25, 30 in order; only the last one pressed stays set).",
+      "verification": "static",
+      "evidence": "Static: the same bank switch in the 1.01 Biohazard.exe (file 0x17374) loads bank 4 as mov ecx,0xC33098; its banks 0-3 and 7-9 are this profile's flag banks; live only on re1-gog-usa-hotfix4 so far.",
+      "sources": [
+        "static cross-map from re1-gog-usa-hotfix4",
+        "tools/rdt/scd.py BANKS"
+      ]
+    },
+    {
+      "name": "flagSys1",
+      "address": "0xC3309C",
+      "type": "u32",
+      "description": "Script flag bank 4 ('sys' in room scripts), word 1: per-room puzzle state, e.g. the gallery's switches (117: sys 26, 28, 29, 27, 25, 30 in order; only the last one pressed stays set).",
+      "verification": "static",
+      "evidence": "Static: the same bank switch in the 1.01 Biohazard.exe (file 0x17374) loads bank 4 as mov ecx,0xC33098; its banks 0-3 and 7-9 are this profile's flag banks; live only on re1-gog-usa-hotfix4 so far.",
+      "sources": [
+        "static cross-map from re1-gog-usa-hotfix4",
+        "tools/rdt/scd.py BANKS"
+      ]
+    },
+    {
       "name": "flagLocks0",
       "address": "0xC38744",
       "type": "u32",

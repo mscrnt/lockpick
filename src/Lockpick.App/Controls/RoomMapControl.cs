@@ -50,6 +50,11 @@ public sealed class RoomMapControl : Control
 
     /// <summary>Draw names (doors, items, people); off for the small overlay minimap.</summary>
     public static readonly StyledProperty<bool> ShowLabelsProperty = AvaloniaProperty.Register<RoomMapControl, bool>(nameof(ShowLabels), true);
+    public static readonly StyledProperty<Lockpick.Core.Routes.RoutePlan?> RouteProperty = AvaloniaProperty.Register<RoomMapControl, Lockpick.Core.Routes.RoutePlan?>(nameof(Route));
+    public static readonly StyledProperty<IBrush?> RouteBrushProperty = AvaloniaProperty.Register<RoomMapControl, IBrush?>(nameof(RouteBrush));
+    public static readonly StyledProperty<IReadOnlyDictionary<MapDoor, bool>?> LockedDoorsProperty = AvaloniaProperty.Register<RoomMapControl, IReadOnlyDictionary<MapDoor, bool>?>(nameof(LockedDoors));
+    public static readonly StyledProperty<IBrush?> LockedBrushProperty = AvaloniaProperty.Register<RoomMapControl, IBrush?>(nameof(LockedBrush));
+    public static readonly StyledProperty<IBrush?> KeyBrushProperty = AvaloniaProperty.Register<RoomMapControl, IBrush?>(nameof(KeyBrush));
 
     private const double Inset = 12;
 
@@ -57,7 +62,8 @@ public sealed class RoomMapControl : Control
     {
         AffectsRender<RoomMapControl>(MapProperty, PlacedItemsProperty, TakenItemsProperty, FilledSocketsProperty, DoorNamesProperty, ActorsProperty, LiveFixturesProperty, ShowAbsentItemsProperty, PlayerXProperty, PlayerZProperty, PlayerAngleProperty, HasPlayerProperty,
             WallBrushProperty, SoftBrushProperty, DoorBrushProperty, ItemBrushProperty, PlayerBrushProperty,
-            FaintTextBrushProperty, LabelPlateBrushProperty, ViewRadiusProperty, ShowLabelsProperty, FloorBrushProperty);
+            FaintTextBrushProperty, LabelPlateBrushProperty, ViewRadiusProperty, ShowLabelsProperty, FloorBrushProperty,
+            RouteProperty, RouteBrushProperty, LockedDoorsProperty, LockedBrushProperty, KeyBrushProperty);
     }
 
     public double ViewRadius { get => GetValue(ViewRadiusProperty); set => SetValue(ViewRadiusProperty, value); }
@@ -99,6 +105,22 @@ public sealed class RoomMapControl : Control
 
     /// <summary>Use spots whose item has been put in place (e.g. the gold emblem in its slot).</summary>
     public IReadOnlySet<MapSocket>? FilledSockets { get => GetValue(FilledSocketsProperty); set => SetValue(FilledSocketsProperty, value); }
+
+    /// <summary>The route guide's way (only this room's part is drawn).</summary>
+    public Lockpick.Core.Routes.RoutePlan? Route { get => GetValue(RouteProperty); set => SetValue(RouteProperty, value); }
+
+    public IBrush? RouteBrush { get => GetValue(RouteBrushProperty); set => SetValue(RouteBrushProperty, value); }
+
+    /// <summary>Doors still locked: true when the player holds the key that opens them (drawn in the key colour), false
+    /// otherwise (the locked colour). Doors not listed are open.</summary>
+    public IReadOnlyDictionary<MapDoor, bool>? LockedDoors { get => GetValue(LockedDoorsProperty); set => SetValue(LockedDoorsProperty, value); }
+
+    public IBrush? LockedBrush { get => GetValue(LockedBrushProperty); set => SetValue(LockedBrushProperty, value); }
+
+    public IBrush? KeyBrush { get => GetValue(KeyBrushProperty); set => SetValue(KeyBrushProperty, value); }
+
+    private IBrush? DoorColour(MapDoor door) =>
+        LockedDoors is { } locked && locked.TryGetValue(door, out var haveKey) ? (haveKey ? KeyBrush : LockedBrush) ?? DoorBrush : DoorBrush;
 
     public IBrush? WallBrush { get => GetValue(WallBrushProperty); set => SetValue(WallBrushProperty, value); }
 
@@ -171,12 +193,12 @@ public sealed class RoomMapControl : Control
             }
         }
 
-        var doorPen = DoorBrush is null ? null : new Pen(DoorBrush, 2);
         foreach (var d in map.Doors)
         {
+            var colour = DoorColour(d);
             var rect = R(d.X, d.Z, d.X + d.Width, d.Z + d.Depth);
-            context.DrawRectangle(null, doorPen, rect);
-            DrawLabel(context, DoorNames?.GetValueOrDefault(d.Target) ?? d.Target, rect.Center, DoorBrush, 12);
+            context.DrawRectangle(null, colour is null ? null : new Pen(colour, 2), rect);
+            DrawLabel(context, DoorNames?.GetValueOrDefault(d.Target) ?? d.Target, rect.Center, colour, 12);
         }
 
         var live = LiveFixtures;
@@ -235,6 +257,9 @@ public sealed class RoomMapControl : Control
                 DrawLabel(context, name, rect.TopLeft + new Vector(rect.Width / 2, -10), ItemBrush, 12);
             }
         }
+
+        RouteDrawing.Draw(context, Route, RouteBrush, room => room == map.RoomId ? P : null,
+            HasPlayer && Route?.Legs is [{ } first, ..] && first.Room == map.RoomId ? (PlayerX, PlayerZ) : null);
 
         foreach (var actor in Actors ?? [])
         {

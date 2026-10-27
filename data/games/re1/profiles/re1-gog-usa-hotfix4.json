@@ -848,6 +848,24 @@
       "sources": ["ecruells/resident-evil-pc-decomp docs/SCENARIO_FLAGS.md", "Gemini-Loboto3/RE1-Mod-SDK (layout)"]
     },
     {
+      "name": "flagSys0",
+      "address": "0xBE41C8",
+      "type": "u32",
+      "verification": "static",
+      "evidence": "Static: the script engine's flag-bank switch at 0x460590 (cmp eax,9; jmp [eax*4+0x46061C]) loads bank 4 as mov ecx,0xBE41C8 (banks 0-3, 7-9 there are the known flagScenarioA/B, flagLocks, flagEnemies, flagRoomItems, flagRoom and itemUse 0xD213A0). Live 2026-10-27 (owner, Jill, gallery 117): sys 27 set after the young man's switch; the middle-aged man's set 25 and cleared 27 (23 for an instant), as room 117's event scripts 16/14 say.",
+      "description": "Script flag bank 4 ('sys' in room scripts), word 0: per-room puzzle state, e.g. the gallery's switches (117: sys 26, 28, 29, 27, 25, 30 in order; only the last one pressed stays set).",
+      "sources": ["tools/rdt/scd.py BANKS", "tools/rdt/events.py (room 117 events 14-19)"]
+    },
+    {
+      "name": "flagSys1",
+      "address": "0xBE41CC",
+      "type": "u32",
+      "verification": "static",
+      "evidence": "Static: the script engine's flag-bank switch at 0x460590 (cmp eax,9; jmp [eax*4+0x46061C]) loads bank 4 as mov ecx,0xBE41C8 (banks 0-3, 7-9 there are the known flagScenarioA/B, flagLocks, flagEnemies, flagRoomItems, flagRoom and itemUse 0xD213A0). Live 2026-10-27 (owner, Jill, gallery 117): sys 27 set after the young man's switch; the middle-aged man's set 25 and cleared 27 (23 for an instant), as room 117's event scripts 16/14 say.",
+      "description": "Script flag bank 4 ('sys' in room scripts), word 1: per-room puzzle state, e.g. the gallery's switches (117: sys 26, 28, 29, 27, 25, 30 in order; only the last one pressed stays set).",
+      "sources": ["tools/rdt/scd.py BANKS", "tools/rdt/events.py (room 117 events 14-19)"]
+    },
+    {
       "name": "flagLocks0",
       "address": "0xBE9874",
       "type": "u32",

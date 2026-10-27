@@ -66,6 +66,9 @@ public interface IRunRules
     /// <summary>The built-in split sets.</summary>
     IReadOnlyList<SplitSet> SplitSets { get; }
 
+    /// <summary>The built-in routes for the route guide.</summary>
+    IReadOnlyList<Routes.Route> Routes => [];
+
     /// <summary>The player has died (the game over / death sequence).</summary>
     bool PlayerDied(GameSnapshot snapshot);
 

@@ -46,11 +46,15 @@ public sealed class WidgetRenderer : IDisposable
                 : new(OverlayLayout.Splits, _host.SplitsPanel, () => model.SplitRows.Count > 0, () => false),
             new(OverlayLayout.Feed, _host.FeedPanel, () => model.FeedLines.Count > 0, () => false),
             new(OverlayLayout.Banner, _host.BannerPanel, () => model.HasBanner, () => false),
+            new(OverlayLayout.Route, _host.RoutePanel, () => model.Map.Guide.HasStep, () => false),
+            new(OverlayLayout.RoutePicture, _host.RoutePicturePanel, () => model.HasRoutePicture, () => true),
         ];
         _entries = entries.ToDictionary(e => e.Id);
         _host.ShowEnemies(model.Enemies);
         _host.ShowSplits(model);
+        _host.ShowRoute(model.Map.Guide);
         model.PropertyChanged += OnModelChanged;
+        model.Map.Guide.PropertyChanged += OnRouteChanged;
         model.Map.PropertyChanged += OnMapChanged;
         services.LiveSplitEngine.Changed += OnEngineChanged;
     }
@@ -139,6 +143,7 @@ public sealed class WidgetRenderer : IDisposable
     {
         _model.PropertyChanged -= OnModelChanged;
         _model.Map.PropertyChanged -= OnMapChanged;
+        _model.Map.Guide.PropertyChanged -= OnRouteChanged;
         _services.LiveSplitEngine.Changed -= OnEngineChanged;
         _host.Close();
     }
@@ -153,7 +158,28 @@ public sealed class WidgetRenderer : IDisposable
 
     private void OnEngineChanged(object? sender, EventArgs e) => Dispatcher.UIThread.Post(() => Bump(OverlayLayout.Splits));
 
-    private void OnMapChanged(object? sender, PropertyChangedEventArgs e) => Bump(OverlayLayout.Minimap);
+    private void OnMapChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        Bump(OverlayLayout.Minimap);
+        if (e.PropertyName is nameof(MapViewModel.PlayerX) or nameof(MapViewModel.PlayerY) or nameof(MapViewModel.PlayerZ)
+            or nameof(MapViewModel.CameraId) or nameof(MapViewModel.Map) or nameof(MapViewModel.HasPlayer) or nameof(MapViewModel.InGame))
+        {
+            Bump(OverlayLayout.RoutePicture);
+        }
+    }
+
+    private void OnRouteChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        Bump(OverlayLayout.RoutePicture);
+        if (e.PropertyName == nameof(RouteViewModel.Plan))
+        {
+            Bump(OverlayLayout.Minimap);
+            return;
+        }
+
+        _host.ShowRoute(_model.Map.Guide);
+        Bump(OverlayLayout.Route);
+    }
 
     private void OnModelChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -166,6 +192,7 @@ public sealed class WidgetRenderer : IDisposable
                 _host.ShowSplits(_model);
                 _host.ShowFeed(_model.FeedLines);
                 _host.ShowEnemies(_model.Enemies);
+                _host.ShowRoute(_model.Map.Guide);
                 foreach (var entry in _entries.Values)
                 {
                     entry.Version++;

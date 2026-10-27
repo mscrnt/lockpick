@@ -82,6 +82,18 @@ public sealed record AppSettings
     /// <summary>Controller buttons for the same actions (TrainerHotkeys.Actions ids → GamepadBinding values).</summary>
     public IReadOnlyDictionary<string, string> GamepadActions { get; init; } = new Dictionary<string, string>();
 
+    /// <summary>The route the guide follows (a route id from the adapter), or null for none.</summary>
+    public string? RouteId { get; init; }
+
+    /// <summary>Whose buttons the route guide shows (<see cref="ButtonStyles"/>): the pad in use, or one kind always.</summary>
+    public string ButtonStyle { get; init; } = ButtonStyles.Auto;
+
+    /// <summary>Draw the route guide's way (the line, the ring, a puzzle's numbers) in the game's own picture.</summary>
+    public bool RouteInPicture { get; init; } = true;
+
+    /// <summary>Show the route guide's buttons at the bottom middle of the game's own picture.</summary>
+    public bool PromptsInPicture { get; init; } = true;
+
     /// <summary>Lockpick's API for other tools (docs/API.md): off unless the player turns it on.</summary>
     public bool ApiEnabled { get; init; }
 
@@ -374,6 +386,23 @@ public static class PopOutMapViews
 }
 
 /// <summary>The overlay's widgets and where each sits. Widgets sharing a corner stack in this order from the corner.</summary>
+/// <summary>Which buttons prompts show.</summary>
+public static class ButtonStyles
+{
+    public const string Auto = "auto";
+    public const string Xbox = "xbox";
+    public const string PlayStation = "playstation";
+    public const string Keyboard = "keyboard";
+
+    public static IReadOnlyList<(string Id, string Name)> All { get; } =
+    [
+        (Auto, "The controller in use (keyboard until one is pressed)"),
+        (Xbox, "Xbox"),
+        (PlayStation, "PlayStation"),
+        (Keyboard, "Keyboard"),
+    ];
+}
+
 public static class OverlayLayout
 {
     public const string Off = "Off";
@@ -383,6 +412,8 @@ public static class OverlayLayout
     public const string Splits = "splits";
     public const string Feed = "feed";
     public const string Banner = "banner";
+    public const string Route = "route";
+    public const string RoutePicture = "route-picture";
 
     public static IReadOnlyList<(string Id, string Name, string Default)> Widgets { get; } =
     [
@@ -392,6 +423,8 @@ public static class OverlayLayout
         (Splits, "Run splits (LiveSplit's look)", OverlayCorners.TopRight),
         (Feed, "What just happened", OverlayCorners.BottomLeft),
         (Banner, "Big messages (challenge failed, died, run finished)", OverlayCorners.TopCentre),
+        (Route, "Route guide (the next step and its buttons)", OverlayCorners.TopLeft),
+        (RoutePicture, "Route guide in the game picture (the way on the floor, the buttons)", OverlayCorners.TopLeft),
     ];
 
     /// <summary>A corner, or off.</summary>

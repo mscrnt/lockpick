@@ -325,8 +325,32 @@ public sealed partial class OverlayViewModel : ObservableObject
         {
             _picture = (widthDips, heightDips);
             UpdateMinimap();
+            PictureWidth = _picture.Width / Scale;
+            PictureHeight = _picture.Height / Scale;
+            RoutePictureWidth = Math.Max(1, PictureWidth - (2 * Margin));
+            RoutePictureHeight = Math.Max(1, PictureHeight - (2 * Margin));
         }
     }
+
+    /// <summary>The game picture in the overlay's units (before its scale), for the route drawn in it.</summary>
+    [ObservableProperty]
+    public partial double PictureWidth { get; private set; }
+
+    [ObservableProperty]
+    public partial double PictureHeight { get; private set; }
+
+    /// <summary>The route layer: the whole picture less the overlay's margin (a full-picture widget sits that far in).</summary>
+    [ObservableProperty]
+    public partial double RoutePictureWidth { get; private set; } = 1;
+
+    [ObservableProperty]
+    public partial double RoutePictureHeight { get; private set; } = 1;
+
+    public double PictureInset => Margin;
+
+    /// <summary>The route guide has something to draw in the game picture (a step with a way, in a game, a switch on).</summary>
+    public bool HasRoutePicture => Map.InGame && Map.Map is not null && Map.Guide.Plan is not null && !Map.Guide.Busy
+        && (Map.Guide.LineInPicture || (Map.Guide.PromptsInPicture && Map.Guide.Prompts.Count > 0) || Map.Guide.Clocks.Length > 0);
 
     private void Show(GameSnapshot? snapshot)
     {

@@ -10,7 +10,7 @@
     <!-- data/ is the source of truth; profiles are embedded so the app works without loose files. -->
     <EmbeddedResource Include="..\..\data\games\re1\profiles\*.json" LogicalName="Lockpick.GameAdapter.RE1.Profiles.%(Filename)%(Extension)" />
     <!-- What flags mean (room index from the game's room files, names, confirmed labels), for ask-mode captures. -->
-    <EmbeddedResource Include="..\..\data\games\re1\room-index.json;..\..\data\games\re1\names.json;..\..\data\games\re1\flag-labels.json;..\..\data\games\re1\rooms.json;..\..\data\games\re1\splits.json;..\..\data\games\re1\speedrun-com.json;..\..\data\games\re1\install\gog-hotfix4.sha256;..\..\data\games\re1\install\gog-jpn-hotfix4.sha256;..\..\data\games\re1\install\rebirth.json;..\..\data\games\re1\install\steam.json" LogicalName="Lockpick.GameAdapter.RE1.Data.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="..\..\data\games\re1\room-index.json;..\..\data\games\re1\names.json;..\..\data\games\re1\flag-labels.json;..\..\data\games\re1\rooms.json;..\..\data\games\re1\splits.json;..\..\data\games\re1\routes.json;..\..\data\games\re1\speedrun-com.json;..\..\data\games\re1\install\gog-hotfix4.sha256;..\..\data\games\re1\install\gog-jpn-hotfix4.sha256;..\..\data\games\re1\install\rebirth.json;..\..\data\games\re1\install\steam.json" LogicalName="Lockpick.GameAdapter.RE1.Data.%(Filename)%(Extension)" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Lockpick.Tests" />

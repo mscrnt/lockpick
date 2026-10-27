@@ -8,9 +8,9 @@ namespace Lockpick.GameAdapter.RE1;
 /// <summary>
 /// Reads room layouts from the player's own RE1 room files (USA\StageN\ROOMsrrV.RDT; V = 0 Chris, 1 Jill), read-only
 /// and cached per room. Layout (tools/rdt/rdt_map.py; ecruells/resident-evil-pc-decomp Types.h, checked against the
-/// files): byte 1 camera count, cameras at 0x94 (0x2C each: from x/z at +0x08/+0x10, target x/z at +0x14/+0x1C);
+/// files): byte 1 camera count, cameras at 0x94 (0x2C each: from x/y/z at +0x08, target x/y/z at +0x14, fov at +0x28);
 /// collision at the pointer at 0x4C (header: five per-quadrant counts as i32 at +4, then 0x0C-byte records xMax, zMax,
-/// xMin, zMin, type — low byte 3 = circle — and flags, bit 8 = blocks); doors (opcode 0x0C), item pickups (opcode
+/// xMin, zMin, type — low byte 3 = circle — and flags: 0x100 or 0x200 = solid); doors (opcode 0x0C, with lock and key), item pickups (opcode
 /// 0x18) and item-use spots (room action 0x0D with handler 7 and words (9, item − 0x1B): it raises the item's use bit
 /// while the player stands there) from the init/main scripts at the pointers at 0x60/0x64.
 /// </summary>
@@ -28,6 +28,12 @@ public sealed class Re1RoomMaps : IRoomMapSource
     ];
 
     private const int HeaderSize = 0x94;
+
+    // A collision record's flags: walls carry 0x300 and furniture 0x200 (the dining table and its chairs in 105; the
+    // player can't walk through either, live 2026-10-27); only the steps and slopes (type 4) have neither: floor zones.
+    private const int Solid = 0x300;
+    private const int SwordKey = 51;
+    private const int Lockpick = 49;
     private const int InkRibbon = 0x2F;
 
     // Room action handlers (opcode 0x0D +0x0A): 8 item box, 16 typewriter (live 2026-10-14: the zones in the save rooms
@@ -65,8 +71,15 @@ public sealed class Re1RoomMaps : IRoomMapSource
                 var map = info.Exists && info.Length is >= HeaderSize and <= MaxFileSize
                     ? Parse(File.ReadAllBytes(path), room, _itemName)
                     : null;
-                // Jill's room files list ink ribbons the game never places for her (Re1ProgressTracker.InkRibbon).
-                return map is not null && variant == 1 ? map with { Items = [.. map.Items.Where(i => i.ItemId != InkRibbon)] } : map;
+                // Jill's room files list ink ribbons the game never places for her (Re1ProgressTracker.InkRibbon), and
+                // her lockpick opens the doors that take Chris's sword key.
+                return map is not null && variant == 1
+                    ? map with
+                    {
+                        Items = [.. map.Items.Where(i => i.ItemId != InkRibbon)],
+                        Doors = [.. map.Doors.Select(d => d.Key == SwordKey ? d with { Key = Lockpick } : d)],
+                    }
+                    : map;
             }
             catch (IOException)
             {
@@ -105,6 +118,28 @@ public sealed class Re1RoomMaps : IRoomMapSource
         return (word.Value & fill.Mask) != 0;
     }
 
+    /// <summary>
+    /// A door's lock flag is set once it has been opened (flagLocks, flag n = bit 31 − n % 32 of word n / 32; "unlocked
+    /// door 20E→210" seen live 2026-10-14 when the examined Shield key opened it).
+    /// </summary>
+    public bool? IsUnlocked(MapDoor door, GameSnapshot snapshot)
+    {
+        if (door.LockFlag is not { } flag || !snapshot.RawFields.TryGetValue($"flagLocks{flag / 32}", out var word) || !word.HasValue)
+        {
+            return door.LockFlag is null ? true : null;
+        }
+
+        return (word.Value & (1L << (31 - flag % 32))) != 0;
+    }
+
+    /// <summary>
+    /// Jill's lockpick: Barry hands it over in the main hall and it never appears in the inventory or the item box; the
+    /// story flag (flagScenarioA3 bit 0x8, docs/MEMORY_MAP.md) says she has it. It opens the Sword-key doors.
+    /// </summary>
+    public IEnumerable<int> HeldElsewhere(GameSnapshot snapshot) =>
+        snapshot.Character is { HasValue: true, Value: PlayableCharacter.Jill }
+        && snapshot.RawFields.TryGetValue("flagScenarioA3", out var word) && word.HasValue && (word.Value & 0x8) != 0 ? [Lockpick] : [];
+
     /// <summary>Parses one room file; null when it isn't a readable room (stubs, damaged files).</summary>
     public static RoomMap? Parse(ReadOnlySpan<byte> data, RoomLocation room, Func<int, string> itemName)
     {
@@ -120,7 +155,9 @@ public sealed class Re1RoomMaps : IRoomMapSource
             for (var i = 0; i < count && HeaderSize + (i + 1) * 0x2C <= data.Length; i++)
             {
                 var o = HeaderSize + i * 0x2C;
-                cameras.Add(new MapCamera(i, I32(data, o + 0x08), I32(data, o + 0x10), I32(data, o + 0x14), I32(data, o + 0x1C)));
+                // +0x0C / +0x18: the heights; +0x28: the field of view (ecruells/resident-evil-pc-decomp RDT_Camera).
+                cameras.Add(new MapCamera(i, I32(data, o + 0x08), I32(data, o + 0x10), I32(data, o + 0x14), I32(data, o + 0x1C),
+                    I32(data, o + 0x0C), I32(data, o + 0x18), I32(data, o + 0x28)));
             }
 
             var shapes = new List<MapShape>();
@@ -148,7 +185,7 @@ public sealed class Re1RoomMaps : IRoomMapSource
                     var kind = U16(data, o + 8);
                     var flags = U16(data, o + 10);
                     shapes.Add(new MapShape((kind & 0xFF) == 3 ? MapShapeKind.Circle : MapShapeKind.Rectangle,
-                        U16(data, o + 4), U16(data, o + 6), U16(data, o), U16(data, o + 2), (flags & 0x100) != 0));
+                        U16(data, o + 4), U16(data, o + 6), U16(data, o), U16(data, o + 2), (flags & Solid) != 0));
                 }
             }
 
@@ -198,8 +235,34 @@ public sealed class Re1RoomMaps : IRoomMapSource
             {
                 var dest = b[0x0F];
                 var stage = dest >> 5 == 0 ? room.Stage : dest >> 5;
+                // +0x0E: lock (bit 0x80 = starts locked, low 6 bits its flagLocks number); +0x18: the key item, or 254
+                // "opens from this side" / 255 "locked from the other side" (every keyless locked door in both
+                // characters' files is a 254/255 pair, one side each, except 206 → 207, which has no door back and is
+                // 254), or 0: the story opens it (11A → 11B: the four crests).
+                var lockByte = b[0x0E];
+                var key = b[0x18];
+                int? lockFlag = (lockByte & 0x80) != 0 && lockByte != 0xFF ? lockByte & 0x3F : null;
+                var unlock = key switch
+                {
+                    254 => MapUnlock.ThisSide,
+                    255 => MapUnlock.OtherSide,
+                    0 => MapUnlock.Event,
+                    _ => MapUnlock.Key,
+                };
+                // +0x0D: how the way is shown: 0x60 stairs (every mansion staircase, the lab stairway), 0x40 no door (the
+                // courtyard's gates, ladders, lifts); a door model otherwise.
+                var exit = b[0x0D] switch { 0x60 => MapExitKind.Stairs, 0x40 => MapExitKind.Passage, _ => MapExitKind.Door };
                 // +0x10: arrival x, y, z and facing in the next room (i16 each).
-                doors.Add(new MapDoor(I16(b, 2), I16(b, 4), U16(b, 6), U16(b, 8), $"{stage}{dest & 0x1F:X2}", I16(b, 0x10), I16(b, 0x14)));
+                var door = new MapDoor(I16(b, 2), I16(b, 4), U16(b, 6), U16(b, 8), $"{stage}{dest & 0x1F:X2}", I16(b, 0x10), I16(b, 0x14),
+                    lockFlag, unlock == MapUnlock.Key ? key : null, lockFlag is null ? MapUnlock.Key : unlock, exit);
+                doors.Add(door);
+
+                // No door leads into the mansion revisited (stages 6 and 7): the game switches to those rooms by itself
+                // once the story moves on, so a door from outside into the mansion also leads to its revisited room.
+                if (room.Stage >= 3 && stage is 1 or 2)
+                {
+                    doors.Add(door with { Target = $"{stage + 5}{dest & 0x1F:X2}" });
+                }
             }
             else if (op == 0x18)
             {

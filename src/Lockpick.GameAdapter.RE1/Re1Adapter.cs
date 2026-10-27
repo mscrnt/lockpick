@@ -119,6 +119,18 @@ public sealed class Re1Adapter : IGameAdapter
 
     public string? RoomName(string roomId) => Knowledge.Value.RoomNames.TryGetValue(roomId, out var name) ? name : null;
 
+    public string? KeyName(Core.Routes.GameControl control, Core.State.GameSnapshot snapshot) => Re1Controls.KeyName(control, snapshot);
+
+    /// <summary>
+    /// stateFlags bits that mean the player isn't in control (docs/MEMORY_MAP.md, the bits the dev harness waits out:
+    /// 0x800 interacting and 0x8000 a message while examining or picking up, the menus' 0x20000000 / 0x40000000 cycle,
+    /// camera locks and voice in cutscenes, death); 0x4 / 0x8 are left by room scripts and don't count.
+    /// </summary>
+    private const long NotInControl = 0x80 | 0xFF00 | 0x10000 | 0x20000 | 0x40000 | 0x100000 | 0x01000000 | 0x04000000 | 0x20000000;
+
+    public bool PlayerBusy(Core.State.GameSnapshot snapshot) =>
+        snapshot.RawFields.TryGetValue(Re1Session.Fields.StateFlags, out var flags) && flags.HasValue && (flags.Value & NotInControl) != 0;
+
     /// <summary>The room files of the game being played: JPN for Biohazard.exe, USA for ResidentEvil.exe.</summary>
     public Core.Maps.IRoomMapSource CreateRoomMaps(string executablePath)
     {

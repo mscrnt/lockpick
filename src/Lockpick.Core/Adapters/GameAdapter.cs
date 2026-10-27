@@ -90,6 +90,12 @@ public interface IGameAdapter
 
     /// <summary>The item's name, or null when the adapter doesn't know it.</summary>
     string? ItemName(int itemId) => null;
+
+    /// <summary>The keyboard key the player has set for <paramref name="control"/> ("C", "↑"), or null when unknown.</summary>
+    string? KeyName(Routes.GameControl control, State.GameSnapshot snapshot) => null;
+
+    /// <summary>The player isn't in control right now (a message, a menu, the inventory, a cutscene): prompts wait.</summary>
+    bool PlayerBusy(State.GameSnapshot snapshot) => false;
 }
 
 /// <summary>A verified connection to one running game process.</summary>

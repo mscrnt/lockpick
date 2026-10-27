@@ -1361,6 +1361,30 @@
       ]
     },
     {
+      "name": "flagSys0",
+      "address": "0xC33098",
+      "type": "u32",
+      "description": "Script flag bank 4 ('sys' in room scripts), word 0: per-room puzzle state, e.g. the gallery's switches (117: sys 26, 28, 29, 27, 25, 30 in order; only the last one pressed stays set).",
+      "verification": "static",
+      "evidence": "Static: GOG's Japanese exe inside Steam's wrapper: bank 4 = 0xC33098 as in re1-gog-jpn-hotfix4 (this profile's flag banks are GOG Japanese's); live only on re1-gog-usa-hotfix4 so far.",
+      "sources": [
+        "static cross-map from re1-gog-jpn-hotfix4",
+        "tools/rdt/scd.py BANKS"
+      ]
+    },
+    {
+      "name": "flagSys1",
+      "address": "0xC3309C",
+      "type": "u32",
+      "description": "Script flag bank 4 ('sys' in room scripts), word 1: per-room puzzle state, e.g. the gallery's switches (117: sys 26, 28, 29, 27, 25, 30 in order; only the last one pressed stays set).",
+      "verification": "static",
+      "evidence": "Static: GOG's Japanese exe inside Steam's wrapper: bank 4 = 0xC33098 as in re1-gog-jpn-hotfix4 (this profile's flag banks are GOG Japanese's); live only on re1-gog-usa-hotfix4 so far.",
+      "sources": [
+        "static cross-map from re1-gog-jpn-hotfix4",
+        "tools/rdt/scd.py BANKS"
+      ]
+    },
+    {
       "name": "flagLocks0",
       "address": "0xC38744",
       "type": "u32",

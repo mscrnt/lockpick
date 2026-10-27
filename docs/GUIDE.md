@@ -198,6 +198,19 @@ settings are kept and can be put back):
 Resident Evil pauses and goes black whenever it isn't the active window — that's the original game. Keep it in front
 while you play (and in OBS, expect a black picture while you click elsewhere).
 
+## The route guide
+
+Map → **Route guide**: pick a route (so far a draft of Jill's any%). Lockpick shows the step you're on, a hint where the
+game data can't say how a puzzle opens, and the way there as a blue line on the map and the minimap: around the
+furniture and through the doors you can open. Locked doors are red, and yellow once you can open them (you hold the
+key, or it opens from your side). Puzzles with an order, like the gallery's paintings, are numbered on the map. Near the item,
+door or spot that matters, the buttons to press appear (Xbox, PlayStation or your keyboard keys, whichever you used last,
+or the one you pick). The steps tick off by themselves as you play, also from a loaded save; **Skip** and **Back** move
+by hand. On the overlay it's the *Route guide* widget (Settings → Overlay), and *Route guide in the game picture* draws the way
+on the floor of the game's own picture, with a ring where the step is and the buttons at the bottom middle; the
+Route guide card has a switch for each (*the way*, *the buttons*). The draft route hasn't been followed through
+a whole run yet, so a step can be out of place: skip it.
+
 ## Helping out: captures
 
 Debug → *Capture*: **Start capture**, play, **Stop and save** — the zip helps Lockpick learn the parts of the game it

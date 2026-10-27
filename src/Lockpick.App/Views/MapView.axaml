@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Lockpick.App.ViewModels"
              xmlns:c="using:Lockpick.App.Controls"
+             xmlns:s="using:Lockpick.App.Services"
              x:Class="Lockpick.App.Views.MapView"
              x:DataType="vm:MapViewModel">
 
@@ -16,6 +17,15 @@
       <Setter Property="FontSize" Value="11" />
       <Setter Property="Margin" Value="0,8,0,2" />
     </Style>
+    <Style Selector="Border.keycap">
+      <Setter Property="Background" Value="{StaticResource LpPanelAltBrush}" />
+      <Setter Property="BorderBrush" Value="{StaticResource LpBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="Padding" Value="5,1" />
+      <Setter Property="MinWidth" Value="22" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
     <Style Selector="StackPanel.legendrow">
       <Setter Property="Orientation" Value="Horizontal" />
       <Setter Property="Spacing" Value="8" />
@@ -24,7 +34,7 @@
   </UserControl.Styles>
 
   <!-- The map is the page: the header is one compact row and the legend only takes room when there is room to give. -->
-  <Grid x:Name="Layout" RowDefinitions="Auto,*,Auto" ColumnDefinitions="*,Auto">
+  <Grid x:Name="Layout" RowDefinitions="Auto,Auto,*,Auto" ColumnDefinitions="*,Auto">
     <Border x:Name="HeaderCard" Classes="card" Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,8" Padding="14,8">
       <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto">
         <c:LucideIcon Data="{StaticResource Icon.Map}" VerticalAlignment="Center" Margin="0,0,10,0" />
@@ -44,15 +54,91 @@
       </Grid>
     </Border>
 
-    <Border x:Name="MapCard" Classes="card" Grid.Row="1" Grid.Column="0" MinHeight="160" Padding="6">
+    <!-- The route guide: pick a route; the step, its buttons and the way there (drawn on the map). -->
+    <Border x:Name="RouteCard" Classes="card" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,0,0,8" Padding="14,8">
+      <StackPanel Spacing="6">
+        <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="6">
+          <StackPanel Classes="cardhead" VerticalAlignment="Center">
+            <c:LucideIcon Data="{StaticResource Icon.Route}" />
+            <TextBlock Classes="caption" Text="ROUTE GUIDE" />
+          </StackPanel>
+          <ComboBox ItemsSource="{Binding Guide.Routes}" SelectedItem="{Binding Guide.SelectedRoute}" MinWidth="200"
+                    AutomationProperties.Name="Route" ToolTip.Tip="The route the guide follows: its next step, the way there and the buttons to press." />
+          <ComboBox ItemsSource="{Binding Guide.Styles}" SelectedItem="{Binding Guide.SelectedStyle}" IsVisible="{Binding Guide.IsOn}"
+                    AutomationProperties.Name="Buttons shown" ToolTip.Tip="Whose buttons the prompts show." />
+          <Button Content="Back" Command="{Binding Guide.BackStepCommand}" IsVisible="{Binding Guide.HasStep}"
+                  AutomationProperties.Name="Previous step" ToolTip.Tip="Go back a step." />
+          <Button Content="Skip" Command="{Binding Guide.SkipStepCommand}" IsVisible="{Binding Guide.HasStep}"
+                  AutomationProperties.Name="Next step" ToolTip.Tip="Skip this step (for one the game gives no sign of, or one you'd rather not do)." />
+        </WrapPanel>
+        <WrapPanel Orientation="Horizontal" ItemSpacing="12" IsVisible="{Binding Guide.IsOn}">
+          <TextBlock Text="In the game picture:" Foreground="{StaticResource LpMutedBrush}" VerticalAlignment="Center" />
+          <CheckBox Content="the way" IsChecked="{Binding Guide.LineInPicture}" AutomationProperties.Name="Draw the way in the game picture"
+                    ToolTip.Tip="Draw the way on the floor in the game's picture, with a ring where the step is and a puzzle's numbers (needs the overlay on: Settings → Overlay)." />
+          <CheckBox Content="the buttons" IsChecked="{Binding Guide.PromptsInPicture}" AutomationProperties.Name="Show the buttons in the game picture"
+                    ToolTip.Tip="Show the buttons to press at the bottom middle of the game's picture." />
+        </WrapPanel>
+        <TextBlock Text="{Binding Guide.Status}" Foreground="{StaticResource LpMutedBrush}" TextWrapping="Wrap"
+                   IsVisible="{Binding Guide.Waiting}" />
+        <StackPanel Spacing="4" IsVisible="{Binding Guide.HasStep}">
+          <TextBlock Classes="headline" Text="{Binding Guide.Step}" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding Guide.Where}" Foreground="{StaticResource LpMutedBrush}" />
+          <TextBlock Text="{Binding Guide.Clocks}" TextWrapping="Wrap" FontWeight="SemiBold" Foreground="{StaticResource LpAmberBrush}"
+                     IsVisible="{Binding Guide.Clocks, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+          <TextBlock Text="{Binding Guide.Hint}" TextWrapping="Wrap"
+                     IsVisible="{Binding Guide.Hint, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+          <ItemsControl ItemsSource="{Binding Guide.Prompts}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel Orientation="Horizontal" ItemSpacing="16" LineSpacing="4" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:PromptRow">
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                  <ItemsControl ItemsSource="{Binding Buttons}">
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" Spacing="2" />
+                      </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="s:ButtonGlyph">
+                        <Panel>
+                          <Image Source="{Binding Image}" Width="24" Height="24" ToolTip.Tip="{Binding Label}"
+                                 IsVisible="{Binding Image, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                          <Border Classes="keycap" IsVisible="{Binding Image, Converter={x:Static ObjectConverters.IsNull}}">
+                            <TextBlock Text="{Binding Label}" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                          </Border>
+                        </Panel>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                  <TextBlock Text="{Binding Text}" VerticalAlignment="Center" />
+                </StackPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <TextBlock Text="{Binding Guide.Note}" Classes="warning" TextWrapping="Wrap"
+                     IsVisible="{Binding Guide.Note, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+          <TextBlock Text="{Binding Guide.Next}" Foreground="{StaticResource LpMutedBrush}" TextWrapping="Wrap" />
+          <TextBlock Text="A draft route, not yet followed through a whole run: steps can be out of order. Skip any that don't fit."
+                     Foreground="{StaticResource LpMutedBrush}" FontSize="11" TextWrapping="Wrap" IsVisible="{Binding Guide.IsDraft}" />
+        </StackPanel>
+      </StackPanel>
+    </Border>
+
+    <Border x:Name="MapCard" Classes="card" Grid.Row="2" Grid.Column="0" MinHeight="160" Padding="6">
       <Panel>
       <c:FloorMapControl x:Name="FloorMap" IsVisible="{Binding ShowFloor}" Interactive="True" ClipToBounds="True"
                          Floor="{Binding Floor}" CurrentRoom="{Binding CurrentRoom}" TakenItems="{Binding FloorTaken}"
                          PlayerX="{Binding PlayerX}" PlayerZ="{Binding PlayerZ}" PlayerAngle="{Binding PlayerAngle}" HasPlayer="{Binding HasPlayer}"
                          FloorBrush="#1C2421" WallBrush="#5A6762" SoftBrush="#2C3833"
                          DoorBrush="{StaticResource LpGreenBrush}" ItemBrush="{StaticResource LpAmberBrush}" PlayerBrush="{StaticResource LpRedBrush}"
-                         LabelBrush="{StaticResource LpTextBrush}" HighlightBrush="{StaticResource LpRedBrush}" />
-      <c:RoomMapControl IsVisible="{Binding !ShowFloor}" Map="{Binding Map}" PlacedItems="{Binding PlacedItems}" TakenItems="{Binding TakenItems}" FilledSockets="{Binding FilledSockets}" DoorNames="{Binding DoorNames}" Actors="{Binding Actors}" LiveFixtures="{Binding LiveFixtures}" ShowAbsentItems="{Binding ShowAbsentItems}" PlayerX="{Binding PlayerX}" PlayerZ="{Binding PlayerZ}"
+                         LabelBrush="{StaticResource LpTextBrush}" HighlightBrush="{StaticResource LpRedBrush}"
+                         Route="{Binding Guide.Plan}" RouteBrush="{StaticResource LpRouteBrush}"
+                         LockedDoors="{Binding LockedDoors}" LockedBrush="{StaticResource LpRedBrush}" KeyBrush="{StaticResource LpKeyBrush}" />
+      <c:RoomMapControl IsVisible="{Binding !ShowFloor}" Route="{Binding Guide.Plan}" RouteBrush="{StaticResource LpRouteBrush}"  LockedDoors="{Binding LockedDoors}" LockedBrush="{StaticResource LpRedBrush}" KeyBrush="{StaticResource LpKeyBrush}" Map="{Binding Map}" PlacedItems="{Binding PlacedItems}" TakenItems="{Binding TakenItems}" FilledSockets="{Binding FilledSockets}" DoorNames="{Binding DoorNames}" Actors="{Binding Actors}" LiveFixtures="{Binding LiveFixtures}" ShowAbsentItems="{Binding ShowAbsentItems}" PlayerX="{Binding PlayerX}" PlayerZ="{Binding PlayerZ}"
                         PlayerAngle="{Binding PlayerAngle}" HasPlayer="{Binding HasPlayer}"
                         WallBrush="{StaticResource LpMutedBrush}" SoftBrush="{StaticResource LpBorderBrush}"
                         DoorBrush="{StaticResource LpGreenBrush}" ItemBrush="{StaticResource LpAmberBrush}"
@@ -62,7 +148,7 @@
     </Border>
 
     <!-- The legend lists only what this room holds: beside the map on a wide window, under it on a narrow one. -->
-    <Border x:Name="LegendCard" Classes="card" Grid.Row="1" Grid.Column="1" Margin="8,0,0,0" MinWidth="190" MaxWidth="260">
+    <Border x:Name="LegendCard" Classes="card" Grid.Row="2" Grid.Column="1" Margin="8,0,0,0" MinWidth="190" MaxWidth="260">
       <ScrollViewer>
         <StackPanel>
           <TextBlock Classes="caption" Text="LEGEND" />
@@ -79,6 +165,14 @@
           <StackPanel Classes="legendrow">
             <Rectangle Width="14" Height="10" Stroke="{StaticResource LpGreenBrush}" StrokeThickness="1.5" />
             <TextBlock Classes="legend" Text="Door (to room)" />
+          </StackPanel>
+          <StackPanel Classes="legendrow">
+            <Rectangle Width="14" Height="10" Stroke="{StaticResource LpRedBrush}" StrokeThickness="1.5" />
+            <TextBlock Classes="legend" Text="Locked door" />
+          </StackPanel>
+          <StackPanel Classes="legendrow">
+            <Rectangle Width="14" Height="10" Stroke="{StaticResource LpKeyBrush}" StrokeThickness="1.5" />
+            <TextBlock Classes="legend" Text="Locked, and you can open it (the key, or from this side)" />
           </StackPanel>
           <StackPanel Classes="legendrow" IsVisible="{Binding HasItemBox}">
             <Rectangle Width="14" Height="10" Fill="#59A1887F" Stroke="#A1887F" StrokeThickness="1.5" />

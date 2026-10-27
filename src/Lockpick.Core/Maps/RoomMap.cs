@@ -12,11 +12,43 @@ public enum MapShapeKind
 /// <summary>A collision record: walls and furniture block movement; soft zones (floors, steps) don't.</summary>
 public sealed record MapShape(MapShapeKind Kind, int X0, int Z0, int X1, int Z1, bool Blocks);
 
+/// <summary>What a room's exit is: a door, stairs, or a way through without either (a gate, a ladder, a lift).</summary>
+public enum MapExitKind
+{
+    Door,
+    Stairs,
+    Passage,
+}
+
+/// <summary>How a door that starts locked is opened.</summary>
+public enum MapUnlock
+{
+    /// <summary>With <see cref="MapDoor.Key"/>.</summary>
+    Key,
+
+    /// <summary>From this side: trying it here unlocks it (both sides open from then on).</summary>
+    ThisSide,
+
+    /// <summary>Only from the other side ("locked from the other side" here).</summary>
+    OtherSide,
+
+    /// <summary>By the story (an event or a puzzle elsewhere).</summary>
+    Event,
+}
+
 /// <summary>
 /// A door zone in this room and the room it leads to (adapter-specific id, e.g. "106"), with where the player arrives
-/// in that room when the game says (for placing rooms on a floor map).
+/// in that room when the game says (for placing rooms on a floor map). <paramref name="LockFlag"/> is the adapter's
+/// lock flag when the door starts locked, <paramref name="Unlock"/> how it opens and <paramref name="Key"/> the item
+/// that opens it when that's a key.
 /// </summary>
-public sealed record MapDoor(int X, int Z, int Width, int Depth, string Target, int? ArrivalX = null, int? ArrivalZ = null);
+public sealed record MapDoor(int X, int Z, int Width, int Depth, string Target, int? ArrivalX = null, int? ArrivalZ = null,
+    int? LockFlag = null, int? Key = null, MapUnlock Unlock = MapUnlock.Key, MapExitKind Exit = MapExitKind.Door)
+{
+    public double CenterX => X + (Width / 2.0);
+
+    public double CenterZ => Z + (Depth / 2.0);
+}
 
 /// <summary>An item pickup zone placed by the room's own data for this character; <paramref name="Flag"/> is the
 /// adapter's pickup flag (−1 when none).</summary>
@@ -35,8 +67,11 @@ public enum FixtureKind
 /// <summary>Where the player uses an item box or a typewriter (the zone the action key tests).</summary>
 public sealed record MapFixture(int X, int Z, int Width, int Depth, FixtureKind Kind);
 
-/// <summary>A fixed camera: where it stands and the point it looks at.</summary>
-public sealed record MapCamera(int Id, int X, int Z, int TargetX, int TargetZ);
+/// <summary>
+/// A fixed camera: where it stands and the point it looks at (with their heights; the room's −Y is up) and its field of
+/// view, the focal length in the picture's units (<see cref="CameraProjection"/>; 0 when unknown).
+/// </summary>
+public sealed record MapCamera(int Id, int X, int Z, int TargetX, int TargetZ, int Y = 0, int TargetY = 0, int Fov = 0);
 
 /// <summary>
 /// One room's static layout, read from the player's own game files by the adapter. Game-agnostic: coordinates are the
@@ -94,4 +129,10 @@ public interface IRoomMapSource
 
     /// <summary>True when the socket's item has been put in place in this game; null when unknown.</summary>
     bool? IsFilled(RoomMap map, MapSocket socket, GameSnapshot snapshot) => null;
+
+    /// <summary>True when a door that starts locked (<see cref="MapDoor.LockFlag"/>) has been opened; null when unknown.</summary>
+    bool? IsUnlocked(MapDoor door, GameSnapshot snapshot) => null;
+
+    /// <summary>Items the player has that the inventory doesn't show (e.g. a tool the story hands over).</summary>
+    IEnumerable<int> HeldElsewhere(GameSnapshot snapshot) => [];
 }

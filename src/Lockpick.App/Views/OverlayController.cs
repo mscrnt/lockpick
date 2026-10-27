@@ -61,7 +61,10 @@ public sealed class OverlayController : IDisposable
         var status = _services.Source.Status;
         var minimapOn = (settings.OverlayEnabled && OverlayLayout.Corner(settings, OverlayLayout.Minimap) != OverlayLayout.Off)
             || _renderer.Watched(OverlayLayout.Minimap); // a pop-out or the Stream page shows it
-        _model.Map.KeepUpdating = minimapOn && status.State is ConnectionState.Attached or ConnectionState.Replaying;
+        // The route in the game picture follows the player and the camera through the same map model.
+        var routePictureOn = settings.OverlayEnabled && OverlayLayout.Corner(settings, OverlayLayout.RoutePicture) != OverlayLayout.Off
+            && settings.RouteId is not null;
+        _model.Map.KeepUpdating = (minimapOn || routePictureOn) && status.State is ConnectionState.Attached or ConnectionState.Replaying;
         if (status.State != ConnectionState.Attached || status.Process is not { } process)
         {
             Game = null;

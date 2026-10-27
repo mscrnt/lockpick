@@ -1297,6 +1297,30 @@
       ]
     },
     {
+      "name": "flagSys0",
+      "address": "0xBE41C8",
+      "type": "u32",
+      "description": "Script flag bank 4 ('sys' in room scripts), word 0: per-room puzzle state, e.g. the gallery's switches (117: sys 26, 28, 29, 27, 25, 30 in order; only the last one pressed stays set).",
+      "verification": "static",
+      "evidence": "Static: GOG's English exe inside Steam's wrapper: the same bank switch, bank 4 = 0xBE41C8 (this profile's flag banks are GOG English's); live only on re1-gog-usa-hotfix4 so far.",
+      "sources": [
+        "static cross-map from re1-gog-usa-hotfix4",
+        "tools/rdt/scd.py BANKS"
+      ]
+    },
+    {
+      "name": "flagSys1",
+      "address": "0xBE41CC",
+      "type": "u32",
+      "description": "Script flag bank 4 ('sys' in room scripts), word 1: per-room puzzle state, e.g. the gallery's switches (117: sys 26, 28, 29, 27, 25, 30 in order; only the last one pressed stays set).",
+      "verification": "static",
+      "evidence": "Static: GOG's English exe inside Steam's wrapper: the same bank switch, bank 4 = 0xBE41C8 (this profile's flag banks are GOG English's); live only on re1-gog-usa-hotfix4 so far.",
+      "sources": [
+        "static cross-map from re1-gog-usa-hotfix4",
+        "tools/rdt/scd.py BANKS"
+      ]
+    },
+    {
       "name": "flagLocks0",
       "address": "0xBE9874",
       "type": "u32",

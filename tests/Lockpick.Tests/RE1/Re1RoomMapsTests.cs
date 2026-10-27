@@ -29,7 +29,7 @@ public class Re1RoomMapsTests
         var r = 0x118;
         U16(r, 5000); U16(r + 2, 6000); U16(r + 4, 1000); U16(r + 6, 2000); U16(r + 8, 1); U16(r + 10, 0x300); // blocking rectangle
         r += 0x0C;
-        U16(r, 900); U16(r + 2, 900); U16(r + 4, 100); U16(r + 6, 100); U16(r + 8, 3); U16(r + 10, 0x200);     // soft circle
+        U16(r, 900); U16(r + 2, 900); U16(r + 4, 100); U16(r + 6, 100); U16(r + 8, 3); U16(r + 10, 0x000);     // soft circle
 
         // Init script at 0x200: a door to 106, the emblem pickup twice (both branches of a condition), an
         // event-placed item (16x16 zone) and the gold emblem's use spot. Main script at 0x300: empty.
@@ -88,10 +88,81 @@ public class Re1RoomMapsTests
     }
 
     [Fact]
+    public void Furniture_blocks_like_walls()
+    {
+        var data = BuildRoom();
+        BinaryPrimitives.WriteUInt16LittleEndian(data.AsSpan(0x118 + 10), 0x200); // the dining table's flags
+        Assert.True(Re1RoomMaps.Parse(data, Room105, Name)!.Shapes[0].Blocks);
+    }
+
+    [Fact]
     public void Reads_doors_with_their_target_room()
     {
         var door = Assert.Single(Parse().Doors);
         Assert.Equal(new MapDoor(31600, 6300, 2000, 4000, "106", 18500, 2500), door);
+    }
+
+    [Fact]
+    public void Reads_a_door_lock_and_its_key_and_whether_it_is_open()
+    {
+        var data = BuildRoom();
+        data[0x202 + 0x0E] = 0x85; // starts locked, lock flag 5
+        data[0x202 + 0x18] = 52;   // the Armor key
+        var door = Assert.Single(Re1RoomMaps.Parse(data, Room105, Name)!.Doors);
+        Assert.Equal((5, 52), (door.LockFlag, door.Key));
+
+        var maps = new Re1RoomMaps(Path.GetTempPath(), Name);
+        Assert.False(maps.IsUnlocked(door, Flags(("flagLocks0", 0))));
+        Assert.True(maps.IsUnlocked(door, Flags(("flagLocks0", 0x80000000L >> 5))));
+        Assert.Null(maps.IsUnlocked(door, new GameSnapshot()));
+        Assert.True(maps.IsUnlocked(door with { LockFlag = null }, new GameSnapshot()));
+    }
+
+    [Theory]
+    [InlineData(254, MapUnlock.ThisSide)]
+    [InlineData(255, MapUnlock.OtherSide)]
+    [InlineData(0, MapUnlock.Event)]
+    public void A_locked_door_without_a_key_opens_from_one_side_or_by_the_story(byte keyByte, MapUnlock unlock)
+    {
+        var data = BuildRoom();
+        data[0x202 + 0x0E] = 0x94; // starts locked, lock flag 20 (10A ↔ 10B)
+        data[0x202 + 0x18] = keyByte;
+        var door = Assert.Single(Re1RoomMaps.Parse(data, Room105, Name)!.Doors);
+        Assert.Equal((20, (int?)null, unlock), (door.LockFlag, door.Key, door.Unlock));
+    }
+
+    [Fact]
+    public void Jill_has_the_lockpick_once_Barry_hands_it_over_though_the_inventory_never_shows_it()
+    {
+        var maps = new Re1RoomMaps(Path.GetTempPath(), Name);
+        GameSnapshot Story(PlayableCharacter who, long a3) => new()
+        {
+            Character = Field<PlayableCharacter>.Valid(who),
+            RawFields = new Dictionary<string, Field<long>> { ["flagScenarioA3"] = Field<long>.Valid(a3) },
+        };
+        Assert.Equal([49], maps.HeldElsewhere(Story(PlayableCharacter.Jill, 0x1000008)));
+        Assert.Empty(maps.HeldElsewhere(Story(PlayableCharacter.Jill, 0x1000000)));
+        Assert.Empty(maps.HeldElsewhere(Story(PlayableCharacter.Chris, 0x8)));
+    }
+
+    [Theory]
+    [InlineData(0x60, MapExitKind.Stairs)]
+    [InlineData(0x40, MapExitKind.Passage)]
+    [InlineData(0x07, MapExitKind.Door)]
+    public void Tells_stairs_and_gates_from_doors(byte shown, MapExitKind kind)
+    {
+        var data = BuildRoom();
+        data[0x202 + 0x0D] = shown;
+        Assert.Equal(kind, Assert.Single(Re1RoomMaps.Parse(data, Room105, Name)!.Doors).Exit);
+    }
+
+    [Fact]
+    public void A_door_from_outside_into_the_mansion_also_leads_to_the_mansion_revisited()
+    {
+        var data = BuildRoom();
+        data[0x202 + 0x0F] = (1 << 5) | 0x1B; // to 11B, from a stage 3 room
+        var doors = Re1RoomMaps.Parse(data, new RoomLocation(3, 0x00), Name)!.Doors;
+        Assert.Equal(["11B", "61B"], doors.Select(d => d.Target));
     }
 
     [Fact]

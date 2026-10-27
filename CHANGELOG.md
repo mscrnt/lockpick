@@ -6,6 +6,25 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- **Route guide** (Map page → Route guide, and an overlay widget): pick a route and Lockpick shows the next step, the
+  way there drawn on the room and floor maps (round the furniture, through the doors you can open), and the buttons to
+  press as you get near: pick up, open the door, use the item, push a puzzle's switches in order (the gallery's
+  paintings, numbered on the map from the room's own scripts). The buttons follow
+  the controller you're using (Xbox, PlayStation, or your own keyboard keys from the game's settings), or one kind you
+  choose. Steps tick off by themselves from the game's flags, so a loaded save starts at the right step; Back and Skip
+  move by hand. The first route is a draft of Jill's any% (the key-item order, the game's own use spots and story
+  flags, and the forced events and puzzles of a full walkthrough, matched to the room files); it hasn't been followed
+  through a whole run yet.
+- **Time limits** on the route: Richard's serum counts down from when he asks for it (15 minutes, in the route widget,
+  the Map page and the top of the game picture).
+- **The route in the game's own picture** (overlay): the way drawn on the floor of the room you're in, a ring where
+  the step is, a puzzle's switches numbered (ticked off as you press them), and the buttons at the bottom middle of the
+  picture. Each part can be switched off in the Route guide card; the layer is an overlay widget
+  (Settings → Overlay). Drawn with each room camera's own projection from the room files.
+- **Locked doors on the map**: red while locked, yellow when you can open them (you hold the key, or it opens from
+  your side).
+
 ## [0.3.3] - 2026-10-26
 
 The portable zip keeps its own data, so you can keep several copies.
