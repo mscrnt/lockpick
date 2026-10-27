@@ -9,6 +9,7 @@ happen on the way). The moves taken are printed as a route.
 from __future__ import annotations
 
 import json
+import os
 import sys
 from collections import deque
 from pathlib import Path
@@ -19,7 +20,7 @@ from sim import ITEM_USE_BASE, Sim, State, target_of  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 NAMES = json.loads((ROOT / "data" / "games" / "re1" / "names.json").read_text(encoding="utf-8"))
-RULES = Path(__file__).with_name("rules.json")
+RULES = Path(os.environ.get("ROUTESIM_RULES") or Path(__file__).with_name("rules.json"))
 
 
 def item_name(i: int) -> str:
@@ -85,14 +86,17 @@ def moves(sim: Sim, s: State):
         yield "kill the enemies", "kill", lambda t: sim.kill(t), {}
 
 
-def nearest(sim: Sim, start: State, ever: set, max_states: int = 6000):
+def nearest(sim: Sim, start: State, ever: set, max_states: int = 6000, shuffle=None):
     """Breadth-first over door moves to the closest productive move; returns (path, state) or None."""
     queue = deque([(start, [])])
     visited = {start.key()}
     count = 0
     while queue and count < max_states:
         s, path = queue.popleft()
-        for text, kind, fn, meta in list(moves(sim, s)):
+        options = list(moves(sim, s))
+        if shuffle is not None:
+            shuffle(options)  # --seed: another order among moves as near, to test the playthrough doesn't depend on it
+        for text, kind, fn, meta in options:
             t = s.clone()
             sim.log = []
             result = fn(t)
@@ -154,14 +158,34 @@ def cameras(install: Path, character: str):
     return camera
 
 
+def geometry(install: Path, character: str):
+    """room -> where the player can walk (reach.Room), cached per room."""
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "rdt"))
+    import rdt_map
+    import reach
+    loaded: dict = {}
+
+    def room(rid: str):
+        if rid not in loaded:
+            try:
+                loaded[rid] = reach.Room(rdt_map.load(install, rid, character))
+            except Exception:  # noqa: BLE001 - no readable geometry: everything counts as reachable
+                loaded[rid] = None
+        return loaded[rid]
+    return room
+
+
 def new_game(sim: Sim, character: str) -> State:
     s = State(character)
     rules = sim.rules.get("newGame", {}).get(character, {})
     s.flags[7] = set(range(256))  # every room item in place
     for b, f in rules.get("set", []):
         s.flags[b].add(f)
+    for b, f in rules.get("clear", []):
+        s.flags[b].discard(f)
     for item, qty in rules.get("inventory", []):
         s.inventory[item] = qty
+    s.pos = tuple(rules["pos"]) if rules.get("pos") else None
     s.fields[9] = 1 if character == "jill" else 0
     sim.enter(s, rules.get("room", "106"))
     return s
@@ -173,17 +197,22 @@ def main(argv: list[str]) -> int:
     limit = int(argv[argv.index("--steps") + 1]) if "--steps" in argv else 400
     rooms, problems = world_mod.build(install, character)
     rules = json.loads(RULES.read_text(encoding="utf-8")) if RULES.exists() else {}
-    sim = Sim(rooms, rules.get(character, {}) | {"newGame": rules.get("newGame", {})}, cameras(install, character))
+    sim = Sim(rooms, rules.get(character, {}) | {"newGame": rules.get("newGame", {})}, cameras(install, character),
+              None if "--no-collision" in argv else geometry(install, character))
     s = new_game(sim, character)
     ever: set = set()
     remember(State(character), s, ever)
+    shuffle = None
+    if "--seed" in argv:
+        import random
+        shuffle = random.Random(int(argv[argv.index("--seed") + 1])).shuffle
     print(f"start in {s.room}; {len(problems)} script problems")
     route = []
     trace = open(argv[argv.index("--trace") + 1], "w", encoding="utf-8") if "--trace" in argv else None
     if trace is not None:
         trace.write(json.dumps(snapshot(sim, s, {"label": "new game", "kind": "start", "room": s.room, "to": s.room})) + "\n")
     for n in range(limit):
-        found = nearest(sim, s, ever)
+        found = nearest(sim, s, ever, shuffle=shuffle)
         if found is None:
             print(f"-- stuck in {s.room} after {n} moves; holding {', '.join(item_name(i) for i in s.inventory)}")
             break
@@ -214,7 +243,9 @@ def explain(sim: Sim, s: State, room: str) -> None:
     print(f"== {room} from this state")
     for slot, a in sorted(t.actions.items()):
         extra = {k: a[k] for k in ("handler", "probe", "words", "item", "flag", "lock", "key", "stage", "room") if k in a}
-        print(f"   slot {slot:2} {a['kind']:6} zone {a.get('zone')} {extra}")
+        reach = sim.where(t, a["zone"], a.get("probe", 0x81)) if a.get("zone") else None
+        print(f"   slot {slot:2} {a['kind']:6} zone {a.get('zone')} {extra}{'' if reach else '  OUT OF REACH'}")
+    print(f"   player at {t.pos}; collision changes {t.mods}")
     for text, kind, _, _ in moves(sim, t):
         print(f"   move: {text}")
 

@@ -30,7 +30,8 @@ SOURCE = ("Simulated (tools/routesim): a playthrough from a new game to the heli
 def playthrough(install: Path, character: str) -> list[dict]:
     rooms, _ = world_mod.build(install, character)
     rules = json.loads(plan.RULES.read_text(encoding="utf-8"))
-    sim = plan.Sim(rooms, rules.get(character, {}) | {"newGame": rules.get("newGame", {})}, plan.cameras(install, character))
+    sim = plan.Sim(rooms, rules.get(character, {}) | {"newGame": rules.get("newGame", {})}, plan.cameras(install, character),
+                    plan.geometry(install, character))
     s = plan.new_game(sim, character)
     ever: set = set()
     plan.remember(plan.State(character), s, ever)

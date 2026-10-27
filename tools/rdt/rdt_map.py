@@ -33,6 +33,7 @@ class Room:
     switches: list[dict] = field(default_factory=list)
     boxes: list[dict] = field(default_factory=list)
     walk: list[tuple[int, int, int, int]] = field(default_factory=list)
+    lists: list[int] = field(default_factory=list)  # records per boundary list (script command 0x30 addresses them)
     doors: list[dict] = field(default_factory=list)
     items: list[dict] = field(default_factory=list)
     objects: list[dict] = field(default_factory=list)  # script-placed models (furniture, the dining-room clock …)
@@ -108,6 +109,7 @@ def load(install: Path, room: str, character: str) -> Room:
     ptr = struct.unpack_from("<I", data, 0x4C)[0]
     if ptr:
         counts = struct.unpack_from("<5i", data, ptr + 4)
+        r.lists = [c if 0 <= c < 4096 else 0 for c in counts]  # the five boundary lists, stored one after another
         total = sum(c for c in counts if 0 <= c < 4096)
         for i in range(total):
             o = ptr + 0x18 + i * 0x0C

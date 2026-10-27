@@ -92,7 +92,14 @@ def item(i: int) -> str:
     return NAMES["items"].get(str(i), f"item {i}")
 
 
-def steps(route: list[dict], rooms: dict, character: str) -> list[dict]:
+def kept(route: list[dict], rooms: dict, character: str) -> set[int]:
+    """The moves the route's steps come from (tools/autoplay/simplay.py plays these, and every door)."""
+    used: set[int] = set()
+    steps(route, rooms, character, used)
+    return used
+
+
+def steps(route: list[dict], rooms: dict, character: str, used: set[int] | None = None) -> list[dict]:
     reads = tested(rooms)
     named = labels(character)
     alias = {int(k): v for k, v in RULES.get(character, {}).get("keyAlias", {}).items()}
@@ -138,7 +145,11 @@ def steps(route: list[dict], rooms: dict, character: str) -> list[dict]:
                     return f
         return next((f for f in flags if f in named), flags[0])
 
+    last, size = None, 0
     for index, m in enumerate(route):
+        if used is not None and last is not None and len(out) > size:
+            used.add(last)
+        last, size = index, len(out)
         if index in brought and story(m):
             for g in brought[index]:
                 where = m["to"] if m["kind"] == "door" else m["room"]
@@ -203,6 +214,8 @@ def steps(route: list[dict], rooms: dict, character: str) -> list[dict]:
             step["at"] = centre(m["zone"])
         if not out or out[-1] != step:
             out.append(step)
+    if used is not None and last is not None and len(out) > size:
+        used.add(last)
     out.append({"end": True})
     return out
 

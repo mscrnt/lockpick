@@ -27,6 +27,13 @@ python tools/routesim/build_routes.py "G:\GOG Games\Resident Evil" [--check]
 - **`export.py`** keeps what a player needs (items used later, every use, scenes that open the way somewhere else)
   and writes route steps: the done flag, the spot the guide's line points at, and the flag's label as the hint.
 
+- **`reach.py`** says where the player can walk: the room file's collision records with the scripts' changes to
+  them (command `0x30`), the same grid as the app's route lines. A zone is out of reach only when the scripts' changes
+  are what cut it off, or when a record a script made solid covers a zone the player must stand in (the alley lift in
+  300 is closed off while the lift is down at the falls). The base geometry alone isn't trusted to cut a room in two
+  (stairs split rooms it shouldn't). The player's position comes from the door they came in by (its arrival point),
+  a script that moves them, or the spot they last stood at.
+
 What the scripts can't say is assumed in the player's favour: distance and facing tests pass, random rolls come up 0,
 and on entering a room every camera test passes (the player can walk to any camera); standing at a spot, the camera
 is the one that shows it (`tools/rdt/rdt_map.py`).
@@ -46,6 +53,20 @@ decomp's notes, a live flag log, or a walkthrough's facts in our own words):
   game starts with.
 
 ## Checking it against real play
+
+- **Live, in the game** (dev harness, never shipped): `tools/autoplay/simplay.py <out> <save-backup> jill` plays the
+  simulated playthrough in the real game, the needed moves and every door, and compares the story, lock and item
+  flags with the simulator's after every move (doors opened with the action button, items taken, cutscenes waited
+  out, a room walked camera by camera when a scene needs the player to get somewhere; kills: HP 1 and one shot).
+  2026-10-27, Jill: from the main hall through the 2F Wesker search, 107 and 108 every move matched (the zombie past
+  Kenneth got up a few seconds after the harness's walk of 104 moved on, so Barry's scene came late); it found three things
+  the simulator now knows: the new game's real state (control in the dining room, the flags and inventory read live,
+  `rules.json` `newGame`), Jill's missing ink ribbons, and the Shield key behind the clock. Saves stay read-only and
+  are checked against a fresh backup.
+- **Shuffled orders**: `plan.py --seed N` breaks ties between equally near moves another way. 24 seeds (both
+  characters) all reach the heliport; before the collision changes were read, one Chris order rode the alley lift
+  without power and was stuck below. Dropping a rule and checking every guarded move over 8 seeds shows which rules
+  the game data doesn't cover: all of `ways` and the gates for the piano's secret room and (for Jill) the plant.
 
 - `check_log.py <install> jill <log.txt>` replays a story-flag log of a real playthrough (a room per line and the flags
   that changed) and compares, per visit, the flags the simulator sets on entering with the ones the game set. Two Jill

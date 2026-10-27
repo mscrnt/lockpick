@@ -21,6 +21,7 @@ Status legend: ✅ done and verified · 🟡 done, partially verified · ⬜ not
 | 0.3.2 | OBS WebSocket automation and keep-running (and Steam's English and Japanese releases) | ✅ released 2026-10-26 (keep-running on GOG English; other builds after their live checks) |
 | 0.3.3 | The portable zip keeps its data in its own folder (several copies side by side) | ✅ released 2026-10-26 |
 | 0.4.0 | Route guide (on the maps and in the game picture) and the world model: the room and event scripts read and run, full-game routes for Jill and Chris | 🟡 released 2026-10-27 (routes not yet followed in a real game) |
+| 0.4.1 | The simulated routes from the real new-game state, with the scripts' collision changes; the route guide never holds on an optional step; the simulated route played in the game by the dev harness (the opening) | 🟡 released 2026-10-27 (the rest of the routes not yet followed in a real game) |
 | 0.5.0 | Object highlighting and ESP | ⬜ |
 | 0.6.0 | Advanced trainer and gameplay manipulation | ⬜ |
 | 0.7.0 | Contextual warnings and route guidance | ⬜ |

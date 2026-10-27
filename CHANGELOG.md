@@ -6,6 +6,16 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-10-27
+
+### Changed
+- The simulated full-game routes for Jill and Chris start from the game's real new-game state (read live: control in
+  the dining room, Jill's opening flags, both starting inventories), know where the player can walk (the room scripts'
+  changes to the collision: the alley lift has no power until the battery's in) and keep the Shield key until the
+  clock has moved. Played in the real game by the dev harness from the new game: the doors, the search upstairs for
+  Wesker and back, 107 and 108 matched the simulator move for move (the zombie past Kenneth gets up a few seconds
+  later than it expects, which the harness's walk didn't wait for).
+
 ### Fixed
 - Route guide: an optional step (the guardhouse statue) or a medal got from a Doom book and used before its step came
   up no longer holds the guide on that step for ever. The Jill any% route gets the done flags it was missing (the

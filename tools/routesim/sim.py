@@ -44,6 +44,8 @@ class State:
     actions: dict[int, dict] = field(default_factory=dict)  # room action table: slot -> door / item / action record
     enemies: list[dict] = field(default_factory=list)
     events: dict[int, Event] = field(default_factory=dict)  # slot -> running event
+    pos: tuple[int, int] | None = None  # where the player stands (a door's arrival, a script's move, the last spot)
+    mods: dict = field(default_factory=dict)  # this visit's collision changes: (list, record) -> (x1, z1, x0, z0, mode)
 
     def key(self) -> tuple:
         """What tells two states apart for the search: persistent flags, inventory, room."""
@@ -61,11 +63,20 @@ def room_id(stage: int, room: int) -> str:
 class Sim:
     """Runs one character's world (world.py output) against a State."""
 
-    def __init__(self, world: dict, rules: dict | None = None, cameras=None):
+    def __init__(self, world: dict, rules: dict | None = None, cameras=None, geometry=None):
         self.world = world
         self.rules = rules or {}
         self.log: list[str] = []
         self.cameras = cameras  # room -> function (x, z) -> camera id or None (tools/rdt/rdt_map.py)
+        self.geometry = geometry  # room -> reach.Room or None: where the player can walk
+
+    def where(self, s: State, zone: list[int], probe: int = 0x81) -> tuple[int, int] | None:
+        """Where the player can stand to reach a zone from where they are (the collision records as the room's scripts
+        left them), or None if it's out of reach. Without the room's geometry, or a position, the zone counts as
+        reachable (its centre)."""
+        centre = (zone[0] + zone[2] // 2, zone[1] + zone[3] // 2)
+        geo = self.geometry(s.room) if self.geometry and s.pos else None
+        return centre if geo is None else geo.reachable(s.mods, s.pos, zone, probe)
 
     def stand(self, s: State, zone: list[int]) -> None:
         """The player stands in a zone: the camera that shows it (None when unknown: every camera test passes)."""
@@ -139,6 +150,10 @@ class Sim:
             s.actions[c["slot"]] = {"kind": "item", **c}
         elif op == 0x1B:
             s.enemies.append(c)
+        elif op == 0x20:
+            s.pos = (c["pos"][0], c["pos"][2])
+        elif op == 0x30:
+            s.mods[(c["list"], c["index"])] = (*c["box"], c["mode"])
         elif op == 0x14:
             self.start(s, room, c["slot"], c["script"])
         elif op == 0x44:
@@ -215,6 +230,8 @@ class Sim:
         if slot is not None and slot in s.actions:
             target = target_of(s, s.actions[slot])
             if target in self.world:
+                arrival = s.actions[slot].get("arrival")
+                s.pos = tuple(arrival) if arrival else None
                 self.enter(s, target)
 
     # ---- moves ----------------------------------------------------------------------------------------------------
@@ -226,13 +243,16 @@ class Sim:
         s.fields[STAGE], s.fields[ROOM] = int(room[0]) - 1, int(room[1:], 16)
         s.fields[CAMERA] = None
         s.fields[FWD_ACTION] = s.fields[ENT_ACTION] = NO_ACTION
-        s.actions, s.enemies, s.events = {}, [], {}
+        s.actions, s.enemies, s.events, s.mods = {}, [], {}, {}
         for b in (4, 9):
             s.flags[b].clear()
         visited = self.rules.get("visitedFlag", {}).get(room)
         if visited is not None:
             s.flags[8].add(visited)
         self.run(s, self.world[room]["init"], room)
+        for record in s.actions.values():  # items this game never places (Jill's ink ribbons): the room clears them
+            if record["kind"] == "item" and record["item"] in self.rules.get("absent", []):
+                s.flags[7].discard(record["flag"])
         self.settle(s)
 
     def give(self, s: State, record: dict) -> None:
@@ -251,19 +271,26 @@ class Sim:
                 return all(f in s.flags[b] for b, f in gate["needs"])
         return True
 
-    def pick(self, s: State, slot: int) -> None:
+    def pick(self, s: State, slot: int) -> bool:
         record = s.actions[slot]
+        spot = self.where(s, record["zone"], record.get("probe", 0x81))
+        if spot is None:
+            return False
+        s.pos = spot
         self.stand(s, record["zone"])
         self.give(s, record)
         s.fields[PICKED_ITEM] = record["item"]
         s.fields[FWD_ACTION] = slot
         self.settle(s)
+        return True
 
     def at(self, s: State, slot: int, press: bool = True) -> bool:
         """Stands at a room action (walking in, then the action key): its handler runs. False if it can't be reached."""
         a = s.actions[slot]
-        if not self.open_way(s, "spot", {"slot": slot}):
+        spot = self.where(s, a["zone"], a.get("probe", 0x81))
+        if spot is None or not self.open_way(s, "spot", {"slot": slot}):
             return False
+        s.pos = spot
         self.stand(s, a["zone"])
         s.fields[FWD_ACTION] = s.fields[ENT_ACTION] = slot
         for rule in self.rules.get("spots", []):  # what the exe does at a spot (the lab computer's passwords)
@@ -280,9 +307,13 @@ class Sim:
         self.settle(s)
         return True
 
-    def use(self, s: State, slot: int, item: int) -> None:
+    def use(self, s: State, slot: int, item: int) -> bool:
         """Uses an item from the inventory while standing at a room action."""
         a = s.actions[slot]
+        spot = self.where(s, a["zone"], a.get("probe", 0x81))
+        if spot is None:
+            return False
+        s.pos = spot
         self.stand(s, a["zone"])
         s.fields[FWD_ACTION] = s.fields[ENT_ACTION] = slot
         for other in s.actions.values():  # every item-use zone overlapping this one arms its bit
@@ -299,6 +330,7 @@ class Sim:
             s.inventory[item] -= 1
             if s.inventory[item] <= 0:
                 del s.inventory[item]
+        return True
 
     def reacts_to(self, room: str) -> set[int]:
         """Items the room's main script or events test with "item used is" (cached)."""
@@ -336,7 +368,8 @@ class Sim:
     def door(self, s: State, slot: int) -> str | None:
         """Goes through a door if it opens (unlocking it with the key when held); returns the room or None."""
         d = s.actions[slot]
-        if d.get("handler", 1) != 1 or not d.get("probe", 1) & 0x01 or not self.open_way(s, "door", d):
+        if d.get("handler", 1) != 1 or not d.get("probe", 1) & 0x01 or not self.open_way(s, "door", d) \
+                or self.where(s, d["zone"], d.get("probe", 0x81)) is None:
             return None  # re-armed as something else (a message), switched off, or out of reach
         lock = d["lock"]
         if lock & 0x80 and lock != 0xFF and (lock & 0x3F) not in s.flags[2]:
@@ -347,6 +380,7 @@ class Sim:
         target = target_of(s, d)
         if target not in self.world:
             return None
+        s.pos = tuple(d["arrival"]) if d.get("arrival") else None
         self.enter(s, target)
         return target
 

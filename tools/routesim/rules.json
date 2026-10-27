@@ -6,7 +6,7 @@
   ],
   "newGame": {
     "jill": {
-      "room": "106",
+      "room": "105",
       "set": [
         [
           1,
@@ -18,14 +18,96 @@
         ],
         [
           1,
+          160
+        ],
+        [
+          1,
           170
+        ],
+        [
+          8,
+          5
+        ],
+        [
+          8,
+          6
         ]
       ],
-      "why": "set by the time Jill enters the main hall in a new game (live flag log 2026-10-27, run 3); B[11] is the decomp's GameStart first-playthrough marker"
+      "clear": [
+        [
+          7,
+          1
+        ],
+        [
+          7,
+          172
+        ]
+      ],
+      "inventory": [
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          15
+        ],
+        [
+          65,
+          1
+        ]
+      ],
+      "why": "live 2026-10-27: the harness's new game (the opening's recorded end applied), flags and inventory read the moment control starts in the dining room",
+      "pos": [
+        30700,
+        7200
+      ]
     },
     "chris": {
-      "room": "106",
-      "why": "Chris's start flags aren't logged yet (B[0] alone, as in Jill's game, leaves him stuck at the crest door): to check with a flag log of a Chris new game"
+      "room": "105",
+      "set": [
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          167
+        ],
+        [
+          8,
+          5
+        ],
+        [
+          8,
+          6
+        ]
+      ],
+      "clear": [
+        [
+          7,
+          1
+        ],
+        [
+          7,
+          172
+        ]
+      ],
+      "inventory": [
+        [
+          1,
+          0
+        ],
+        [
+          65,
+          1
+        ]
+      ],
+      "why": "live 2026-10-27: the harness's new game (the opening's recorded end applied), flags and inventory read the moment control starts in the dining room",
+      "pos": [
+        30700,
+        7200
+      ]
     }
   },
   "jill": {
@@ -62,6 +144,17 @@
           ]
         ],
         "why": "past the plant the herbicide kills (flag-labels B[169])"
+      },
+      {
+        "room": "105",
+        "item": 53,
+        "needs": [
+          [
+            1,
+            171
+          ]
+        ],
+        "why": "behind the clock, which the room script moves aside only once the gold emblem is on the wall (B[171]: 105 init places object 2 at x 16000 instead of 18000); the clock's collision isn't read yet. Live 2026-10-27: the key can't be taken before"
       }
     ],
     "use": [
@@ -210,6 +303,22 @@
         ],
         "why": "the lab computer's password screens (exe): log in, then B2's password, then open B3 (walkthrough); 508 main turns A[52..54] into the door events' sys[5..7]. Lock 37 (503's door to the visual data room 504, a 'locked' message until it's set; no script sets it) opens with them: the walkthrough goes there right after."
       }
+    ],
+    "absent": [
+      47
+    ],
+    "absentWhy": "Jill's first playthrough has no ink ribbons: her rooms clear their ribbon flags on entering (decomp: ITEM_INK_RIBBONS skipped for Jill on a first playthrough; live 2026-10-27 in 107)",
+    "heldBy": [
+      {
+        "item": 49,
+        "flags": [
+          [
+            0,
+            124
+          ]
+        ],
+        "why": "Jill's lockpick never enters the inventory: Barry's flag A[124] (flagScenarioA3 0x8, docs/MEMORY_MAP.md) says she has it (Re1RoomMaps.HeldElsewhere)"
+      }
     ]
   },
   "chris": {
@@ -243,6 +352,17 @@
           ]
         ],
         "why": "behind the wall the piano opens; in Chris's game Rebecca plays it (his 10F init reads B[162] where Jill's reads B[165])"
+      },
+      {
+        "room": "105",
+        "item": 53,
+        "needs": [
+          [
+            1,
+            168
+          ]
+        ],
+        "why": "behind the clock, which the room script moves aside only once the gold emblem is on the wall (Chris's B[168], which his 105 sets with the gold emblem where Jill's sets B[171]); the clock's collision isn't read yet. Live 2026-10-27: the key can't be taken before"
       }
     ],
     "use": [],

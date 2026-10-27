@@ -190,6 +190,8 @@ look Which menu is open, and which entry is highlighted?
   (`context.py`). Env: `LOCKPICK_EMBED_URL`, `LOCKPICK_RERANK_URL`, `LOCKPICK_QDRANT_URL`.
 - `tools/routesim`: the route simulator (plays the game through from the room and event scripts; `plan.py`,
   `build_routes.py`, `check_log.py` against a live story-flag log). See its README.
+- `simplay.py <out> <save-backup> jill|chris [--from N] [--moves N]` — plays the simulated playthrough in the game
+  and compares the flags with the simulator's after every move (make a fresh save backup with a manifest first).
 - `tools/rdt`: `scd.py` (room scripts with their conditions), `events.py` (event scripts), `rdt_map.py` (geometry),
   `render_map.py` / `floor_map.py` (room and floor maps, local HTML), `tools/bounties/flag_timeline.py` (when each saved
   flag turns on across practice saves).

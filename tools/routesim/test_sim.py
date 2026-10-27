@@ -124,3 +124,42 @@ class Running(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class Reach(unittest.TestCase):
+    """reach.Room with a handmade room: a 10000 x 4000 box of walls, a lift-shaft record a script can close."""
+
+    @staticmethod
+    def room(divided: bool = False):
+        import reach
+
+        def wall(x0, z0, x1, z1, flags=0x300):
+            return {"x0": x0, "z0": z0, "x1": x1, "z1": z1, "shape": 1, "flags": flags}
+
+        class Geometry:  # what rdt_map.Room gives reach.Room
+            boxes = [wall(0, 0, 10000, 300), wall(0, 3700, 10000, 4000), wall(0, 0, 300, 4000),
+                     wall(9700, 0, 10000, 4000), wall(4900, 0, 5100, 4000, 0x200 if divided else 0),
+                     wall(7000, 1500, 8000, 2500, 0)]
+            lists = [5, 1]
+
+        return reach.Room(Geometry())
+
+    def test_a_wall_the_script_builds_cuts_the_room_in_two(self):
+        room = self.room()
+        # The script turns the second list's record into a wall across the room: the east half is out of reach.
+        wall = {(1, 0): (6100, 4000, 5900, 0, 0x03)}
+        self.assertIsNotNone(room.reachable({}, (1500, 2000), [8500, 1800, 400, 400]))
+        self.assertIsNone(room.reachable(wall, (1500, 2000), [8500, 1800, 400, 400]))
+        self.assertIsNotNone(room.reachable(wall, (1500, 2000), [2500, 1800, 400, 400]))
+
+    def test_the_base_geometry_alone_never_cuts_a_zone_off(self):
+        room = self.room(divided=True)
+        # The furniture at x 4900-5100 splits the handmade room (as stairs split real ones): no script change, so
+        # the far side still counts as reachable.
+        self.assertIsNotNone(room.reachable({(1, 0): (1, 1, 0, 0, 0)}, (1500, 2000), [8500, 1800, 400, 400]))
+
+    def test_a_zone_to_stand_in_is_out_of_reach_under_a_solid_record(self):
+        room = self.room()
+        closed = {(1, 0): (8000, 2500, 7000, 1500, 0x03)}  # the shaft record made solid (mode 3 = flags 0x300)
+        self.assertIsNone(room.reachable(closed, (1500, 2000), [7300, 1800, 400, 400], probe=0x41))
+        self.assertIsNotNone(room.reachable({(1, 0): (1, 1, 0, 0, 0)}, (1500, 2000), [7300, 1800, 400, 400], probe=0x41))

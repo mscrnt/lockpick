@@ -56,7 +56,8 @@ def decode(op: int, b: bytes) -> dict:
         # (0x80 = locked, low 6 bits its flagLocks index), key +0x18 (item id; 254 this side, 255 other side, 0 event).
         dest = b[0x0F]
         return {"op": op, "slot": b[1], "zone": [u16(b, 2), u16(b, 4), u16(b, 6), u16(b, 8)],
-                "stage": dest >> 5, "room": dest & 0x1F, "lock": b[0x0E], "key": b[0x18], "probe": b[0x19]}
+                "stage": dest >> 5, "room": dest & 0x1F, "lock": b[0x0E], "key": b[0x18], "probe": b[0x19],
+                "arrival": [s16(b, 0x10), s16(b, 0x14)]}
     if op == 0x0D:
         return {"op": op, "slot": b[1], "zone": [u16(b, 2), u16(b, 4), u16(b, 6), u16(b, 8)], "handler": b[0x0A],
                 "probe": b[0x0B], "words": [u16(b, 0x0C), u16(b, 0x0E), u16(b, 0x10)]}
@@ -75,6 +76,11 @@ def decode(op: int, b: bytes) -> dict:
                 "quantity": b[0x0B], "flag": b[0x16], "probe": b[0x17]}
     if op == 0x1B:
         return {"op": op, "type": b[1], "killFlag": b[3]}
+    if op == 0x30:
+        # A collision record rewritten (decomp: words [2], [3], [0], [1] from +4, +6, +8, +10; rdt_map reads the words
+        # as x1, z1, x0, z0). A non-zero mode patches the record's 0x0F00 flag bits (solid or not).
+        return {"op": op, "list": b[1], "index": b[2], "mode": b[3],
+                "box": [u16(b, 8), u16(b, 10), u16(b, 4), u16(b, 6)]}
     if op == 0x20:
         return {"op": op, "pos": [s16(b, 8), s16(b, 10), s16(b, 12)]}
     if op == 0x22:
