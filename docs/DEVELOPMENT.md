@@ -35,7 +35,8 @@ App options: `--replay <recording.jsonl>` plays a recording instead of attaching
 Run the app from a copy (or close it) before rebuilding — a running `Lockpick.exe` locks its DLLs.
 
 Runtime files live in `%LOCALAPPDATA%\Lockpick\`: `logs\` (JSON lines), `recordings\`, `profiles\`
-(user/override profiles), `settings.json`.
+(user/override profiles), `settings.json`. The portable zip (a `.portable` marker beside `Update.exe`, the app in
+`current\`) keeps them in `data\` beside the marker instead (`AppPaths.DataRootFor`).
 
 ## Probe tool (headless validation)
 

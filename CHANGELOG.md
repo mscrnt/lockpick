@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+- **The portable zip keeps everything in its own folder**: settings, logs, runs, captures and secrets now go in a
+  `data` folder beside `Lockpick Trainer.exe` instead of `%LOCALAPPDATA%\Lockpick`, so several unzipped copies stay
+  separate. Neither the zip nor the app writes to the registry. Installed copies are unchanged.
+
 ## [0.3.2] - 2026-10-26
 
 Steam's Resident Evil, OBS from Lockpick's side, and the game kept running when you click away.

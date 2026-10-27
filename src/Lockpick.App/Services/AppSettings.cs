@@ -4,10 +4,25 @@ using Microsoft.Extensions.Logging;
 
 namespace Lockpick.App.Services;
 
-/// <summary>Per-user locations. Everything Lockpick writes lives under %LOCALAPPDATA%\Lockpick.</summary>
+/// <summary>
+/// Per-user locations. Everything Lockpick writes lives under %LOCALAPPDATA%\Lockpick, or for the portable zip in a
+/// "data" folder beside it, so each unzipped copy keeps its own settings.
+/// </summary>
 public static class AppPaths
 {
-    public static string DataRoot { get; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Lockpick");
+    public static string DataRoot { get; } = DataRootFor(AppContext.BaseDirectory, Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+
+    /// <summary>
+    /// The portable zip has a ".portable" marker beside Update.exe, with the app itself in "current" (which an update
+    /// replaces), so the data folder goes beside the marker.
+    /// </summary>
+    internal static string DataRootFor(string appDirectory, string localAppData)
+    {
+        var root = Path.GetDirectoryName(Path.TrimEndingDirectorySeparator(appDirectory));
+        return root is not null && File.Exists(Path.Combine(root, ".portable"))
+            ? Path.Combine(root, "data")
+            : Path.Combine(localAppData, "Lockpick");
+    }
 
     public static string Logs => Path.Combine(DataRoot, "logs");
 

@@ -109,7 +109,13 @@ split into sections in the sidebar, a support bundle for bug reports, and a [pla
    installer's *Launch* button, which starts it as administrator. Lockpick connects by itself.
 
 **Updates:** Lockpick checks for new versions in the background. When one is ready, the version number at the bottom
-of the sidebar turns green; nothing installs until you click. Each release also has a portable zip.
+of the sidebar turns green; nothing installs until you click.
+
+**Portable:** each release also has **Lockpick-win-Portable.zip**. Unzip it anywhere and run `Lockpick Trainer.exe`.
+It keeps its settings, logs and runs in a `data` folder beside it, so you can keep several copies in different
+folders. Neither the zip nor the app writes to the registry, and the portable copy updates itself the same way. The
+installer adds only what any per-user install adds: desktop and Start menu shortcuts and an entry in *Installed apps*,
+so you can uninstall it.
 
 **Which game version?** Lockpick supports:
 
