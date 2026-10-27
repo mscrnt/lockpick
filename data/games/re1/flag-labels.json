@@ -22,7 +22,7 @@
   {
    "bank": "flagEnemies7",
    "mask": "0x00000001",
-   "label": "an enemy the room doesn't remember died (kill flag 255)",
+   "label": "an enemy died (one the room doesn't keep track of, kill flag 255)",
    "source": "room scripts + live 2026-10-13"
   },
   {

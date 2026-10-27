@@ -16,7 +16,7 @@
         { "go": "104", "hint": "The game won't let you leave yet: check the corridor past the dining room (Kenneth), and wait for the zombie to get up.", "done": "flagScenarioB0:0x20000000" },
         { "go": "105", "hint": "Run back to the dining room: Barry shoots the zombie.", "done": "flagScenarioB5:0x00040000" },
         { "go": "106", "hint": "Back to the main hall: Wesker is missing.", "done": "flagScenarioB0:0x10000000" },
-        { "go": "203", "hint": "Look for Wesker upstairs, then come back down the stairs.", "done": "flagScenarioB0:0x04000000" },
+        { "go": "203", "hint": "Look for Wesker upstairs, then come back down the stairs.", "done": "flagScenarioB0:0x05000000" },
         { "go": "106", "hint": "Barry hands you the lockpick in the main hall.", "done": "flagScenarioA3:0x00000008" },
         { "get": 38, "in": "118" },
         { "go": "202", "hint": "Push the statue along the balcony and off the edge where the railing is gone: it drops the Blue Jewel into the dining room for later.", "done": "flagScenarioA0:0x00100000" },

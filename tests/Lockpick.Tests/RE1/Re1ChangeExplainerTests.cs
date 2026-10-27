@@ -106,6 +106,26 @@ public class Re1ChangeExplainerTests
     }
 
     [Fact]
+    public void An_unremembered_enemy_is_named_from_the_one_that_fell()
+    {
+        // Barry shoots the zombie from Kenneth's corridor in the dining room: kill flag 255 (flagEnemies7 bit 0).
+        (string, long)[] slot = [("enemy0Flags", 1), ("enemy0Type", 0)];
+        var explainer = new Re1Adapter().CreateChangeExplainer(new Re1Adapter().Profiles[0]);
+        explainer.Explain(Jill(0, "105", [.. slot, ("enemy0Hp", 20), ("flagEnemies7", 0)]), Jill(1, "105", [.. slot, ("enemy0Hp", -5), ("flagEnemies7", 0)]));
+        var dead = explainer.Explain(Jill(2, "105", [.. slot, ("enemy0Hp", -5), ("flagEnemies7", 0)]), Jill(3, "105", [.. slot, ("enemy0Hp", -5), ("flagEnemies7", 1)]));
+        Assert.Contains("Zombie died", dead.Known);
+    }
+
+    [Fact]
+    public void People_turning_up_are_not_enemies_appearing()
+    {
+        var explainer = new Re1Adapter().CreateChangeExplainer(new Re1Adapter().Profiles[0]);
+        var barry = explainer.Explain(Jill(0, "105", ("enemy0Flags", 0), ("enemy0Type", 0x22), ("enemy0Hp", 100)),
+            Jill(1, "105", ("enemy0Flags", 1), ("enemy0Type", 0x22), ("enemy0Hp", 100)));
+        Assert.DoesNotContain(barry.Known, line => line.EndsWith("appears", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void A_push_is_told_with_its_length_when_it_ends()
     {
         var explainer = new Re1Adapter().CreateChangeExplainer(new Re1Adapter().Profiles[0]);

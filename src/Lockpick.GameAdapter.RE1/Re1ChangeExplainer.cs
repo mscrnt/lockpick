@@ -186,7 +186,8 @@ internal sealed class Re1ChangeExplainer(Re1Knowledge knowledge) : IChangeExplai
                     }
 
                     var story = bank.StartsWith("flagScenario", StringComparison.Ordinal);
-                    if (Explain(bank, word, mask, flag, set, room, player) is { } explanation)
+                    var fallen = bank == "flagEnemies" && set && flag == NotRemembered ? Fallen(previous, current, previousLocation == location) : null;
+                    if ((fallen is null ? Explain(bank, word, mask, flag, set, room, player) : $"{fallen} died") is { } explanation)
                     {
                         if (explanation.Length > 0)
                         {
@@ -288,7 +289,7 @@ internal sealed class Re1ChangeExplainer(Re1Knowledge knowledge) : IChangeExplai
         if (previousLocation == location)
         {
             var present = ActiveEnemies(previous);
-            actions.AddRange(ActiveEnemies(current).Except(present).Select(type => $"{knowledge.Enemy(type)} appears"));
+            actions.AddRange(ActiveEnemies(current).Except(present).Where(type => type < FirstNpcType).Select(type => $"{knowledge.Enemy(type)} appears"));
         }
 
         known.AddRange(actions.Where(a => !known.Contains(a)));
@@ -340,6 +341,24 @@ internal sealed class Re1ChangeExplainer(Re1Knowledge knowledge) : IChangeExplai
 
     /// <summary>Kill flag for enemies a room script doesn't remember (em_set kill flag 255).</summary>
     private const int NotRemembered = 255;
+
+    /// <summary>Actor types from here on are people (Barry, Rebecca...), not enemies: they don't "appear" in the feed.</summary>
+    private const int FirstNpcType = 0x20;
+
+    /// <summary>
+    /// The enemy behind kill flag 255, which every unremembered enemy shares: the one that fell in this room (this poll,
+    /// or earlier while the room stayed loaded), when only one kind did.
+    /// </summary>
+    private string? Fallen(GameSnapshot previous, GameSnapshot current, bool sameRoom)
+    {
+        var types = Enumerable.Range(0, 8)
+            .Where(slot => Raw(previous, $"enemy{slot}Hp") is { } was && (short)was > 0 && Raw(current, $"enemy{slot}Hp") is { } hp && (short)hp <= 0)
+            .Select(slot => (int)(Raw(current, $"enemy{slot}Type") ?? 0))
+            .Concat(sameRoom ? _down.Values : [])
+            .Where(type => type < FirstNpcType)
+            .Distinct().ToList();
+        return types.Count == 1 ? knowledge.Enemy(types[0]) : null;
+    }
 
     // Jill's game never places ink ribbons (Re1ProgressTracker.InkRibbon): her rooms clear their ribbon flags as she
     // enters (live 2026-10-17: flag 39 on entering 107, nothing reached the inventory), which isn't a pickup.
