@@ -41,6 +41,10 @@ public sealed record RouteStep(RouteStepKind Kind, int? Item = null, string? Roo
     /// <summary>Where in <see cref="Room"/> the step happens, when the room file doesn't place it (an item handed over by a
     /// script, like the serum on the shelf).</summary>
     public RoutePoint? At { get; init; }
+
+    /// <summary>A step the game doesn't need (the guardhouse statue over the hole: there's a door the other way round),
+    /// done once a later step is.</summary>
+    public bool Optional { get; init; }
 }
 
 /// <summary>

@@ -237,6 +237,31 @@ public class RouteTests
     }
 
     [Fact]
+    public void An_optional_step_or_an_item_from_the_inventory_is_passed_once_a_later_step_is_done()
+    {
+        // The guardhouse statue (optional, its flag never set) and a Doom book's medal (got from the inventory, used
+        // before its step came up): the use after them is done, so the guide moves on instead of waiting for ever.
+        var route = Route with
+        {
+            Steps =
+            [
+                new RouteStep(RouteStepKind.Go, Room: "102", Done: new RouteFlag("flagScenarioA2", 0x4000)) { Optional = true },
+                new RouteStep(RouteStepKind.Get, 36),
+                new RouteStep(RouteStepKind.Use, 36, "103", Done: new RouteFlag("flagScenarioA0", 0x8)),
+                new RouteStep(RouteStepKind.End),
+            ],
+        };
+        var guide = new RouteGuide(route, new RoutePlanner(Rooms), _maps, _ => "Wolf medal", _ => null);
+        GameSnapshot With(long a0) => At("101", 5000, 5000) with
+        {
+            RawFields = new Dictionary<string, Field<long>> { ["flagScenarioA0"] = Field<long>.Valid(a0), ["flagScenarioA2"] = Field<long>.Valid(0) },
+        };
+
+        Assert.Equal(0, guide.Update(With(0))!.StepIndex); // nothing done yet: the optional step is still shown
+        Assert.True(guide.Update(With(0x8))!.Finished);
+    }
+
+    [Fact]
     public void A_second_use_at_the_same_spot_is_not_taken_as_done_by_the_first()
     {
         // Like the square crank, turned twice at the water gate: the filled spot says nothing about the second turn.

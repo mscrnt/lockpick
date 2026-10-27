@@ -53,6 +53,11 @@ decomp's notes, a live flag log, or a walkthrough's facts in our own words):
   which a room entry can't know, and no flag the simulator set that the game didn't once the new-game flags were in.
 - `check_capture.py` does the same with capture recordings, once they record the flag banks (the current ones
   don't).
+- `plan.py --trace trace.jsonl` writes the game state after every move (room, position, inventory, flag words) and
+  `dotnet run tools/routesim/GuideCheck.cs -- <route id> trace.jsonl` feeds it to the app's own route guide: it
+  must end on the route's last step without going back. All three routes follow a full playthrough to the end
+  (2026-10-27); this found two guide bugs (an optional step and a medal got from a Doom book used to hold it for ever)
+  and filled the hand-made route's missing done flags from the simulated ones (the 10 it had already matched).
 - `export.py --compare re1-jill-any-nmg` checks a simulated route against the hand-made one: Jill's covers all 47 of its
   get and use steps (in a different order: nearest first, not the fastest).
 

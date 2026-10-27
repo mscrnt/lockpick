@@ -20,7 +20,9 @@ room scripts); a step with a readable flag is done exactly when it's set. A step
 crank turned and kept) is done once the player has been in its room and left. The step the player is on is the first
 one the flags don't show as done; a step they can't tell about counts as done when a later one is, so steps done out of
 order (a crest placed early) neither hold the guide back nor skip what's left. A use repeated at the same spot (the
-square crank, twice at the water gate) isn't judged by the spot.
+square crank, twice at the water gate) isn't judged by the spot. `"optional": true` marks a step the game doesn't
+need (the guardhouse statue over the hole: a door goes the other way round); it's passed once a later step is done,
+and so is a step that gets an item from the inventory (a Doom book's medal) once a later one is.
 
 **Sources for the steps:** the key-item order of the community split set; the room files (items, use spots, doors,
 flags, scripts); and the events and puzzles of a full-game Jill walkthrough (GameFAQs, PlayStation Director's Cut),

@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+- Route guide: an optional step (the guardhouse statue) or a medal got from a Doom book and used before its step came
+  up no longer holds the guide on that step for ever. The Jill any% route gets the done flags it was missing (the
+  guardhouse red book, the batteries, the hex crank, the medals), taken from the simulated playthrough.
+
 ## [0.4.0] - 2026-10-27
 
 ### Added

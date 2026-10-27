@@ -15,7 +15,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 import world as world_mod  # noqa: E402
-from sim import ITEM_USE_BASE, Sim, State  # noqa: E402
+from sim import ITEM_USE_BASE, Sim, State, target_of  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 NAMES = json.loads((ROOT / "data" / "games" / "re1" / "names.json").read_text(encoding="utf-8"))
@@ -104,7 +104,7 @@ def nearest(sim: Sim, start: State, ever: set, max_states: int = 6000):
                     "flags": [[b, f, "+"] for b in (0, 1, 2, 3, 7) for f in sorted(t.flags[b] - s.flags[b])]
                     + [[b, f, "-"] for b in (0, 1, 2, 3, 7) for f in sorted(s.flags[b] - t.flags[b])],
                     "got": sorted(i for i in t.inventory if i not in s.inventory),
-                    "lost": sorted(i for i in s.inventory if i not in t.inventory)}
+                    "lost": sorted(i for i in s.inventory if i not in t.inventory), "_state": t}
             if gained:
                 return path + [(step, gained)], t
             # Doors, and moves that only undo something (they open other ways), are steps on the way.
@@ -116,6 +116,26 @@ def nearest(sim: Sim, start: State, ever: set, max_states: int = 6000):
                 queue.append((t, path + [(step, [])]))
                 count += 1
     return None
+
+
+FIELD_WORDS = {0: ("flagScenarioA", 4), 1: ("flagScenarioB", 8), 2: ("flagLocks", 2), 3: ("flagEnemies", 8),
+               4: ("flagSys", 2), 7: ("flagRoomItems", 8)}
+
+
+def snapshot(sim: Sim, s: State, step: dict) -> dict:
+    """What the game would show after a move, for checking the app's route guide (--trace): the room, where the player
+    stands (the spot of the move, or the door they came in by), the inventory and the flag words by profile name."""
+    zone = step.get("zone") if step.get("to") == step.get("room") else None
+    if zone is None:
+        came = next((a["zone"] for a in s.actions.values() if a["kind"] == "door" and a.get("zone")
+                     and target_of(s, a) == step.get("room")), None)
+        zone = came or next((a["zone"] for a in s.actions.values() if a["kind"] == "door" and a.get("zone")), [0, 0, 0, 0])
+    words = {}
+    for bank, (name, count) in FIELD_WORDS.items():
+        for w in range(count):
+            words[f"{name}{w}"] = sum(1 << (31 - f % 32) for f in s.flags[bank] if f // 32 == w)
+    return {"label": step.get("label"), "room": s.room, "x": zone[0] + zone[2] // 2, "z": zone[1] + zone[3] // 2,
+            "inventory": sorted(s.inventory.items()), "fields": words}
 
 
 def cameras(install: Path, character: str):
@@ -159,6 +179,9 @@ def main(argv: list[str]) -> int:
     remember(State(character), s, ever)
     print(f"start in {s.room}; {len(problems)} script problems")
     route = []
+    trace = open(argv[argv.index("--trace") + 1], "w", encoding="utf-8") if "--trace" in argv else None
+    if trace is not None:
+        trace.write(json.dumps(snapshot(sim, s, {"label": "new game", "kind": "start", "room": s.room, "to": s.room})) + "\n")
     for n in range(limit):
         found = nearest(sim, s, ever)
         if found is None:
@@ -168,6 +191,9 @@ def main(argv: list[str]) -> int:
         remember(s, t, ever)
         s = t
         for step, gained in path:
+            state = step.pop("_state")
+            if trace is not None:
+                trace.write(json.dumps(snapshot(sim, state, step)) + "\n")
             route.append({"move": n, **step, "gained": gained})
             if gained or "--verbose" in argv:
                 print(f"{n:3} {step['label']}  {' '.join(gained)}")

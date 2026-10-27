@@ -44,6 +44,7 @@ public static class RouteFile
                 p.GetArrayLength() > 5 ? Flag(p[5].GetString()!) : null))]
             : [],
         At = s.TryGetProperty("at", out var at) ? new RoutePoint(at[0].GetDouble(), at[1].GetDouble()) : null,
+        Optional = s.TryGetProperty("optional", out var optional) && optional.GetBoolean(),
     };
 
     private static RouteStep Plain(JsonElement s)

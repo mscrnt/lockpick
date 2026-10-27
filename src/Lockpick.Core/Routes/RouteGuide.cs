@@ -104,13 +104,14 @@ public sealed class RouteGuide(Route route, RoutePlanner planner, IRoomMapSource
             _lastTime = time;
         }
 
-        // The step the flags say the player is on: the first one they say isn't done. A step they can't tell about
-        // counts as done when a later one is (the player has moved on), so steps done out of order (a crest placed
-        // early) don't hold the guide back or make it skip what's still to do.
+        // The step the flags say the player is on: the first one they say isn't done. A step they can't tell about,
+        // or an optional one, counts as done when a later one is (the player has moved on), so steps done out of order
+        // (a crest placed early) don't hold the guide back or make it skip what's still to do.
         var byFlags = route.Steps.Select(s => DoneByFlags(s, snapshot, held)).ToList();
         var first = 0;
         while (first < byFlags.Count - 1
-            && (byFlags[first] == true || (byFlags[first] is null && byFlags.Skip(first + 1).Contains(true))))
+            && (byFlags[first] == true
+                || ((byFlags[first] is null || route.Steps[first].Optional) && byFlags.Skip(first + 1).Contains(true))))
         {
             first++;
         }
@@ -124,7 +125,13 @@ public sealed class RouteGuide(Route route, RoutePlanner planner, IRoomMapSource
         }
 
         _index = Math.Min(_index, route.Steps.Count - 1);
-        while (_index < route.Steps.Count - 1 && (byFlags[_index] == true || Done(route.Steps[_index], snapshot, location.Id, held, boxed)))
+        // An optional step, or an item got from the inventory (a Doom book's medal, used before the step came up), is
+        // passed once a later step is done: nothing else could ever say it's done.
+        while (_index < route.Steps.Count - 1
+            && (byFlags[_index] == true
+                || ((route.Steps[_index].Optional || route.Steps[_index] is { Kind: RouteStepKind.Get, Room: null })
+                    && byFlags[_index] != true && byFlags.Skip(_index + 1).Contains(true))
+                || Done(route.Steps[_index], snapshot, location.Id, held, boxed)))
         {
             _index++;
             _heldOnStep = false;
@@ -348,6 +355,10 @@ public sealed class RouteGuide(Route route, RoutePlanner planner, IRoomMapSource
 
         switch (step.Kind)
         {
+            case RouteStepKind.Get when step.Room is null:
+                // Got from the inventory (a medal out of a Doom book): held says so; once used, the flags can't tell
+                // (the item's records elsewhere, the fountain's medal slots, aren't where it was got).
+                return step.Item is { } got && held.Contains(got) ? true : null;
             case RouteStepKind.Get:
                 var items = Rooms(step).SelectMany(m => m.Items.Where(i => i.ItemId == step.Item)).ToList();
                 var taken = items.Select(i => maps.IsTaken(i, snapshot)).ToList();
