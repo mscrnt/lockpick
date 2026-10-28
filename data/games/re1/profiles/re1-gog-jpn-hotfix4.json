@@ -356,8 +356,13 @@
       "address": "0x4B3274",
       "type": "u32",
       "description": "The game's only 'window focused' flag (decomp g_bWindowFocused): WM_ACTIVATE clears it when the window loses focus and sets it when it comes back, and the main loop skips the game (input, logic, drawing) while it is 0 - the original pause in the background. Keep-running (Trainer Mode) holds it at 1 while the game isn't in front.",
-      "verification": "static",
-      "evidence": "Cross-mapped from re1-gog-usa-hotfix4 (0x4BCB2C) by tools/re1/xmap.py: 3 of 4 code sites that use it there are found here and use 0x4B3274 at the same instruction.",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): 0 while the game ran unfocused (the picture stood still, the in-game clock 0x47 then frozen) and 1 as soon as its window was brought to the front (the title answered the pad, the clock ran on); 0 again when another window was clicked (the game paused, as the owner saw), 1 when it came back. Cross-mapped from re1-gog-usa-hotfix4 (0x4BCB2C) by tools/re1/xmap.py: 3 of 4 code sites that use it there are found here and use 0x4B3274 at the same instruction.",
+      "write": {
+        "min": 1,
+        "max": 1,
+        "anyTime": true
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: static analysis of this executable",
@@ -369,8 +374,13 @@
       "address": "0x4CFD40",
       "type": "u32",
       "description": "The keyboard map, bytes 0-3 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
-      "verification": "static",
-      "evidence": "Cross-mapped from re1-gog-usa-hotfix4 (0xAC4030) by tools/re1/xmap.py: 6 of 8 code sites that use it there are found here and use 0x4CFD40 at the same instruction.",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): Read from the running game: 0x27252826: right, left, down, up arrows (VK 0x27 0x25 0x28 0x26). The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from. Cross-mapped from re1-gog-usa-hotfix4 (0xAC4030) by tools/re1/xmap.py: 6 of 8 code sites that use it there are found here and use 0x4CFD40 at the same instruction.",
+      "write": {
+        "min": 0,
+        "max": 4294967295,
+        "anyTime": true
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: static analysis of this executable"
@@ -381,8 +391,13 @@
       "address": "0x4CFD44",
       "type": "u32",
       "description": "The keyboard map, bytes 4-7 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
-      "verification": "static",
-      "evidence": "Cross-mapped from re1-gog-usa-hotfix4 (0xAC4034) by tools/re1/xmap.py: 4 of 4 code sites that use it there are found here and use 0x4CFD44 at the same instruction.",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): Read from the running game: 0x00005600: V. The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from. Cross-mapped from re1-gog-usa-hotfix4 (0xAC4034) by tools/re1/xmap.py: 4 of 4 code sites that use it there are found here and use 0x4CFD44 at the same instruction.",
+      "write": {
+        "min": 0,
+        "max": 4294967295,
+        "anyTime": true
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: static analysis of this executable"
@@ -393,8 +408,13 @@
       "address": "0x4CFD48",
       "type": "u32",
       "description": "The keyboard map, bytes 8-11 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xAC4038); it lies between 0xAC4034 and 0xAC4044, which both map by -0x5f42f0 from their own code (4 and 4 sites), so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): Read from the running game: 0x43580000: X, C. The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from. Not used directly by code in re1-gog-usa-hotfix4 (0xAC4038); it lies between 0xAC4034 and 0xAC4044, which both map by -0x5f42f0 from their own code (4 and 4 sites), so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 4294967295,
+        "anyTime": true
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: static analysis of this executable"
@@ -405,8 +425,13 @@
       "address": "0x4CFD4C",
       "type": "u32",
       "description": "The keyboard map, bytes 12-15 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xAC403C); it lies between 0xAC4034 and 0xAC4044, which both map by -0x5f42f0 from their own code (4 and 4 sites), so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): Read from the running game: 0x00005A00: Z. The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from. Not used directly by code in re1-gog-usa-hotfix4 (0xAC403C); it lies between 0xAC4034 and 0xAC4044, which both map by -0x5f42f0 from their own code (4 and 4 sites), so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 4294967295,
+        "anyTime": true
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: static analysis of this executable"
@@ -417,8 +442,13 @@
       "address": "0x4CFD50",
       "type": "u32",
       "description": "The keyboard map, bytes 16-19 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xAC4040); it lies between 0xAC4034 and 0xAC4044, which both map by -0x5f42f0 from their own code (4 and 4 sites), so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): Read from the running game: 0 (unused). The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from. Not used directly by code in re1-gog-usa-hotfix4 (0xAC4040); it lies between 0xAC4034 and 0xAC4044, which both map by -0x5f42f0 from their own code (4 and 4 sites), so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 4294967295,
+        "anyTime": true
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: static analysis of this executable"
@@ -429,8 +459,13 @@
       "address": "0x4CFD54",
       "type": "u32",
       "description": "The keyboard map, bytes 20-23 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
-      "verification": "static",
-      "evidence": "Cross-mapped from re1-gog-usa-hotfix4 (0xAC4044) by tools/re1/xmap.py: 4 of 4 code sites that use it there are found here and use 0x4CFD54 at the same instruction.",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): Read from the running game: 0 (unused). The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from. Cross-mapped from re1-gog-usa-hotfix4 (0xAC4044) by tools/re1/xmap.py: 4 of 4 code sites that use it there are found here and use 0x4CFD54 at the same instruction.",
+      "write": {
+        "min": 0,
+        "max": 4294967295,
+        "anyTime": true
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: static analysis of this executable"
@@ -441,8 +476,13 @@
       "address": "0x4CFD58",
       "type": "u32",
       "description": "The keyboard map, bytes 24-27 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
-      "verification": "static",
-      "evidence": "Cross-mapped from re1-gog-usa-hotfix4 (0xAC4048) by tools/re1/xmap.py: 4 of 4 code sites that use it there are found here and use 0x4CFD58 at the same instruction.",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): Read from the running game: 0x41000000: A. The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from. Cross-mapped from re1-gog-usa-hotfix4 (0xAC4048) by tools/re1/xmap.py: 4 of 4 code sites that use it there are found here and use 0x4CFD58 at the same instruction.",
+      "write": {
+        "min": 0,
+        "max": 4294967295,
+        "anyTime": true
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: static analysis of this executable"
@@ -453,8 +493,13 @@
       "address": "0x4CFD5C",
       "type": "u32",
       "description": "The keyboard map, bytes 28-31 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
-      "verification": "static",
-      "evidence": "Cross-mapped from re1-gog-usa-hotfix4 (0xAC404C) by tools/re1/xmap.py: 4 of 4 code sites that use it there are found here and use 0x4CFD5C at the same instruction.",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): Read from the running game: 0x1B200D11: Ctrl, Enter, Space, Esc. The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from. Cross-mapped from re1-gog-usa-hotfix4 (0xAC404C) by tools/re1/xmap.py: 4 of 4 code sites that use it there are found here and use 0x4CFD5C at the same instruction.",
+      "write": {
+        "min": 0,
+        "max": 4294967295,
+        "anyTime": true
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: static analysis of this executable"
@@ -546,8 +591,8 @@
       "address": "0xC3881C",
       "type": "u16",
       "description": "Inventory slot 5: low byte item id, high byte quantity/ammo. Slots 7-8 are Jill only.",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE994C); it is part of 'inventory' (0xBE9944, 0x10 bytes), whose references map by +0x4eed0 at 17 of 18 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): After loading a Jill save with all 8 slots full (community save \"Jill Rocky Balboa\"), slot 5 held bazooka x5 (0x0507), the save file's own entry; all 8 slots matched the file byte for byte (id low byte, quantity high byte), the bazooka in slot 5 equipped (equippedSlot 5). Not used directly by code in re1-gog-usa-hotfix4 (0xBE994C); it is part of 'inventory' (0xBE9944, 0x10 bytes), whose references map by +0x4eed0 at 17 of 18 code sites, so the layout carries over (tools/re1/xmap.py).",
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: static analysis of this executable (item writes at 0xBE9944/0xBE9945)",
@@ -560,8 +605,8 @@
       "address": "0xC3881E",
       "type": "u16",
       "description": "Inventory slot 6: low byte item id, high byte quantity/ammo. Slots 7-8 are Jill only.",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE994E); it is part of 'inventory' (0xBE9944, 0x10 bytes), whose references map by +0x4eed0 at 17 of 18 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): After loading a Jill save with all 8 slots full (community save \"Jill Rocky Balboa\"), slot 6 held armor key (0x0534), the save file's own entry; all 8 slots matched the file byte for byte (id low byte, quantity high byte), the bazooka in slot 5 equipped (equippedSlot 5). Not used directly by code in re1-gog-usa-hotfix4 (0xBE994E); it is part of 'inventory' (0xBE9944, 0x10 bytes), whose references map by +0x4eed0 at 17 of 18 code sites, so the layout carries over (tools/re1/xmap.py).",
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: static analysis of this executable (item writes at 0xBE9944/0xBE9945)",
@@ -574,8 +619,8 @@
       "address": "0xC38820",
       "type": "u16",
       "description": "Inventory slot 7: low byte item id, high byte quantity/ammo. Slots 7-8 are Jill only.",
-      "verification": "static",
-      "evidence": "Cross-mapped from re1-gog-usa-hotfix4 (0xBE9950) by tools/re1/xmap.py: 3 of 3 code sites that use it there are found here and use 0xC38820 at the same instruction.",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): After loading a Jill save with all 8 slots full (community save \"Jill Rocky Balboa\"), slot 7 held blue jewel (0x0121), the save file's own entry; all 8 slots matched the file byte for byte (id low byte, quantity high byte), the bazooka in slot 5 equipped (equippedSlot 5). Cross-mapped from re1-gog-usa-hotfix4 (0xBE9950) by tools/re1/xmap.py: 3 of 3 code sites that use it there are found here and use 0xC38820 at the same instruction.",
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: static analysis of this executable (item writes at 0xBE9944/0xBE9945)",
@@ -588,8 +633,8 @@
       "address": "0xC38822",
       "type": "u16",
       "description": "Inventory slot 8: low byte item id, high byte quantity/ammo. Slots 7-8 are Jill only.",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE9952); it is part of 'inventory' (0xBE9944, 0x10 bytes), whose references map by +0x4eed0 at 17 of 18 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): After loading a Jill save with all 8 slots full (community save \"Jill Rocky Balboa\"), slot 8 held shield key (0x0135), the save file's own entry; all 8 slots matched the file byte for byte (id low byte, quantity high byte), the bazooka in slot 5 equipped (equippedSlot 5). Not used directly by code in re1-gog-usa-hotfix4 (0xBE9952); it is part of 'inventory' (0xBE9944, 0x10 bytes), whose references map by +0x4eed0 at 17 of 18 code sites, so the layout carries over (tools/re1/xmap.py).",
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: static analysis of this executable (item writes at 0xBE9944/0xBE9945)",
@@ -666,8 +711,12 @@
       "address": "0xC3881D",
       "type": "u8",
       "description": "Inventory slot 5 quantity (Chris and Jill; for a weapon, the loaded rounds).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE994D); it is part of 'inventory' (0xBE9944, 0x10 bytes), whose references map by +0x4eed0 at 17 of 18 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): After loading a Jill save with all 8 slots full (community save \"Jill Rocky Balboa\"), slot 5 held bazooka x5 (0x0507), the save file's own entry; all 8 slots matched the file byte for byte (id low byte, quantity high byte), the bazooka in slot 5 equipped (equippedSlot 5). Not used directly by code in re1-gog-usa-hotfix4 (0xBE994D); it is part of 'inventory' (0xBE9944, 0x10 bytes), whose references map by +0x4eed0 at 17 of 18 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 255
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: static analysis of this executable (item writes at 0xBE9944/0xBE9945)"
@@ -678,8 +727,12 @@
       "address": "0xC3881F",
       "type": "u8",
       "description": "Inventory slot 6 quantity (Chris and Jill; for a weapon, the loaded rounds).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE994F); it is part of 'inventory' (0xBE9944, 0x10 bytes), whose references map by +0x4eed0 at 17 of 18 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): After loading a Jill save with all 8 slots full (community save \"Jill Rocky Balboa\"), slot 6 held armor key (0x0534), the save file's own entry; all 8 slots matched the file byte for byte (id low byte, quantity high byte), the bazooka in slot 5 equipped (equippedSlot 5). Not used directly by code in re1-gog-usa-hotfix4 (0xBE994F); it is part of 'inventory' (0xBE9944, 0x10 bytes), whose references map by +0x4eed0 at 17 of 18 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 255
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: static analysis of this executable (item writes at 0xBE9944/0xBE9945)"
@@ -690,8 +743,12 @@
       "address": "0xC38821",
       "type": "u8",
       "description": "Inventory slot 7 quantity (Chris and Jill; for a weapon, the loaded rounds).",
-      "verification": "static",
-      "evidence": "Cross-mapped from re1-gog-usa-hotfix4 (0xBE9951) by tools/re1/xmap.py: 1 of 1 code sites that use it there are found here and use 0xC38821 at the same instruction.",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): After loading a Jill save with all 8 slots full (community save \"Jill Rocky Balboa\"), slot 7 held blue jewel (0x0121), the save file's own entry; all 8 slots matched the file byte for byte (id low byte, quantity high byte), the bazooka in slot 5 equipped (equippedSlot 5). Cross-mapped from re1-gog-usa-hotfix4 (0xBE9951) by tools/re1/xmap.py: 1 of 1 code sites that use it there are found here and use 0xC38821 at the same instruction.",
+      "write": {
+        "min": 0,
+        "max": 255
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: static analysis of this executable (item writes at 0xBE9944/0xBE9945)"
@@ -702,8 +759,12 @@
       "address": "0xC38823",
       "type": "u8",
       "description": "Inventory slot 8 quantity (Chris and Jill; for a weapon, the loaded rounds).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE9953); it is part of 'inventory' (0xBE9944, 0x10 bytes), whose references map by +0x4eed0 at 17 of 18 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): After loading a Jill save with all 8 slots full (community save \"Jill Rocky Balboa\"), slot 8 held shield key (0x0135), the save file's own entry; all 8 slots matched the file byte for byte (id low byte, quantity high byte), the bazooka in slot 5 equipped (equippedSlot 5). Not used directly by code in re1-gog-usa-hotfix4 (0xBE9953); it is part of 'inventory' (0xBE9944, 0x10 bytes), whose references map by +0x4eed0 at 17 of 18 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 255
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: static analysis of this executable (item writes at 0xBE9944/0xBE9945)"
@@ -1286,10 +1347,11 @@
       "type": "u32",
       "description": "Script flag bank 4 ('sys' in room scripts), word 0: per-room puzzle state, e.g. the gallery's switches (117: sys 26, 28, 29, 27, 25, 30 in order; only the last one pressed stays set).",
       "verification": "static",
-      "evidence": "Static: the same bank switch in Biohazard.exe (file 0x17574) loads bank 4 as mov ecx,0xC33098; its banks 0-3 and 7-9 are this profile's flagScenarioA/B, flagLocks, flagEnemies, flagRoomItems, flagRoom (tools: scratch scan 2026-10-27); live only on re1-gog-usa-hotfix4 so far.",
+      "evidence": "Cross-mapped from re1-gog-usa-hotfix4 (0xBE41C8) by tools/re1/xmap.py: 55 of 61 code sites that use it there are found here and use 0xC33098 at the same instruction; 1 site(s) disagree (+0x54584 x1, neighbouring globals in the same window).",
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
-        "tools/rdt/scd.py BANKS"
+        "re1-gog-usa-hotfix4: tools/rdt/scd.py BANKS",
+        "re1-gog-usa-hotfix4: tools/rdt/events.py (room 117 events 14-19)"
       ]
     },
     {
@@ -1298,10 +1360,11 @@
       "type": "u32",
       "description": "Script flag bank 4 ('sys' in room scripts), word 1: per-room puzzle state, e.g. the gallery's switches (117: sys 26, 28, 29, 27, 25, 30 in order; only the last one pressed stays set).",
       "verification": "static",
-      "evidence": "Static: the same bank switch in Biohazard.exe (file 0x17574) loads bank 4 as mov ecx,0xC33098; its banks 0-3 and 7-9 are this profile's flagScenarioA/B, flagLocks, flagEnemies, flagRoomItems, flagRoom (tools: scratch scan 2026-10-27); live only on re1-gog-usa-hotfix4 so far.",
+      "evidence": "Cross-mapped from re1-gog-usa-hotfix4 (0xBE41CC) by tools/re1/xmap.py: 2 of 2 code sites that use it there are found here and use 0xC3309C at the same instruction.",
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
-        "tools/rdt/scd.py BANKS"
+        "re1-gog-usa-hotfix4: tools/rdt/scd.py BANKS",
+        "re1-gog-usa-hotfix4: tools/rdt/events.py (room 117 events 14-19)"
       ]
     },
     {

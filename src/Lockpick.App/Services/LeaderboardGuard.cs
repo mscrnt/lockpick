@@ -171,7 +171,7 @@ public sealed class LeaderboardGuard
         var checks = new List<GuardCheck>();
         var trainerOff = _services.Trainer is not { Mode: TrainerMode.Trainer };
         checks.Add(trainerOff
-            ? new GuardCheck(GuardState.Pass, "Lockpick's trainer is off and locked (read-only; switching it on would fail the attempt).")
+            ? new GuardCheck(GuardState.Pass, "Lockpick's trainer is off (read-only; turning cheats on turns leaderboard mode off).")
             : new GuardCheck(GuardState.Fail, "Lockpick's trainer is on: turn it off (Trainer → Cheats)."));
         checks.Add(AskModeOn?.Invoke() == true
             ? new GuardCheck(GuardState.Fail, "Ask mode is on: it pauses the game. Turn it off (Debug → Capture).")

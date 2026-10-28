@@ -6,6 +6,18 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+- **Cheats turn leaderboard mode off** instead of leaderboard mode locking cheats: a run with cheats is practice and
+  doesn't count for the leaderboards. Turning leaderboard mode on still turns cheats off. Other challenges keep running
+  with cheats on (the attempt shows "with cheats").
+
+### Fixed
+- **GOG Japanese: more cheats.** Live checks on Biohazard.exe (2026-10-28) confirmed every inventory slot (counts in
+  slots 5–8 too, so infinite ammo works for any slot) and the focus flag and key map, so *Keep running in the
+  background* is offered on it. Rebecca's items, the item box past its first entry, enemy HP and poison still wait for
+  their own live check there.
+- **GOG Japanese saves** (`savedatN.daj`) are noticed now (they were ignored: only `.dat` counted).
+
 ## [0.4.7] - 2026-10-28
 
 ### Added

@@ -158,7 +158,10 @@ public sealed class Re1KeepRunningTests : IDisposable
         var fields = Game.KeepRunningFields;
         Assert.Equal(9, fields.Count);
         Assert.All(fields, f => Assert.True(Gog.FindField(f) is { IsWritable: true, Write.AnyTime: true }, f));
-        foreach (var port in _adapter.Profiles.Where(p => p.Id != Gog.Id))
+        // GOG's Japanese build: the focus flag and the key map read live on it (2026-10-28 lab).
+        var japanese = _adapter.Profiles.Single(p => p.Id == "re1-gog-jpn-hotfix4");
+        Assert.All(fields, f => Assert.True(japanese.FindField(f) is { IsWritable: true, Write.AnyTime: true }, f));
+        foreach (var port in _adapter.Profiles.Where(p => p.Id != Gog.Id && p.Id != japanese.Id))
         {
             // Carried over by the cross-mapper (static) and waiting for a live check on that build.
             Assert.All(fields, f => Assert.Equal(Verification.Static, port.FindField(f)!.Verification));

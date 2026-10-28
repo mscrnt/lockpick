@@ -27,7 +27,92 @@
     "enemy0Type": "0 (zombie), 2 (dog), 0x11, and NPC types 0x23/0x24/0x26 in the cutscene rooms.",
     "flagRoomItems0": "Bits cleared at the moments items appeared in the inventory.",
     "flagRoomItems1": "Bits cleared at the moments items appeared in the inventory.",
-    "box0": "0x0F0B (Clip x15) at the start, then the item stored."
+    "box0": "0x0F0B (Clip x15) at the start, then the item stored.",
+    "windowFocused": {
+      "date": "2026-10-28",
+      "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
+      "seen": "0 while the game ran unfocused (the picture stood still, the in-game clock 0x47 then frozen) and 1 as soon as its window was brought to the front (the title answered the pad, the clock ran on); 0 again when another window was clicked (the game paused, as the owner saw), 1 when it came back."
+    },
+    "keyMap0": {
+      "date": "2026-10-28",
+      "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
+      "seen": "Read from the running game: 0x27252826: right, left, down, up arrows (VK 0x27 0x25 0x28 0x26). The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from."
+    },
+    "keyMap1": {
+      "date": "2026-10-28",
+      "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
+      "seen": "Read from the running game: 0x00005600: V. The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from."
+    },
+    "keyMap2": {
+      "date": "2026-10-28",
+      "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
+      "seen": "Read from the running game: 0x43580000: X, C. The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from."
+    },
+    "keyMap3": {
+      "date": "2026-10-28",
+      "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
+      "seen": "Read from the running game: 0x00005A00: Z. The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from."
+    },
+    "keyMap4": {
+      "date": "2026-10-28",
+      "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
+      "seen": "Read from the running game: 0 (unused). The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from."
+    },
+    "keyMap5": {
+      "date": "2026-10-28",
+      "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
+      "seen": "Read from the running game: 0 (unused). The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from."
+    },
+    "keyMap6": {
+      "date": "2026-10-28",
+      "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
+      "seen": "Read from the running game: 0x41000000: A. The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from."
+    },
+    "keyMap7": {
+      "date": "2026-10-28",
+      "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
+      "seen": "Read from the running game: 0x1B200D11: Ctrl, Enter, Space, Esc. The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from."
+    },
+    "inv4": {
+      "date": "2026-10-28",
+      "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
+      "seen": "After loading a Jill save with all 8 slots full (community save \"Jill Rocky Balboa\"), slot 5 held bazooka x5 (0x0507), the save file's own entry; all 8 slots matched the file byte for byte (id low byte, quantity high byte), the bazooka in slot 5 equipped (equippedSlot 5)."
+    },
+    "inv4Qty": {
+      "date": "2026-10-28",
+      "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
+      "seen": "After loading a Jill save with all 8 slots full (community save \"Jill Rocky Balboa\"), slot 5 held bazooka x5 (0x0507), the save file's own entry; all 8 slots matched the file byte for byte (id low byte, quantity high byte), the bazooka in slot 5 equipped (equippedSlot 5)."
+    },
+    "inv5": {
+      "date": "2026-10-28",
+      "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
+      "seen": "After loading a Jill save with all 8 slots full (community save \"Jill Rocky Balboa\"), slot 6 held armor key (0x0534), the save file's own entry; all 8 slots matched the file byte for byte (id low byte, quantity high byte), the bazooka in slot 5 equipped (equippedSlot 5)."
+    },
+    "inv5Qty": {
+      "date": "2026-10-28",
+      "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
+      "seen": "After loading a Jill save with all 8 slots full (community save \"Jill Rocky Balboa\"), slot 6 held armor key (0x0534), the save file's own entry; all 8 slots matched the file byte for byte (id low byte, quantity high byte), the bazooka in slot 5 equipped (equippedSlot 5)."
+    },
+    "inv6": {
+      "date": "2026-10-28",
+      "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
+      "seen": "After loading a Jill save with all 8 slots full (community save \"Jill Rocky Balboa\"), slot 7 held blue jewel (0x0121), the save file's own entry; all 8 slots matched the file byte for byte (id low byte, quantity high byte), the bazooka in slot 5 equipped (equippedSlot 5)."
+    },
+    "inv6Qty": {
+      "date": "2026-10-28",
+      "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
+      "seen": "After loading a Jill save with all 8 slots full (community save \"Jill Rocky Balboa\"), slot 7 held blue jewel (0x0121), the save file's own entry; all 8 slots matched the file byte for byte (id low byte, quantity high byte), the bazooka in slot 5 equipped (equippedSlot 5)."
+    },
+    "inv7": {
+      "date": "2026-10-28",
+      "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
+      "seen": "After loading a Jill save with all 8 slots full (community save \"Jill Rocky Balboa\"), slot 8 held shield key (0x0135), the save file's own entry; all 8 slots matched the file byte for byte (id low byte, quantity high byte), the bazooka in slot 5 equipped (equippedSlot 5)."
+    },
+    "inv7Qty": {
+      "date": "2026-10-28",
+      "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
+      "seen": "After loading a Jill save with all 8 slots full (community save \"Jill Rocky Balboa\"), slot 8 held shield key (0x0135), the save file's own entry; all 8 slots matched the file byte for byte (id low byte, quantity high byte), the bazooka in slot 5 equipped (equippedSlot 5)."
+    }
   },
   "addresses": {
     "inventoryPointer": "Holds the inventory's address (0xC38814) during Chris's game.",

@@ -82,9 +82,11 @@ public sealed class Re1Adapter : IGameAdapter
     public string? SaveDirectory(string executablePath) =>
         Path.GetDirectoryName(executablePath) is { } folder ? Re1Install.Inspect(folder).SaveDirectory : null;
 
+    /// <summary>savedatN.dat; GOG's Japanese Biohazard.exe writes savedatN.daj (its format string, live 2026-10-28).</summary>
     public int? SaveSlot(string fileName) =>
         fileName.Length == 12 && fileName.StartsWith("savedat", StringComparison.OrdinalIgnoreCase)
-            && fileName.EndsWith(".dat", StringComparison.OrdinalIgnoreCase) && fileName[7] is >= '1' and <= '8'
+            && (fileName.EndsWith(".dat", StringComparison.OrdinalIgnoreCase) || fileName.EndsWith(".daj", StringComparison.OrdinalIgnoreCase))
+            && fileName[7] is >= '1' and <= '8'
             ? fileName[7] - '0'
             : null;
 

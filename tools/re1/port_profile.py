@@ -161,7 +161,10 @@ def main() -> int:
         out["evidence"] = evidence if trusted else f"Lead only (unverified in {source['id']}); {evidence}"
         if trusted and f["name"] in live_fields:
             out["verification"] = "runtime"
-            out["evidence"] = f"Live {live['date']} ({live['session']}): {live_fields[f['name']]} {evidence}"
+            seen = live_fields[f["name"]]
+            # An entry from another session than the file's own: {"date", "session", "seen"}.
+            when = f"Live {seen['date']} ({seen['session']})" if isinstance(seen, dict) else f"Live {live['date']} ({live['session']})"
+            out["evidence"] = f"{when}: {seen['seen'] if isinstance(seen, dict) else seen} {evidence}"
             if "write" in f:
                 out["write"] = f["write"]  # the trainer may write it again once it is confirmed in play
         out["sources"] = [f"static cross-map from {source['id']}"] + [f"{source['id']}: {x}" for x in f.get("sources", [])]
