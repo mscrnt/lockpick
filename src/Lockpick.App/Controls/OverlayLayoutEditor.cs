@@ -131,7 +131,7 @@ public sealed class OverlayLayoutEditor : Control
 
         var margin = OverlayViewModel.Margin * _scale;
         List<OverlayPlacement.Item> items = [];
-        foreach (var row in rows.Where(r => r.Corner != OverlayLayout.Off))
+        foreach (var row in rows.Where(r => r.Corner != OverlayLayout.Off && !r.PoppedOut)) // a popped-out one isn't on the game
         {
             var (w, h) = SizeOf(row.Id, renderer, renderer.Full(row.Id) ? 1 : row.SizePercent / 100.0);
             var full = renderer.Full(row.Id);

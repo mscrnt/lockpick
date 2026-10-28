@@ -21,7 +21,11 @@ public sealed partial class OverlayWidgetRow : ObservableObject
         Corner = corner;
         Size = $"{size}%";
         _loading = false;
-        windows.Changed += (_, _) => OnPropertyChanged(nameof(PopOutText));
+        windows.Changed += (_, _) =>
+        {
+            OnPropertyChanged(nameof(PopOutText));
+            OnPropertyChanged(nameof(PoppedOut));
+        };
     }
 
     /// <summary>Where the widget sits when placed by hand (the layout editor), or null.</summary>
@@ -29,6 +33,9 @@ public sealed partial class OverlayWidgetRow : ObservableObject
 
     /// <summary>The pop-out button's text: open the widget's window, or close it.</summary>
     public string PopOutText => _windows.IsOpen(Id) ? "Close window" : "Pop out";
+
+    /// <summary>The widget is in its own window, so it's off the game's picture until that window closes.</summary>
+    public bool PoppedOut => _windows.IsOpen(Id);
 
     [RelayCommand]
     private void PopOut() => _windows.Toggle(Id);

@@ -14,6 +14,11 @@ All notable changes to this project are documented here. The format follows
   window, so widgets can sit beside the picture instead of over it. The route drawn in the picture and the
   full-screen maps stay on the picture. The layout editor draws the window's real shape with its bars.
 
+### Fixed
+- **Pop-outs keep the game's picture clear:** a widget popped out into its own window stayed on the overlay over the
+  game too. It now leaves the game while its window is open (and the layout editor shows it gone); closing the window
+  puts it back. Opening a pop-out no longer takes focus from the game.
+
 ## [0.4.4] - 2026-10-27
 
 ### Added

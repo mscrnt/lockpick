@@ -115,7 +115,9 @@ public sealed class OverlayController : IDisposable
         var shown = 0;
         // Draw what changed, then place every widget with content (corners stack; spots placed by hand).
         List<(Widget Widget, byte[]? Pixels)> drawn = [];
-        foreach (var widget in _widgets.Where(w => OverlayLayout.Corner(settings, w.Id) != OverlayLayout.Off))
+        // A widget popped out into its own window leaves the game's picture while that window is open.
+        bool OnGame(string id) => OverlayLayout.Corner(settings, id) != OverlayLayout.Off && !_services.WidgetWindows.IsOpen(id);
+        foreach (var widget in _widgets.Where(w => OnGame(w.Id)))
         {
             if (!_renderer.HasContent(widget.Id))
             {
@@ -157,7 +159,7 @@ public sealed class OverlayController : IDisposable
             shown++;
         }
 
-        foreach (var widget in _widgets.Where(w => OverlayLayout.Corner(settings, w.Id) == OverlayLayout.Off))
+        foreach (var widget in _widgets.Where(w => !OnGame(w.Id)))
         {
             widget.Window?.Hide();
         }
