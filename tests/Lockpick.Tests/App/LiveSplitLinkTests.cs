@@ -82,7 +82,9 @@ public sealed class LiveSplitLinkTests : IDisposable
         NewGame();
         _server.Phase = "Running";
         _server.Index = 0;
-        Thread.Sleep(400);
+        // Lockpick reads LiveSplit at the first split twice before it moves on (not a fixed wait: CI machines are slow).
+        var asked = _server.Received.Count(c => c == "getsplitindex");
+        WaitFor(() => _server.Received.Count(c => c == "getsplitindex") >= asked + 2);
         _server.Index = 2; // two splits in LiveSplit
         WaitFor(() => _runs.Status.Current == 2);
         Assert.NotNull(_runs.Status.Times[1]);

@@ -6,7 +6,9 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
-## [0.4.5] - 2026-10-27
+## [0.4.6] - 2026-10-27
+
+(0.4.5 was tagged but never published: its build stopped on a test that timed out on the build machine.)
 
 ### Added
 - **Overlay widgets in the black bars** (Settings → Overlay → Layout, *Use the black bars beside the game's picture*):
