@@ -55,12 +55,27 @@ def remember(a: State, b: State, ever: set) -> None:
 
 
 def moves(sim: Sim, s: State):
-    """Every move in the current room: (description, kind, function on a state)."""
+    """Every move in the current room: (description, kind, function on a state, details). Where a room asks a yes/no
+    question, its doors and spots come twice: answering yes, and answering no."""
+    for text, kind, fn, meta in plain_moves(sim, s):
+        yield text, kind, fn, meta
+        if kind in ("door", "spot") and (sim.asks(s.room) or (kind == "door" and sim.asks(meta.get("to_room") or ""))):
+            def answering_no(t, fn=fn):
+                t.answer = 1
+                try:
+                    return fn(t)
+                finally:
+                    t.answer = 0
+            yield f"{text}, answering No", kind, answering_no, {**meta, "answer": "no"}
+
+
+def plain_moves(sim: Sim, s: State):
+    """Every move in the current room: (description, kind, function on a state, details)."""
     for slot, a in sorted(s.actions.items()):
         if a["kind"] == "door" and a.get("handler", 1) in (7, 9):
             yield f"step up to door {slot}", "spot", lambda t, slot=slot: sim.at(t, slot), {"zone": a["zone"]}
         elif a["kind"] == "door":
-            yield f"door {slot}", "door", lambda t, slot=slot: sim.door(t, slot), {"key": a["key"], "lock": a["lock"]}
+            yield f"door {slot}", "door", lambda t, slot=slot: sim.door(t, slot),                 {"key": a["key"], "lock": a["lock"], "to_room": target_of(s, a)}
         elif a["kind"] == "item" and sim.present(s, a):
             yield f"take {item_name(a['item'])}", "take", lambda t, slot=slot: sim.pick(t, slot),                 {"item": a["item"], "zone": a["zone"]}
         elif a["kind"] == "action":
@@ -108,7 +123,7 @@ def nearest(sim: Sim, start: State, ever: set, max_states: int = 6000, shuffle=N
             step = {"label": label, "kind": kind, "room": s.room, "to": t.room, **meta,
                     "flags": [[b, f, "+"] for b in (0, 1, 2, 3, 7) for f in sorted(t.flags[b] - s.flags[b])]
                     + [[b, f, "-"] for b in (0, 1, 2, 3, 7) for f in sorted(s.flags[b] - t.flags[b])],
-                    "got": sorted(i for i in t.inventory if i not in s.inventory),
+                    "got": sorted(i for i in t.inventory if t.inventory[i] > s.inventory.get(i, 0)),
                     "lost": sorted(i for i in s.inventory if i not in t.inventory), "_state": t}
             if goal is not None:
                 if goal(s, t):
@@ -132,12 +147,23 @@ def split_goal(split: dict):
     if split.get("end"):
         return lambda a, b: b.room == "303" and 42 in b.inventory
     if "item" in split:
-        return lambda a, b: split["item"] in b.inventory and split["item"] not in a.inventory \
+        # One more of it than before (the second battery while the first is still held), where the split says.
+        return lambda a, b: b.inventory.get(split["item"], 0) > a.inventory.get(split["item"], 0) \
             and ("in" not in split or a.room == split["in"])
     room = split["room"]
     if split.get("fromOtherStage"):
         return lambda a, b: b.room == room and a.room[0] != room[0]
+    if split.get("anyFrom") or "from" not in split:
+        return lambda a, b: b.room == room and a.room != room
     return lambda a, b: b.room == room and a.room == split["from"]
+
+
+def early(split: dict, route: list[dict]) -> dict | None:
+    """The move that already got an item split's item (where the split says, not already another split's), if any."""
+    if "item" not in split:
+        return None
+    return next((m for m in reversed(route) if split["item"] in m["got"] and not m.get("split")
+                 and ("in" not in split or m["room"] == split["in"])), None)
 
 
 def play(sim: Sim, character: str, splits: list[dict] | None = None, shuffle=None, limit: int = 900, log=None):
@@ -152,13 +178,11 @@ def play(sim: Sim, character: str, splits: list[dict] | None = None, shuffle=Non
     wait = 0  # after the next split was out of reach, try again only after a few more steps of progress
     for n in range(limit):
         found, reached = None, None
-        while goals and ((goals[0].get("end") and len(goals) > 1) or ("item" in goals[0] and ("item", goals[0]["item"]) in ever)):
+        while goals and ((goals[0].get("end") and len(goals) > 1) or early(goals[0], route) is not None):
             done = goals.pop(0)
             if "item" in done:
                 # Got before its split came up (on the way to an earlier one): the split is the move that took it.
-                took = next((m for m in reversed(route) if done["item"] in m["got"]), None)
-                if took is not None and not took.get("split"):
-                    took["split"] = done["name"]
+                early(done, route)["split"] = done["name"]
         if goals and wait <= 0:
             found = nearest(sim, s, ever, max_states=900, shuffle=shuffle, goal=split_goal(goals[0]))
             if found is not None:

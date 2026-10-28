@@ -217,6 +217,7 @@ def read_room(path: Path, problems: list[str]) -> dict:
         pos, nodes = offsets[index], []
         while (length := u16(data, pos)) != 0:
             nodes += block(data, pos + 2, pos + length, problems, f"{path.name} {label}")
+            nodes.append({"op": 0x00, "chunk": True})  # each chunk is run on its own (a failed condition ends only it)
             pos += length
         room[label] = nodes
     starts = events.table(data)

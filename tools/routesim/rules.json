@@ -155,6 +155,17 @@
           ]
         ],
         "why": "behind the clock, which the room script moves aside only once the gold emblem is on the wall (B[171]: 105 init places object 2 at x 16000 instead of 18000); the clock's collision isn't read yet. Live 2026-10-27: the key can't be taken before"
+      },
+      {
+        "room": "117",
+        "item": 45,
+        "needs": [
+          [
+            0,
+            3
+          ]
+        ],
+        "why": "revealed behind the painting once the switch puzzle is solved (flag-labels A[3]); the crest's record is armed from the start"
       }
     ],
     "use": [
@@ -285,23 +296,15 @@
         "slot": 1,
         "set": [
           [
-            0,
-            52
-          ],
-          [
-            0,
-            53
-          ],
-          [
-            0,
-            54
+            2,
+            37
           ],
           [
             2,
-            37
+            38
           ]
         ],
-        "why": "the lab computer's password screens (exe): log in, then B2's password, then open B3 (walkthrough); 508 main turns A[52..54] into the door events' sys[5..7]. Lock 37 (503's door to the visual data room 504, a 'locked' message until it's set; no script sets it) opens with them: the walkthrough goes there right after."
+        "why": "the lab computer's password screens (exe): the visual data room (503's door to 504, lock 37) and the private room (508's door to 509, lock 38) open with them; no script sets either lock and no door uses them as key locks; the walkthrough goes to both right after logging in (no script sets it; the walkthrough goes there right after). A[52..54] are not the computer's: 508's code panel (event 2) sets them once the three pass codes from the MO disk machines are in"
       }
     ],
     "absent": [
@@ -363,6 +366,17 @@
           ]
         ],
         "why": "behind the clock, which the room script moves aside only once the gold emblem is on the wall (Chris's B[168], which his 105 sets with the gold emblem where Jill's sets B[171]); the clock's collision isn't read yet. Live 2026-10-27: the key can't be taken before"
+      },
+      {
+        "room": "117",
+        "item": 45,
+        "needs": [
+          [
+            0,
+            3
+          ]
+        ],
+        "why": "revealed behind the painting once the switch puzzle is solved (flag-labels A[3]); the crest's record is armed from the start"
       }
     ],
     "use": [],
@@ -481,23 +495,15 @@
         "slot": 1,
         "set": [
           [
-            0,
-            52
-          ],
-          [
-            0,
-            53
-          ],
-          [
-            0,
-            54
+            2,
+            37
           ],
           [
             2,
-            37
+            38
           ]
         ],
-        "why": "the lab computer's password screens (exe): log in, then B2's password, then open B3 (walkthrough); 508 main turns A[52..54] into the door events' sys[5..7]. Lock 37 (503's door to the visual data room 504, a 'locked' message until it's set; no script sets it) opens with them: the walkthrough goes there right after."
+        "why": "the lab computer's password screens (exe): the visual data room (503's door to 504, lock 37) and the private room (508's door to 509, lock 38) open with them; no script sets either lock and no door uses them as key locks; the walkthrough goes to both right after logging in (no script sets it; the walkthrough goes there right after). A[52..54] are not the computer's: 508's code panel (event 2) sets them once the three pass codes from the MO disk machines are in"
       }
     ]
   }

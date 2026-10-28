@@ -21,6 +21,7 @@ STAGE, ROOM, CAMERA, CHARACTER, FWD_ACTION, ENT_ACTION, USED_ITEM, PICKED_ITEM =
 # Byte 3 (the decomp names it attractMode_RoomCameraId) is tested against the neighbouring rooms' numbers (305: 15/16
 # for 30F/310, 302: 0/1 for 300/301 where the lifts arrive): it holds the room the player came from.
 CAME_FROM = 3
+MENU_CHOICE = 5
 NO_ACTION = 0xFF
 PENDING_DOOR = 1000  # not a game byte: a door a script sends the player through once the frame ends
 KNOWN_FIELDS = {STAGE, ROOM, CAME_FROM, CHARACTER, FWD_ACTION, ENT_ACTION, USED_ITEM, PICKED_ITEM}
@@ -38,6 +39,7 @@ class Event:
 class State:
     character: str  # "jill" / "chris"
     room: str = ""
+    answer: int = 0  # how the player answers a yes/no question asked during the move (0 yes, 1 no)
     flags: list[set[int]] = field(default_factory=lambda: [set() for _ in range(BANKS)])
     inventory: dict[int, int] = field(default_factory=dict)  # item id -> quantity (capacity is ignored)
     fields: dict[int, int] = field(default_factory=dict)
@@ -96,8 +98,11 @@ class Sim:
                 camera = s.fields.get(CAMERA)
                 # Walking around the room the player passes every camera; standing at a spot, the one showing it.
                 return True if camera is None else compare(camera, c["cmp"], c["value"])
+            if c["field"] == MENU_CHOICE and c["value"] in (0, 1):
+                # The answer to a yes/no question (bit 0: 0 yes, 1 no; decomp g_menu_choice_id): the player's choice.
+                return compare(s.answer, c["cmp"], c["value"])
             if c["field"] not in KNOWN_FIELDS:
-                return True  # camera, message/choice, attract: the player can walk to any camera, answers yes
+                return True  # camera, a message being up, attract: the player can walk to any camera
             return compare(s.fields.get(c["field"], 0), c["cmp"], c["value"])
         if op == 0x07:
             return compare(0, c["cmp"], c["value"])  # random roll / countdown: 0
@@ -119,12 +124,29 @@ class Sim:
             return True  # ammo count, object state, distance, facing: in the player's favour
         return False  # d-pad held, costume
 
-    def run(self, s: State, nodes: list[dict], room: str) -> None:
+    def run(self, s: State, nodes: list[dict], room: str, top: bool = True) -> bool:
+        """Runs a block; False once a condition standing on its own fails, which ends the block there (the dispatcher
+        stops on a command returning 0, decomp docs/SCD_SCRIPT_SYSTEM.md §6: a switch's event counts only if the
+        switch before it was pressed). At the top, a script's chunks (each ended by 0x00) are run one by one."""
+        skipping = False
         for n in nodes:
+            if n.get("chunk"):
+                skipping = False
+                continue
+            if skipping:
+                continue
             if "if" in n:
-                self.run(s, n["then"] if all(self.test(s, c) for c in n["if"]) else n["else"], room)
+                ok = self.run(s, n["then"] if all(self.test(s, c) for c in n["if"]) else n["else"], room, top=False)
+            elif n["op"] in COND_OPS:
+                ok = self.test(s, n)
             else:
                 self.command(s, n, room)
+                ok = True
+            if not ok:
+                if not top:
+                    return False
+                skipping = True
+        return not skipping
 
     def command(self, s: State, c: dict, room: str) -> None:
         op = c["op"]
@@ -159,11 +181,11 @@ class Sim:
         elif op == 0x44:
             s.events.pop(c["slot"], None)
         elif op in (0x24, 0x2D):
-            # A room action run by the script: the pick-up handlers (include_key 3, set_key_flag 4,
+            # A room action run by the script: the pick-up handlers (include_key 3, set_key_flag 4, set_room_event_flag 0x0D,
             # pickup_key_event 0x0F) on an item record hand the item over (the serum on the shelf, items given in
             # cutscenes); got_item (0x2D) always does.
             record = s.actions.get(c["slot"])
-            if record and record["kind"] == "item" and (op == 0x2D or c["action"] in (3, 4, 0x0F))                     and record["flag"] in s.flags[7]:
+            if record and record["kind"] == "item" and (op == 0x2D or c["action"] in (3, 4, 0x0D, 0x0F))                     and record["flag"] in s.flags[7]:
                 self.give(s, record)
                 s.fields[PICKED_ITEM] = record["item"]
             elif record and record["kind"] == "door" and op == 0x24 and c["action"] in (1, 5, 6):
@@ -179,52 +201,57 @@ class Sim:
             slot = next((i for i in range(8) if i not in s.events), 7)
         s.events[slot] = Event(room, script)
 
-    def step_events(self, s: State, budget: int = 400) -> None:
-        """Runs every event until it waits on something false, ends, or uses up its share of steps."""
+    def step_events(self, s: State) -> None:
+        """One frame of the event machine: every running event takes one step (decomp: room_events_check runs 8 slots,
+        one step each per frame), so events that hand a flag back and forth see each other's changes in between
+        (the gallery: event 13 clears sys[22] for a moment, the switch's event waits for exactly that)."""
         for slot in sorted(list(s.events)):
             e = s.events.get(slot)
-            steps = 0
-            while e is not None and steps < budget:
-                script = self.world[e.room]["events"][e.script]
-                if e.pc >= len(script):
-                    s.events.pop(slot, None)
-                    break
-                st = script[e.pc]
-                steps += 1
-                if "block" in st:
-                    self.run(s, st["block"], e.room)
-                elif "wait" in st:
-                    waited = st["wait"]
-                    if waited and "if" not in waited[0] and not all(self.test(s, c) for c in waited if "op" in c
-                                                                    and c["op"] in COND_OPS):
-                        break  # still waiting
-                elif "start" in st:
-                    self.start(s, e.room, st["slot"], st["start"])
-                elif "stop" in st:
-                    s.events.pop(st["stop"], None)
-                elif "goto" in st:
-                    e.script, e.pc = st["goto"], 0
-                    continue
-                elif "end" in st:
-                    s.events.pop(slot, None)
-                    break
+            if e is None:
+                continue
+            if e.room != s.room:
+                s.events.pop(slot, None)
+                continue
+            script = self.world[e.room]["events"][e.script]
+            if e.pc >= len(script):
+                s.events.pop(slot, None)
+                continue
+            st = script[e.pc]
+            if "block" in st:
+                self.run(s, st["block"], e.room)
+            elif "wait" in st:
+                if not all(self.test(s, c) for c in st["wait"] if "op" in c and c["op"] in COND_OPS):
+                    continue  # still waiting: try again next frame
+            elif "start" in st:
+                self.start(s, e.room, st["slot"], st["start"])
+            elif "stop" in st:
+                s.events.pop(st["stop"], None)
+            elif "goto" in st:
+                e.script, e.pc = st["goto"], 0
+                continue
+            elif "end" in st:
+                s.events.pop(slot, None)
+                continue
+            if s.events.get(slot) is e:
                 e.pc += 1
-                e = s.events.get(slot)
-                if e is not None and e.room != s.room:
-                    s.events.pop(slot, None)
-                    break
 
-    def settle(self, s: State) -> None:
-        """Main script and events, a few frames, the transient bytes clearing after the first."""
-        for frame in range(6):
-            before = (tuple(frozenset(f) for f in s.flags), tuple(sorted(s.inventory.items())))
+    def settle(self, s: State, quiet: int = 30, frames: int = 600) -> None:
+        """Frames of the main script and the event machine until nothing has changed for `quiet` frames; the
+        transient bytes (item used, item picked up, the item-use bits) last the first frame only."""
+        calm = 0
+        for frame in range(frames):
+            before = (tuple(frozenset(f) for f in s.flags), tuple(sorted(s.inventory.items())),
+                      tuple(sorted((k, v) for k, v in s.fields.items() if v is not None)))
             self.run(s, self.world[s.room]["main"], s.room)
             self.step_events(s)
             if frame == 0:
                 s.fields[USED_ITEM] = 0
                 s.fields[PICKED_ITEM] = 0
                 s.flags[9].clear()
-            if frame > 0 and before == (tuple(frozenset(f) for f in s.flags), tuple(sorted(s.inventory.items()))):
+            after = (tuple(frozenset(f) for f in s.flags), tuple(sorted(s.inventory.items())),
+                     tuple(sorted((k, v) for k, v in s.fields.items() if v is not None)))
+            calm = calm + 1 if after == before else 0
+            if calm >= quiet or (not s.events and calm >= 2):
                 break
         slot = s.fields.pop(PENDING_DOOR, None)
         if slot is not None and slot in s.actions:
@@ -331,6 +358,32 @@ class Sim:
             if s.inventory[item] <= 0:
                 del s.inventory[item]
         return True
+
+    def asks(self, room: str) -> bool:
+        """Whether the room's scripts ask a yes/no question whose answer they test (cached)."""
+        cache = self.__dict__.setdefault("_asks", {})
+        if room not in self.world:
+            return False  # a stub room (110, 20C...): no scripts
+        if room not in cache:
+            found = False
+
+            def walk(nodes: list[dict]) -> None:
+                nonlocal found
+                for n in nodes:
+                    conds = n["if"] if "if" in n else [n] if n.get("op") in COND_OPS else []
+                    if any(c["op"] == 0x06 and c["field"] == MENU_CHOICE and c["value"] in (0, 1) for c in conds):
+                        found = True
+                    if "if" in n:
+                        walk(n["then"])
+                        walk(n["else"])
+
+            walk(self.world[room]["init"])
+            walk(self.world[room]["main"])
+            for script in self.world[room]["events"]:
+                for st in script:
+                    walk(st.get("block", []) + st.get("wait", []))
+            cache[room] = found
+        return cache[room]
 
     def reacts_to(self, room: str) -> set[int]:
         """Items the room's main script or events test with "item used is" (cached)."""

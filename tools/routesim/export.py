@@ -151,6 +151,11 @@ def steps(route: list[dict], rooms: dict, character: str, used: set[int] | None 
         if used is not None and last is not None and len(out) > size:
             used.add(last)
         last, size = index, len(out)
+        if m.get("answer") == "no" and story(m):
+            out.append({"go": m["to"] if m["kind"] == "door" else m["room"], "done": field(*best(story(m), None)),
+                        "hint": "Answer No when asked." + (f" {label(best(story(m), None), m['room'])}"
+                                                           if label(best(story(m), None), m["room"]) else "")})
+            continue
         if m.get("split") and m["kind"] in ("door", "spot") and m["to"] != m["room"] and not m["got"]:
             # A room split: the step is to get there (the item splits are the get steps themselves).
             out.append({"go": m["to"], "hint": f"Split: {m['split']}."})
