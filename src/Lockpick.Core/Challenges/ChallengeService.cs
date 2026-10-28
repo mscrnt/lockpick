@@ -7,9 +7,11 @@ using Lockpick.Core.Trainer;
 namespace Lockpick.Core.Challenges;
 
 /// <summary>
-/// Runs the challenge the player chose. Starting one puts the trainer in Challenge Mode (no write access), so the run is
-/// as played; it only watches: damage fails a no-damage run, a shot from anything but the knife fails knife-only, and
-/// switching the trainer out of Challenge Mode fails any challenge. A new game or a loaded save starts a new attempt.
+/// Runs the challenge the player chose. It only watches: damage fails a no-damage run, a shot from anything but the knife
+/// fails knife-only. Cheats stay as the player set them: an attempt the trainer changed is marked
+/// <see cref="ChallengeStatus.WithCheats"/>, not failed. A locked challenge (leaderboard mode's record runs) puts the
+/// trainer in Challenge Mode (no write access) instead, and switching out of it fails the attempt. A new game or a
+/// loaded save starts a new attempt.
 /// </summary>
 public sealed class ChallengeService : IDisposable
 {
@@ -20,6 +22,7 @@ public sealed class ChallengeService : IDisposable
     private readonly object _gate = new();
     private GameSnapshot? _previous;
     private bool _changingMode;
+    private bool _locked;
 
     public ChallengeService(IGameStateSource source, TrainerService? trainer, Func<VersionProfile, IChallengeRules?> rulesFor, TimeProvider? time = null)
     {
@@ -43,14 +46,23 @@ public sealed class ChallengeService : IDisposable
     /// <summary><see cref="ChallengeStarted"/> and <see cref="ChallengeFailed"/>, for the event log, captures and the API.</summary>
     public event EventHandler<GameEvent>? EventRaised;
 
-    /// <summary>Starts <paramref name="challenge"/> with <paramref name="rules"/> (its own by default).</summary>
-    public void Start(ChallengeDefinition challenge, IReadOnlyList<ChallengeRule>? rules = null)
+    /// <summary>
+    /// Starts <paramref name="challenge"/> with <paramref name="rules"/> (its own by default). With
+    /// <paramref name="lockTrainer"/> the trainer goes to Challenge Mode for as long as it runs (record runs); otherwise
+    /// cheats are left as they are.
+    /// </summary>
+    public void Start(ChallengeDefinition challenge, IReadOnlyList<ChallengeRule>? rules = null, bool lockTrainer = false)
     {
         lock (_gate)
         {
-            _changingMode = true;
-            _trainer?.SetMode(TrainerMode.Challenge);
-            _changingMode = false;
+            _locked = lockTrainer;
+            if (lockTrainer)
+            {
+                _changingMode = true;
+                _trainer?.SetMode(TrainerMode.Challenge);
+                _changingMode = false;
+            }
+
             Status = new ChallengeStatus(ChallengeState.Waiting, challenge, rules ?? challenge.Rules, 0, null, null, null, null);
             _previous = null;
             if (InGame(_source.Latest))
@@ -83,7 +95,7 @@ public sealed class ChallengeService : IDisposable
         StatusChanged?.Invoke(this, Status);
     }
 
-    /// <summary>Ends the challenge; Lockpick goes back to read-only.</summary>
+    /// <summary>Ends the challenge; a locked one puts Lockpick back to read-only.</summary>
     public void Stop()
     {
         lock (_gate)
@@ -95,12 +107,13 @@ public sealed class ChallengeService : IDisposable
 
             Status = ChallengeStatus.Off;
             _changingMode = true;
-            if (_trainer?.Mode == TrainerMode.Challenge)
+            if (_locked && _trainer?.Mode == TrainerMode.Challenge)
             {
                 _trainer.SetMode(TrainerMode.ReadOnly);
             }
 
             _changingMode = false;
+            _locked = false;
         }
 
         StatusChanged?.Invoke(this, Status);
@@ -179,9 +192,14 @@ public sealed class ChallengeService : IDisposable
         var changed = false;
         lock (_gate)
         {
-            if (!_changingMode && Status.State is ChallengeState.Running or ChallengeState.Waiting && _trainer?.Mode != TrainerMode.Challenge)
+            if (_locked && !_changingMode && Status.State is ChallengeState.Running or ChallengeState.Waiting && _trainer?.Mode != TrainerMode.Challenge)
             {
                 Fail("Lockpick's trainer was switched on", _source.Latest);
+                changed = true;
+            }
+            else if (!_locked && Status.State == ChallengeState.Running && !Status.WithCheats && _trainer?.RunModified == true)
+            {
+                Status = Status with { WithCheats = true };
                 changed = true;
             }
         }
@@ -203,6 +221,7 @@ public sealed class ChallengeService : IDisposable
             FailReason = null,
             FailedAt = null,
             FailedAtGameTime = null,
+            WithCheats = false,
         };
         EventRaised?.Invoke(this, new ChallengeStarted(now, Status.Challenge!.Name, Status.Attempt));
     }

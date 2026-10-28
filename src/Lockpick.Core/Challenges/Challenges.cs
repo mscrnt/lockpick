@@ -69,4 +69,7 @@ public sealed record ChallengeStatus(
     TimeSpan? FailedAtGameTime)
 {
     public static ChallengeStatus Off { get; } = new(ChallengeState.Off, null, [], 0, null, null, null, null);
+
+    /// <summary>The trainer changed the game during this attempt (cheats are allowed in a challenge that isn't locked).</summary>
+    public bool WithCheats { get; init; }
 }

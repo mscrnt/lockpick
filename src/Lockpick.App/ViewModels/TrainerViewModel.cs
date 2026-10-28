@@ -375,11 +375,12 @@ public sealed partial class TrainerViewModel : PageViewModel
             Mode = _trainer.Mode;
             CanWrite = Mode == TrainerMode.Trainer && _trainer.HasWriteAccess;
             var challenge = _services.Challenges.Status;
-            ChallengeActive = challenge.State != Lockpick.Core.Challenges.ChallengeState.Off;
+            // Only a locked challenge (leaderboard mode's record runs) keeps cheats off; any other leaves them alone.
+            ChallengeActive = challenge.State != Lockpick.Core.Challenges.ChallengeState.Off && _trainer.Mode == TrainerMode.Challenge;
             var attached = State.Status.State == ConnectionState.Attached;
             ModeText = Mode switch
             {
-                _ when ChallengeActive => $"A challenge is running ({challenge.Challenge?.Name}). Cheats stay off until you stop it (Runs → Challenges).",
+                _ when ChallengeActive => $"Leaderboard mode is on ({challenge.Challenge?.Name}): cheats stay off until you turn it off.",
                 TrainerMode.ReadOnly => "Cheats are off: Lockpick only reads the game and has no way to change it.",
                 TrainerMode.Challenge => "Challenge Mode: Lockpick refuses every change.",
                 _ when _trainer.HasWriteAccess => "Cheats are on. Every change is checked against the game's limits, read back and logged below.",

@@ -159,7 +159,7 @@ public sealed class LeaderboardGuard
         // The trainer locked read-only for the whole session: the Speedrun challenge (no rules of its own).
         if (_services.Challenges.Status.State == ChallengeState.Off && ChallengeDefinition.Presets.FirstOrDefault(p => p.Id == "speedrun") is { } speedrun)
         {
-            _services.Challenges.Start(speedrun);
+            _services.Challenges.Start(speedrun, lockTrainer: true);
         }
 
         TurnOffAskMode?.Invoke();

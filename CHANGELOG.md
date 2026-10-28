@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-10-27
+
+### Changed
+- **Challenges no longer turn cheats off.** Cheats stay as you set them during a challenge; if the trainer changes the
+  game, the attempt shows "with cheats" instead of "clean" (Runs → Challenges, the overlay, `withCheats` in the API).
+  Only leaderboard mode (record runs for speedrun.com) still locks the trainer off.
+
 ## [0.4.1] - 2026-10-27
 
 ### Fixed

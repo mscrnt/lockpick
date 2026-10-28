@@ -99,7 +99,7 @@ the game — so use these pages for the stream. Game Capture of the game works i
 
 | Request | Body | Does |
 |---|---|---|
-| `/api/v1/challenge/start` | `{"id": "no-damage"}`, optional `"rules": ["noDamage", "knifeOnly"]` | Starts a challenge (Lockpick goes into Challenge Mode: no changes to the game) |
+| `/api/v1/challenge/start` | `{"id": "no-damage"}`, optional `"rules": ["noDamage", "knifeOnly"]` | Starts a challenge (cheats are left as they are; an attempt the trainer changed shows `withCheats`) |
 | `/api/v1/challenge/retry` | — | A new attempt |
 | `/api/v1/challenge/stop` | — | Ends the challenge |
 | `/api/v1/run/split` · `/undo` · `/skip` · `/reset` | — | The run keys (they change Lockpick's timing only, never the game); each answers with the run |
