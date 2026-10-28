@@ -23,6 +23,9 @@ public sealed class OverlayLayoutEditor : Control
     public static readonly StyledProperty<IReadOnlyList<OverlayWidgetRow>?> RowsProperty =
         AvaloniaProperty.Register<OverlayLayoutEditor, IReadOnlyList<OverlayWidgetRow>?>(nameof(Rows));
 
+    /// <summary>Widgets may use the black bars beside the picture: the game's whole window is drawn around it.</summary>
+    public static readonly StyledProperty<bool> UseBarsProperty = AvaloniaProperty.Register<OverlayLayoutEditor, bool>(nameof(UseBars));
+
     /// <summary>Widget sizes in the overlay's own units (a 480-pixel-high picture) while they have nothing to show.</summary>
     private static readonly Dictionary<string, (double Width, double Height)> EmptySizes = new()
     {
@@ -35,6 +38,7 @@ public sealed class OverlayLayoutEditor : Control
     };
 
     private static readonly SolidColorBrush Picture = new SolidColorBrush(Color.Parse("#1A2420"));
+    private static readonly SolidColorBrush Bars = new SolidColorBrush(Color.Parse("#05080A"));
     private static readonly SolidColorBrush Box = new SolidColorBrush(Color.Parse("#552E3A36"));
     private static readonly Pen BoxPen = new Pen(new SolidColorBrush(Color.Parse("#8FA39B")), 1, DashStyle.Dash);
     private static readonly Pen DragPen = new Pen(new SolidColorBrush(Color.Parse("#4EC36D")), 2);
@@ -47,9 +51,14 @@ public sealed class OverlayLayoutEditor : Control
     private Point? _dragPosition;
     private Point _grab;
     private Rect _picture;
+    private Rect _window;
     private double _scale;
 
-    static OverlayLayoutEditor() => AffectsRender<OverlayLayoutEditor>(RowsProperty);
+    static OverlayLayoutEditor()
+    {
+        AffectsRender<OverlayLayoutEditor>(RowsProperty, UseBarsProperty);
+        AffectsMeasure<OverlayLayoutEditor>(UseBarsProperty);
+    }
 
     public OverlayLayoutEditor()
     {
@@ -59,13 +68,22 @@ public sealed class OverlayLayoutEditor : Control
 
     public IReadOnlyList<OverlayWidgetRow>? Rows { get => GetValue(RowsProperty); set => SetValue(RowsProperty, value); }
 
+    public bool UseBars { get => GetValue(UseBarsProperty); set => SetValue(UseBarsProperty, value); }
+
+    /// <summary>The game window's shape: as last seen (16:9 until then) with the black bars on, else the 4:3 picture.</summary>
+    private double Aspect => UseBars ? Math.Max(4.0 / 3, OverlayController.WindowAspect ?? 16.0 / 9) : 4.0 / 3;
+
+    /// <summary>Where a widget may go: the picture, or with the black bars on the whole window (unless it lines up with
+    /// the picture).</summary>
+    private Rect AreaFor(string id) => UseBars && !OverlayLayout.OnPicture(id, WidgetRenderer.Current?.Full(id) == true) ? _window : _picture;
+
     /// <summary>A widget was dropped at a spot of its own.</summary>
     public event EventHandler<(string Id, WidgetSpot Spot)>? Placed;
 
     protected override Size MeasureOverride(Size availableSize)
     {
         var width = double.IsInfinity(availableSize.Width) ? 640 : availableSize.Width;
-        return new Size(width, Math.Min(width * 3 / 4, 540));
+        return new Size(width, Math.Min(width / Aspect, 540));
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -90,11 +108,20 @@ public sealed class OverlayLayoutEditor : Control
 
     public override void Render(DrawingContext context)
     {
-        // The 4:3 picture, as large as fits, centred.
-        var height = Math.Min(Bounds.Height, Bounds.Width * 3 / 4);
+        // The game window as large as fits, centred, with the 4:3 picture in its middle (the black bars beside it when
+        // widgets may use them).
+        var windowHeight = Math.Min(Bounds.Height, Bounds.Width / Aspect);
+        var windowWidth = windowHeight * Aspect;
+        _window = new Rect((Bounds.Width - windowWidth) / 2, (Bounds.Height - windowHeight) / 2, windowWidth, windowHeight);
+        var height = windowHeight;
         var width = height * 4 / 3;
-        _picture = new Rect((Bounds.Width - width) / 2, (Bounds.Height - height) / 2, width, height);
+        _picture = new Rect(_window.X + ((windowWidth - width) / 2), _window.Y, width, height);
         _scale = height / 480;
+        if (UseBars)
+        {
+            context.FillRectangle(Bars, _window, 3);
+        }
+
         context.FillRectangle(Picture, _picture, 3);
         Text(context, "The game's picture", new Point(_picture.X + 8, _picture.Bottom - 22), 11, BoxPen.Brush!);
         if (Rows is not { } rows || WidgetRenderer.Current is not { } renderer)
@@ -112,7 +139,12 @@ public sealed class OverlayLayoutEditor : Control
                 full ? width - (2 * margin) : w, full ? height - (2 * margin) : h, full));
         }
 
-        var places = OverlayPlacement.Place(items, _picture.X, _picture.Y, width, height, margin);
+        var onPicture = items.Where(i => AreaFor(i.Id) == _picture).ToList();
+        var places = OverlayPlacement.Place(onPicture, _picture.X, _picture.Y, width, height, margin);
+        foreach (var (id, at) in OverlayPlacement.Place(items.Except(onPicture), _window.X, _window.Y, _window.Width, _window.Height, margin))
+        {
+            places[id] = at;
+        }
         _rects.Clear();
         foreach (var item in items)
         {
@@ -136,7 +168,8 @@ public sealed class OverlayLayoutEditor : Control
             var name = OverlayLayout.Widgets.FirstOrDefault(w => w.Id == item.Id).Name ?? item.Id;
             if (item.Full || !renderer.HasContent(item.Id))
             {
-                Text(context, item.Full ? $"{name} (full screen)" : name, rect.TopLeft + new Point(6, 4), 11, Label);
+                Text(context, item.Full ? $"{name} (full screen)" : name,
+                    item.Full ? new Point(rect.X + 6, rect.Center.Y) : rect.TopLeft + new Point(6, 4), 11, Label);
             }
 
             if (_dragging == item.Id)
@@ -174,10 +207,11 @@ public sealed class OverlayLayoutEditor : Control
         }
 
         var margin = OverlayViewModel.Margin * _scale;
+        var area = AreaFor(_dragging);
         var at = e.GetPosition(this) - _grab;
         _dragPosition = new Point(
-            Math.Clamp(at.X, _picture.X + margin, Math.Max(_picture.X + margin, _picture.Right - margin - rect.Width)),
-            Math.Clamp(at.Y, _picture.Y + margin, Math.Max(_picture.Y + margin, _picture.Bottom - margin - rect.Height)));
+            Math.Clamp(at.X, area.X + margin, Math.Max(area.X + margin, area.Right - margin - rect.Width)),
+            Math.Clamp(at.Y, area.Y + margin, Math.Max(area.Y + margin, area.Bottom - margin - rect.Height)));
         InvalidateVisual();
     }
 
@@ -186,7 +220,8 @@ public sealed class OverlayLayoutEditor : Control
         base.OnPointerReleased(e);
         if (_dragging is { } id && _dragPosition is { } drop && _rects.TryGetValue(id, out var rect))
         {
-            var spot = OverlayPlacement.SpotFor(drop.X, drop.Y, rect.Width, rect.Height, _picture.X, _picture.Y, _picture.Width, _picture.Height,
+            var area = AreaFor(id);
+            var spot = OverlayPlacement.SpotFor(drop.X, drop.Y, rect.Width, rect.Height, area.X, area.Y, area.Width, area.Height,
                 OverlayViewModel.Margin * _scale);
             Placed?.Invoke(this, (id, spot));
         }

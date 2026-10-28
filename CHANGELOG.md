@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.4.5] - 2026-10-27
+
+### Added
+- **Overlay widgets in the black bars** (Settings → Overlay → Layout, *Use the black bars beside the game's picture*):
+  with GOG's 4:3 picture in a wider window (16:9), the corners and the spots you drag widgets to cover the whole game
+  window, so widgets can sit beside the picture instead of over it. The route drawn in the picture and the
+  full-screen maps stay on the picture. The layout editor draws the window's real shape with its bars.
+
 ## [0.4.4] - 2026-10-27
 
 ### Added

@@ -117,6 +117,11 @@ public sealed record AppSettings
     /// <summary>Each overlay widget's corner, or "Off" (<see cref="OverlayLayout"/>); missing: the widget's default.</summary>
     public IReadOnlyDictionary<string, string> OverlayWidgetCorners { get; init; } = new Dictionary<string, string>();
 
+    /// <summary>The overlay's widgets may sit in the black bars beside the game's picture (GOG's 4:3 picture in a wider
+    /// window): corners and spots are on the whole game window. The route in the picture and the full-screen maps stay
+    /// on the picture.</summary>
+    public bool OverlayUseBars { get; init; }
+
     /// <summary>Each widget's size on the overlay, in percent of the usual (widget id → 50–200; missing: 100).</summary>
     public IReadOnlyDictionary<string, int> OverlayWidgetSizes { get; init; } = new Dictionary<string, int>();
 
@@ -490,6 +495,10 @@ public static class OverlayLayout
 
     /// <summary>The sizes a widget can have, in percent.</summary>
     public static IReadOnlyList<int> Sizes { get; } = [50, 75, 100, 125, 150, 200];
+
+    /// <summary>The widget belongs on the game's picture even when widgets may use the black bars: it is drawn to line
+    /// up with the picture (the route on the floor) or covers it (a full-screen map view).</summary>
+    public static bool OnPicture(string id, bool full) => full || id == RoutePicture;
 
     /// <summary>The widget's size factor on the overlay (1 = the usual).</summary>
     public static double SizeOf(AppSettings settings, string id) =>

@@ -44,6 +44,7 @@ public sealed partial class SettingsViewModel : PageViewModel
         MarkerHotkeyStatus = services.MarkerHotkeyName is null && MarkerHotkey != "Off" ? $"{MarkerHotkey} is used by another program." : string.Empty;
         MarkerButtonName = services.MarkerButton.DisplayName;
         OverlayEnabled = current.OverlayEnabled;
+        OverlayUseBars = current.OverlayUseBars;
         LoadLook(current.OverlayLook);
         StreamerMode = current.StreamerMode;
         OverlayWidgetRows = [.. OverlayLayout.Widgets.Select(w =>
@@ -350,6 +351,10 @@ public sealed partial class SettingsViewModel : PageViewModel
     [ObservableProperty]
     public partial bool OverlayEnabled { get; set; }
 
+    /// <summary>The overlay's widgets may sit in the black bars beside the game's picture.</summary>
+    [ObservableProperty]
+    public partial bool OverlayUseBars { get; set; }
+
     /// <summary>Blur paths, process ids and the API token on screen (for streaming Lockpick's window).</summary>
     [ObservableProperty]
     public partial bool StreamerMode { get; set; }
@@ -415,6 +420,14 @@ public sealed partial class SettingsViewModel : PageViewModel
         if (!_loading)
         {
             Persist(s => s with { OverlayEnabled = value });
+        }
+    }
+
+    partial void OnOverlayUseBarsChanged(bool value)
+    {
+        if (!_loading)
+        {
+            Persist(s => s with { OverlayUseBars = value });
         }
     }
 

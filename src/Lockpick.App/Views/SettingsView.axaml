@@ -265,7 +265,10 @@
             <TextBlock Classes="caption" Text="LAYOUT" />
             <TextBlock TextWrapping="Wrap" Foreground="{StaticResource LpMutedBrush}"
                        Text="Drag a widget to put it anywhere on the game's picture: it keeps that spot at any size (its place above reads Your spot). Choosing a corner above puts it back. Widgets with nothing to show yet are boxes." />
-            <c:OverlayLayoutEditor x:Name="LayoutEditor" Rows="{Binding OverlayWidgetRows}"
+            <CheckBox Content="Use the black bars beside the game's picture (the whole game window)" IsChecked="{Binding OverlayUseBars}"
+                      AutomationProperties.Name="Use the black bars beside the game's picture"
+                      ToolTip.Tip="With GOG's 4:3 picture in a wider window, widgets can sit in the black bars at the sides. The route drawn in the picture and the full-screen maps stay on the picture." />
+            <c:OverlayLayoutEditor x:Name="LayoutEditor" Rows="{Binding OverlayWidgetRows}" UseBars="{Binding OverlayUseBars}"
                                    AutomationProperties.Name="Overlay layout: drag widgets to place them" />
             <WrapPanel ItemSpacing="8" LineSpacing="6">
               <Button Content="Back to the corners" Command="{Binding ResetOverlayLayoutCommand}" />

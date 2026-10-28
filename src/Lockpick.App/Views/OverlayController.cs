@@ -42,6 +42,9 @@ public sealed class OverlayController : IDisposable
     /// <summary>The game window as last seen (null when there is none), for the Settings page.</summary>
     public GameWindowInfo? Game { get; private set; }
 
+    /// <summary>The game window's width over its height when last seen (the layout editor draws the black bars from it).</summary>
+    public static double? WindowAspect { get; private set; }
+
     public void Dispose()
     {
         _timer.Stop();
@@ -123,11 +126,21 @@ public sealed class OverlayController : IDisposable
             drawn.Add((widget, Render(widget, game)));
         }
 
-        var places = OverlayPlacement.Place(
-            drawn.Select(d => new OverlayPlacement.Item(d.Widget.Id, OverlayLayout.Corner(settings, d.Widget.Id),
-                settings.OverlayWidgetSpots.TryGetValue(d.Widget.Id, out var spot) ? spot : null,
-                d.Widget.Size.Width, d.Widget.Size.Height, _renderer.Full(d.Widget.Id))),
-            picture.X, picture.Y, picture.Width, picture.Height, margin);
+        var items = drawn.Select(d => new OverlayPlacement.Item(d.Widget.Id, OverlayLayout.Corner(settings, d.Widget.Id),
+            settings.OverlayWidgetSpots.TryGetValue(d.Widget.Id, out var spot) ? spot : null,
+            d.Widget.Size.Width, d.Widget.Size.Height, _renderer.Full(d.Widget.Id))).ToList();
+        // With the black bars on, widgets sit on the whole game window; what lines up with the picture stays on it.
+        var window = settings.OverlayUseBars ? game.Client : picture;
+        if (game.Client.Height > 0)
+        {
+            WindowAspect = (double)game.Client.Width / game.Client.Height;
+        }
+
+        var places = OverlayPlacement.Place(items.Where(i => OverlayLayout.OnPicture(i.Id, i.Full)), picture.X, picture.Y, picture.Width, picture.Height, margin);
+        foreach (var (id, at) in OverlayPlacement.Place(items.Where(i => !OverlayLayout.OnPicture(i.Id, i.Full)), window.X, window.Y, window.Width, window.Height, margin))
+        {
+            places[id] = at;
+        }
         foreach (var (widget, pixels) in drawn)
         {
             var (w, h) = widget.Size;
