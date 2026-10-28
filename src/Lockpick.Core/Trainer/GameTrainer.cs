@@ -31,6 +31,13 @@ public interface IGameTrainer
     /// </summary>
     TrainerRule CreateKeepRunningRule(Func<bool> inFront);
 
+    /// <summary>
+    /// The profile's code patches (<see cref="Profiles.VersionProfile.Patches"/>, by name) that keep the controller and the
+    /// sound working while the game isn't in front, added to keep-running when the player asks; offered only where the
+    /// profile has them all usable. None when the game has no such patches.
+    /// </summary>
+    IReadOnlyList<string> BackgroundPatches => [];
+
     /// <summary>Items the player can be given (through <see cref="AddToStorage"/>), by id, with their names.</summary>
     IReadOnlyList<GivableItem> GivableItems { get; }
 

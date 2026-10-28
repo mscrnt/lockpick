@@ -105,6 +105,13 @@ public sealed record TrainerRule(string Name, Func<GameSnapshot, IReadOnlyList<F
     /// <summary>The writes that put the game back when the rule ends: switched off, Trainer Mode left (a challenge, a
     /// leaderboard run) or Lockpick closing.</summary>
     public Func<IReadOnlyList<FieldWrite>>? Restore { get; init; }
+
+    /// <summary>
+    /// Code patches from the profile (<see cref="Profiles.VersionProfile.Patches"/>, by name) applied when the rule is
+    /// switched on and put back when it ends, as <see cref="Restore"/>. The rule is refused unless every one is usable
+    /// on this build and the game's code is as expected.
+    /// </summary>
+    public IReadOnlyList<string> Patches { get; init; } = [];
 }
 
 /// <summary>One field value a trainer feature wants written.</summary>

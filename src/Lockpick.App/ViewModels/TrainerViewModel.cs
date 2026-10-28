@@ -110,6 +110,13 @@ public sealed partial class TrainerViewModel : PageViewModel
     [ObservableProperty]
     public partial string KeepRunningNote { get; private set; } = string.Empty;
 
+    /// <summary>The controller and the sound keep working in the background too (patches the game's code in memory).</summary>
+    [ObservableProperty]
+    public partial bool BackgroundInput { get; set; }
+
+    [ObservableProperty]
+    public partial bool BackgroundInputAvailable { get; private set; }
+
     [ObservableProperty]
     public partial string LastResult { get; private set; } = string.Empty;
 
@@ -283,11 +290,38 @@ public sealed partial class TrainerViewModel : PageViewModel
 
         if (value)
         {
-            Show(_trainer.SetRule(KeepRunningRule, game.CreateKeepRunningRule(GameInFront)));
+            Show(_trainer.SetRule(KeepRunningRule, KeepRunningRuleFor(game)));
         }
         else
         {
             _trainer.ClearRule(KeepRunningRule); // puts the keyboard back if the game is in the background
+        }
+
+        Sync();
+    }
+
+    /// <summary>Keep-running, with the controller and sound patches when the player asked for them and they're usable.</summary>
+    private TrainerRule KeepRunningRuleFor(IGameTrainer game) =>
+        BackgroundInput && BackgroundInputAvailable
+            ? game.CreateKeepRunningRule(GameInFront) with { Name = "Keep running in the background (controller and sound too)", Patches = game.BackgroundPatches }
+            : game.CreateKeepRunningRule(GameInFront);
+
+    partial void OnBackgroundInputChanged(bool value)
+    {
+        if (_syncing || _trainer is null || Game() is not { } game)
+        {
+            return;
+        }
+
+        if (value && !KeepRunning)
+        {
+            KeepRunning = true; // its rule takes the patches
+            return;
+        }
+
+        if (KeepRunning)
+        {
+            Show(_trainer.SetRule(KeepRunningRule, KeepRunningRuleFor(game))); // the rule again, with or without them
         }
 
         Sync();
@@ -427,6 +461,8 @@ public sealed partial class TrainerViewModel : PageViewModel
             var profile = State.Status.Profile;
             KeepRunningAvailable = game is not null && profile is not null
                 && game.KeepRunningFields.All(f => profile.FindField(f) is { IsWritable: true });
+            BackgroundInputAvailable = KeepRunningAvailable && game!.BackgroundPatches.Count > 0
+                && game.BackgroundPatches.All(p => profile!.FindPatch(p) is { IsUsable: true });
             KeepRunningNote = KeepRunningAvailable || profile is null
                 ? string.Empty
                 : $"Not checked on this version of the game yet ({profile.DisplayName}); so far it works on GOG's English release.";

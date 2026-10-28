@@ -36,42 +36,42 @@
     "keyMap0": {
       "date": "2026-10-28",
       "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
-      "seen": "Read from the running game: 0x27252826: right, left, down, up arrows (VK 0x27 0x25 0x28 0x26). The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from."
+      "seen": "The keyboard map the poll reads (the game copies its default table 0x4AC510- into it at 0x417960, as English copies 0x4D4730- to 0xAC4030). Read at boot: the defaults (arrows 26 28 25 27, V, X C, Z, A, Ctrl, Enter, Space, Esc); a few seconds later the game loaded the player's own table there (on this PC 00 10 00 00 00 40 00 00 00 80 00 00 00 20 00 00 20 00 00 00 40 00 00 00 02 00 00 00 10 00 00 00). Lockpick's keep-running (0.5.0 build) blanked all eight words with the game in the background and put them back exactly when switched off, each write read back."
     },
     "keyMap1": {
       "date": "2026-10-28",
       "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
-      "seen": "Read from the running game: 0x00005600: V. The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from."
+      "seen": "The keyboard map the poll reads (the game copies its default table 0x4AC510- into it at 0x417960, as English copies 0x4D4730- to 0xAC4030). Read at boot: the defaults (arrows 26 28 25 27, V, X C, Z, A, Ctrl, Enter, Space, Esc); a few seconds later the game loaded the player's own table there (on this PC 00 10 00 00 00 40 00 00 00 80 00 00 00 20 00 00 20 00 00 00 40 00 00 00 02 00 00 00 10 00 00 00). Lockpick's keep-running (0.5.0 build) blanked all eight words with the game in the background and put them back exactly when switched off, each write read back."
     },
     "keyMap2": {
       "date": "2026-10-28",
       "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
-      "seen": "Read from the running game: 0x43580000: X, C. The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from."
+      "seen": "The keyboard map the poll reads (the game copies its default table 0x4AC510- into it at 0x417960, as English copies 0x4D4730- to 0xAC4030). Read at boot: the defaults (arrows 26 28 25 27, V, X C, Z, A, Ctrl, Enter, Space, Esc); a few seconds later the game loaded the player's own table there (on this PC 00 10 00 00 00 40 00 00 00 80 00 00 00 20 00 00 20 00 00 00 40 00 00 00 02 00 00 00 10 00 00 00). Lockpick's keep-running (0.5.0 build) blanked all eight words with the game in the background and put them back exactly when switched off, each write read back."
     },
     "keyMap3": {
       "date": "2026-10-28",
       "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
-      "seen": "Read from the running game: 0x00005A00: Z. The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from."
+      "seen": "The keyboard map the poll reads (the game copies its default table 0x4AC510- into it at 0x417960, as English copies 0x4D4730- to 0xAC4030). Read at boot: the defaults (arrows 26 28 25 27, V, X C, Z, A, Ctrl, Enter, Space, Esc); a few seconds later the game loaded the player's own table there (on this PC 00 10 00 00 00 40 00 00 00 80 00 00 00 20 00 00 20 00 00 00 40 00 00 00 02 00 00 00 10 00 00 00). Lockpick's keep-running (0.5.0 build) blanked all eight words with the game in the background and put them back exactly when switched off, each write read back."
     },
     "keyMap4": {
       "date": "2026-10-28",
       "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
-      "seen": "Read from the running game: 0 (unused). The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from."
+      "seen": "The keyboard map the poll reads (the game copies its default table 0x4AC510- into it at 0x417960, as English copies 0x4D4730- to 0xAC4030). Read at boot: the defaults (arrows 26 28 25 27, V, X C, Z, A, Ctrl, Enter, Space, Esc); a few seconds later the game loaded the player's own table there (on this PC 00 10 00 00 00 40 00 00 00 80 00 00 00 20 00 00 20 00 00 00 40 00 00 00 02 00 00 00 10 00 00 00). Lockpick's keep-running (0.5.0 build) blanked all eight words with the game in the background and put them back exactly when switched off, each write read back."
     },
     "keyMap5": {
       "date": "2026-10-28",
       "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
-      "seen": "Read from the running game: 0 (unused). The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from."
+      "seen": "The keyboard map the poll reads (the game copies its default table 0x4AC510- into it at 0x417960, as English copies 0x4D4730- to 0xAC4030). Read at boot: the defaults (arrows 26 28 25 27, V, X C, Z, A, Ctrl, Enter, Space, Esc); a few seconds later the game loaded the player's own table there (on this PC 00 10 00 00 00 40 00 00 00 80 00 00 00 20 00 00 20 00 00 00 40 00 00 00 02 00 00 00 10 00 00 00). Lockpick's keep-running (0.5.0 build) blanked all eight words with the game in the background and put them back exactly when switched off, each write read back."
     },
     "keyMap6": {
       "date": "2026-10-28",
       "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
-      "seen": "Read from the running game: 0x41000000: A. The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from."
+      "seen": "The keyboard map the poll reads (the game copies its default table 0x4AC510- into it at 0x417960, as English copies 0x4D4730- to 0xAC4030). Read at boot: the defaults (arrows 26 28 25 27, V, X C, Z, A, Ctrl, Enter, Space, Esc); a few seconds later the game loaded the player's own table there (on this PC 00 10 00 00 00 40 00 00 00 80 00 00 00 20 00 00 20 00 00 00 40 00 00 00 02 00 00 00 10 00 00 00). Lockpick's keep-running (0.5.0 build) blanked all eight words with the game in the background and put them back exactly when switched off, each write read back."
     },
     "keyMap7": {
       "date": "2026-10-28",
       "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
-      "seen": "Read from the running game: 0x1B200D11: Ctrl, Enter, Space, Esc. The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from."
+      "seen": "The keyboard map the poll reads (the game copies its default table 0x4AC510- into it at 0x417960, as English copies 0x4D4730- to 0xAC4030). Read at boot: the defaults (arrows 26 28 25 27, V, X C, Z, A, Ctrl, Enter, Space, Esc); a few seconds later the game loaded the player's own table there (on this PC 00 10 00 00 00 40 00 00 00 80 00 00 00 20 00 00 20 00 00 00 40 00 00 00 02 00 00 00 10 00 00 00). Lockpick's keep-running (0.5.0 build) blanked all eight words with the game in the background and put them back exactly when switched off, each write read back."
     },
     "inv4": {
       "date": "2026-10-28",
@@ -119,5 +119,17 @@
     "inventory": "The slots above, as picked up and used.",
     "itemBox": "Its first entry is the box's starting Clip x15, then what was stored.",
     "actorSlots": "Slot 0's type and HP above (zombie hit by the Beretta, then dead)."
+  },
+  "patches": {
+    "backgroundFocus": {
+      "date": "2026-10-28",
+      "session": "owner with a real controller (connected before the game started), the patches applied by Lockpick's Trainer (keep-running with \"Controller and sound in the background too\"), each write read back and logged",
+      "seen": "With another window in front the game kept running, its sound kept playing and the owner's controller kept working (before the patch, with keep-running alone: no sound and the controller did nothing, in the same session). Put back when switched off."
+    },
+    "backgroundSound": {
+      "date": "2026-10-28",
+      "session": "owner with a real controller (connected before the game started), the patches applied by Lockpick's Trainer (keep-running with \"Controller and sound in the background too\"), each write read back and logged",
+      "seen": "With another window in front the owner heard the game's sounds (keep-running alone: silent)."
+    }
   }
 }

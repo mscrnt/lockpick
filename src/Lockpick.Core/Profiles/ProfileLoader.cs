@@ -171,6 +171,25 @@ public static class ProfileLoader
             }
         }
 
+        var patchNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var patch in profile.Patches)
+        {
+            if (!patchNames.Add(patch.Name))
+            {
+                errors.Add($"duplicate patch '{patch.Name}'");
+            }
+
+            if (patch.Original.Length == 0 || patch.Original.Length != patch.Patched.Length || !image.Contains(patch.Address, patch.Original.Length))
+            {
+                errors.Add($"patch '{patch.Name}' at 0x{patch.Address:X} is empty, changes the length or is outside the image {image}");
+            }
+
+            if (patch.Verification >= Verification.Static && string.IsNullOrWhiteSpace(patch.Evidence))
+            {
+                errors.Add($"patch '{patch.Name}' is marked {patch.Verification} but has no evidence");
+            }
+        }
+
         var regionNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var region in profile.CaptureRegions)
         {

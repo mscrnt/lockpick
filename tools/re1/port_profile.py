@@ -202,6 +202,42 @@ def main() -> int:
                         "evidence": f"The same instruction as {source['id']}'s anchor at {anchor['address']}, found by its surrounding code "
                                     f"(tools/re1/xmap.py); " + (translate(anchor.get("evidence")) or "")})
 
+    # Code patches (a trainer feature's changes to the game's code in memory): the instruction each is in, found here
+    # by its surrounding code; the original bytes are this build's own; a relative jump keeps its destination (mapped
+    # the same way). Static until a live check on this build says otherwise (--live "patches").
+    patches = []
+    live_patches = live.get("patches", {})
+    for p in source.get("patches", []):
+        instruction, address = int(p["instruction"], 16), int(p["address"], 16)
+        offset = address - instruction
+        original = bytes.fromhex(p["original"].replace(" ", ""))
+        patched = bytearray.fromhex(p["patched"].replace(" ", ""))
+        found = map_code(a, b, instruction)
+        if found is None:
+            print(f"patch not carried over (instruction not found): {p['name']}", file=sys.stderr)
+            continue
+        at, raw = found
+        here = bytes(raw[offset:offset + len(original)])
+        jump = offset == 0 and patched[:1] == b"\xE9"
+        if len(here) != len(original) or (not jump and here != original):
+            print(f"patch not carried over (different code here): {p['name']}", file=sys.stderr)
+            continue
+        if jump:
+            destination = address + 5 + int.from_bytes(patched[1:5], "little", signed=True)
+            mapped = map_code(a, b, destination)
+            if mapped is None:
+                print(f"patch not carried over (jump destination not found): {p['name']}", file=sys.stderr)
+                continue
+            patched[1:5] = (mapped[0] - (at + 5)).to_bytes(4, "little", signed=True)
+        seen = live_patches.get(p["name"])
+        entry = {"name": p["name"], "address": f"0x{at + offset:X}", "instruction": f"0x{at:X}",
+                 "original": here.hex(" ").upper(), "patched": bytes(patched).hex(" ").upper(),
+                 "verification": "runtime" if seen else "static", "description": translate(p.get("description")),
+                 "evidence": (f"Live {seen['date']} ({seen['session']}): {seen['seen']} " if seen else "")
+                 + f"The same instruction as {source['id']}'s at {p['instruction']}, found by its surrounding code "
+                   f"(tools/re1/xmap.py); " + (translate(p.get("evidence")) or "")}
+        patches.append(entry)
+
     pe = pefile.PE(args.target_exe, fast_load=True)
     shipped = Path(args.identity or args.target_exe)
     data = shipped.read_bytes()
@@ -220,6 +256,7 @@ def main() -> int:
             "sizeOfImage": f"0x{pe.OPTIONAL_HEADER.SizeOfImage:X}",
         },
         "anchors": anchors,
+        "patches": patches,
         "addresses": named,
         "captureRegions": regions,
         "fields": fields,

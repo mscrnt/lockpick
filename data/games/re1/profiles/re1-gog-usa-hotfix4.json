@@ -85,6 +85,28 @@
       "description": "Research, for training captures (#61): the control type ([0xBE9A5C] & 3) the game remaps key_on/key_trg (0xBE9840/0xBE9842, in gameState) with (docs/MEMORY_MAP.md 'Focus and input', static). Recorded verbatim; nothing reads it as a field."
     }
   ],
+  "patches": [
+    {
+      "name": "backgroundFocus",
+      "address": "0x44126B",
+      "instruction": "0x44126B",
+      "original": "C7 05 2C CB 4B 00 00 00 00 00",
+      "patched": "E9 C6 00 00 00 90 90 90 90 90",
+      "verification": "runtime",
+      "description": "The window procedure's WM_ACTIVATE handling skipped: a jump to its DefWindowProcA call (0x441336). The focus flag is no longer cleared, the game's looping sounds aren't stopped (0x480640) and the controller isn't flagged for release (0x4C39CC) when another window is clicked.",
+      "evidence": "Static: WM_ACTIVATE at 0x44126B clears the focus flag 0x4BCB2C, then for WA_INACTIVE sets 0x4C39CC (when [0x4C39C8] = 1) and calls 0x480640, which stops every playing looping sound (0xAC9940 and the table 0xAC99D0-0xAC99E8, GetStatus 0x41D360 / Stop 0x41D300) and marks it for 0x4806B0 to play again; the jump lands on 0x441336, the common path to DefWindowProcA. Live 2026-10-14 (dev harness --background, docs/MEMORY_MAP.md 'Focus and input'): with this patch the game ran with another window in front, read every input of a virtual Xbox controller and rendered normally; the bytes went back on exit."
+    },
+    {
+      "name": "backgroundSound",
+      "address": "0x41EBC1",
+      "instruction": "0x41EBBD",
+      "original": "E2 00 00 00",
+      "patched": "E2 80 00 00",
+      "verification": "static",
+      "description": "The sound buffers' DSBUFFERDESC flags 0xE2 (static, frequency, pan, volume) with DSBCAPS_GLOBALFOCUS (0x8000) added, so Windows doesn't mute them while another window is in front. Only buffers made after the patch: the game makes them as it loads sounds.",
+      "evidence": "Static: the only secondary-buffer creation (IDirectSound::CreateSoundBuffer, call [eax+0xC] at 0x41EBCC) sets dwSize 0x14 at 0x41EBB5 and dwFlags 0xE2 at 0x41EBBD ('mov dword [esp+0x24],0xE2'); both DirectSound setups (0x41E900, 0x41F43B) use it, the others are the primary buffers (flags 1)."
+    }
+  ],
   "fields": [
     {
       "name": "stage",

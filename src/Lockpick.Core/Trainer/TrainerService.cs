@@ -191,15 +191,17 @@ public sealed class TrainerService : IDisposable
         lock (_gate)
         {
             var refusal = WriteRefusal();
+            if (refusal is null && _rules.TryGetValue(id, out var before))
+            {
+                Restore(before, source);
+                _rules.Remove(id);
+            }
+
+            refusal ??= ApplyPatches(rule, source);
             result = new TrainerAction(_time.GetUtcNow(), $"{rule.Name} on", null, null, null, source,
                 refusal is null ? TrainerResult.Applied : TrainerResult.Refused, refusal);
             if (refusal is null)
             {
-                if (_rules.TryGetValue(id, out var before))
-                {
-                    Restore(before, source);
-                }
-
                 _rules[id] = rule;
             }
 
@@ -400,15 +402,20 @@ public sealed class TrainerService : IDisposable
         if (old != value)
         {
             EventRaised?.Invoke(this, new TrainerActionExecuted(now, applied.Describe()));
-            if (!RunModified)
-            {
-                RunModified = true;
-                RunModifiedAt = now;
-                EventRaised?.Invoke(this, new RunInvalidated(now, applied.Describe()));
-            }
+            MarkModified(now, applied.Describe());
         }
 
         return applied;
+    }
+
+    private void MarkModified(DateTimeOffset now, string what)
+    {
+        if (!RunModified)
+        {
+            RunModified = true;
+            RunModifiedAt = now;
+            EventRaised?.Invoke(this, new RunInvalidated(now, what));
+        }
     }
 
     /// <summary>Puts back what each rule changed (before the write handle closes).</summary>
@@ -422,15 +429,108 @@ public sealed class TrainerService : IDisposable
 
     private void Restore(TrainerRule rule, TrainerSource source)
     {
-        if (rule.Restore is not { } restore || _writer is null || Mode != TrainerMode.Trainer)
+        if (_writer is null || Mode != TrainerMode.Trainer)
         {
             return;
         }
 
-        foreach (var write in restore())
+        foreach (var write in rule.Restore?.Invoke() ?? [])
         {
             WriteCore(write.Field, write.Value, source, $"{rule.Name} off: put back");
         }
+
+        foreach (var name in Enumerable.Reverse(rule.Patches))
+        {
+            if (_profile?.FindPatch(name) is { } patch)
+            {
+                PatchCore(patch, patch.Patched, patch.Original, source, $"{rule.Name} off: put back {name}");
+            }
+        }
+    }
+
+    /// <summary>Applies the rule's code patches; on any failure puts back the ones already applied and says why.</summary>
+    private string? ApplyPatches(TrainerRule rule, TrainerSource source)
+    {
+        var applied = new List<CodePatch>();
+        foreach (var name in rule.Patches)
+        {
+            if (_profile?.FindPatch(name) is not { IsUsable: true } patch)
+            {
+                return Undo($"{rule.Name} isn't checked on this version of the game yet ({name})");
+            }
+
+            if (PatchCore(patch, patch.Original, patch.Patched, source, $"{rule.Name}: {name}") is { } why)
+            {
+                return Undo(why);
+            }
+
+            applied.Add(patch);
+        }
+
+        return null;
+
+        string Undo(string why)
+        {
+            foreach (var patch in Enumerable.Reverse(applied))
+            {
+                PatchCore(patch, patch.Patched, patch.Original, source, $"{rule.Name}: put back {patch.Name}");
+            }
+
+            return why;
+        }
+    }
+
+    /// <summary>
+    /// Writes <paramref name="to"/> over <paramref name="from"/> at the patch's address: only when the game's code is
+    /// <paramref name="from"/> (already <paramref name="to"/> counts as done), read back and logged. Null when done.
+    /// </summary>
+    private string? PatchCore(CodePatch patch, byte[] from, byte[] to, TrainerSource source, string action)
+    {
+        var now = _time.GetUtcNow();
+        string Fail(string why, TrainerResult result)
+        {
+            Record(new TrainerAction(now, action, null, null, null, source, result, why));
+            return why;
+        }
+
+        if (_writer is null)
+        {
+            return Fail("not attached to the game", TrainerResult.Refused);
+        }
+
+        var current = new byte[from.Length];
+        if (!_writer.TryRead(patch.Address, current))
+        {
+            return Fail($"couldn't read the game's code at 0x{patch.Address:X}", TrainerResult.Failed);
+        }
+
+        if (current.AsSpan().SequenceEqual(to))
+        {
+            return null;
+        }
+
+        if (!current.AsSpan().SequenceEqual(from))
+        {
+            return Fail($"the game's code at 0x{patch.Address:X} isn't what Lockpick expects ({Convert.ToHexString(current)}); left alone",
+                TrainerResult.Refused);
+        }
+
+        if (!_writer.TryWrite(patch.Address, to))
+        {
+            return Fail($"Windows refused the write at 0x{patch.Address:X}", TrainerResult.Failed);
+        }
+
+        var back = new byte[to.Length];
+        if (!_writer.TryRead(patch.Address, back) || !back.AsSpan().SequenceEqual(to))
+        {
+            _writer.TryWrite(patch.Address, from);
+            return Fail($"read back {Convert.ToHexString(back)} at 0x{patch.Address:X}", TrainerResult.Mismatch);
+        }
+
+        Record(new TrainerAction(now, action, null, null, null, source, TrainerResult.Applied,
+            $"0x{patch.Address:X}: {Convert.ToHexString(from)} -> {Convert.ToHexString(to)}"));
+        MarkModified(now, action);
+        return null;
     }
 
     private TrainerAction Record(TrainerAction action)

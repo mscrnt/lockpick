@@ -242,6 +242,17 @@ the map intact the game read A typed in Notepad (input word `0x1000`, Jill moved
 switch held the flag within half a second of each focus loss, put the map back on each return and when switched off,
 and A in Notepad did nothing. The Japanese builds have the fields at `0x4B3274` / `0x4CFD40` (cross-mapped, static).
 
+**Controller and sound in the background (the app, 0.5.1):** two code patches in the profiles (`patches`:
+`backgroundFocus`, `backgroundSound`), applied by keep-running when the player asks, only over the expected bytes, read
+back and put back. `backgroundFocus` is the `WM_ACTIVATE` jump below (English `0x44126B`, Japanese `0x448795`): the
+focus-loss branch also calls `0x480640`, which stops every playing looping sound (`0xAC9940` and the table
+`0xAC99D0`-`0xAC99E8`; `0x4806B0` plays them again on activation), and sets `0x4C39CC` when `[0x4C39C8]` is 1.
+`backgroundSound` adds `DSBCAPS_GLOBALFOCUS` (0x8000) to the only secondary-buffer flags, `0xE2` at English `0x41EBC1`
+(`mov [esp+0x24],0xE2` at `0x41EBBD`, CreateSoundBuffer at `0x41EBCC`) / Japanese `0x48B6F1`. **Live 2026-10-28 (GOG
+Japanese, owner's controller):** keep-running alone kept the game running but silent and deaf to the controller; with
+both patches the controller worked and the sound played with another window in front. English: the jump was live with
+the dev harness (2026-10-14); the sound patch waits for its own check.
+
 Planned patches (Trainer Mode, opt-in, reversible, read back, never in Challenge Mode):
 - **Keep running unfocused (the code-patch variant; not used, the app's is data-only above):** `0x44126B` `C7 05 2C CB 4B 00 00 00 00 00` → `E9 C6 00 00 00 90 90 90 90 90`
   (`WM_ACTIVATE` goes straight to `DefWindowProcA`; the flag stays 1, sounds aren't paused). Data-only alternative:

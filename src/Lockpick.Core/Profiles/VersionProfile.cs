@@ -52,10 +52,19 @@ public sealed record VersionProfile
     /// </summary>
     public IReadOnlyList<MemoryRegionSpec> CaptureRegions { get; init; } = [];
 
+    /// <summary>
+    /// Changes to the game's code in memory that a trainer feature may make (never to its files), each used only when
+    /// it is runtime-verified on this build (<see cref="CodePatch.IsUsable"/>).
+    /// </summary>
+    public IReadOnlyList<CodePatch> Patches { get; init; } = [];
+
     public IReadOnlyList<string> Notes { get; init; } = [];
 
     public FieldSpec? FindField(string name) =>
         Fields.FirstOrDefault(f => string.Equals(f.Name, name, StringComparison.OrdinalIgnoreCase));
+
+    public CodePatch? FindPatch(string name) =>
+        Patches.FirstOrDefault(p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase));
 
     /// <summary>The named address when it is confirmed (static or runtime); null when missing or only a lead.</summary>
     public ulong? TrustedAddress(string name) =>
@@ -106,6 +115,39 @@ public sealed record CodeAnchor
     public required byte[] Bytes { get; init; }
 
     public string? Evidence { get; init; }
+}
+
+/// <summary>
+/// A change to the game's code in memory: <see cref="Patched"/> in place of <see cref="Original"/> at
+/// <see cref="Address"/>, the same length. The trainer applies it only while the player has the feature on, only when
+/// <see cref="Original"/> (or the patch itself) is what's there, reads it back, and puts <see cref="Original"/> back when
+/// the feature, cheats or Lockpick end. Never written to the game's files.
+/// </summary>
+public sealed record CodePatch
+{
+    public required string Name { get; init; }
+
+    [JsonConverter(typeof(HexUInt64Converter))]
+    public ulong Address { get; init; }
+
+    /// <summary>The instruction the patch is in (its start; the patch may be part of it, e.g. an operand).</summary>
+    [JsonConverter(typeof(HexUInt64Converter))]
+    public ulong Instruction { get; init; }
+
+    [JsonConverter(typeof(HexBytesConverter))]
+    public required byte[] Original { get; init; }
+
+    [JsonConverter(typeof(HexBytesConverter))]
+    public required byte[] Patched { get; init; }
+
+    public Verification Verification { get; init; }
+
+    public string? Description { get; init; }
+
+    public string? Evidence { get; init; }
+
+    /// <summary>Seen doing what it says in this build's live game, so the trainer may apply it.</summary>
+    public bool IsUsable => Verification == Verification.Runtime && Original.Length > 0 && Original.Length == Patched.Length;
 }
 
 /// <summary>A named address (a table, pointer or array start) and the bytes the adapter reads there.</summary>

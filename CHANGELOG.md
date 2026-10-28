@@ -6,6 +6,23 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-10-28
+
+### Added
+- **Controller and sound in the background** (Trainer → In the background, with keep-running): the game's own
+  focus-loss handling is skipped (it stopped its sounds and let go of the controller when another window was clicked)
+  and its sounds are made with DirectSound's global focus (Windows muted them in the background). Two small changes to
+  the game's code in memory while the option is on, never its files: each only over the exact bytes expected, read back,
+  logged, and put back when it's switched off, cheats go off or Lockpick closes. Checked live on GOG Japanese (the
+  owner's controller and the sound with another window in front); on GOG English the sound part waits for its own check,
+  so the option is offered there once it has one. Sounds the game loaded before the option was turned on stay muted in
+  the background until it loads them again (the next room).
+
+### Fixed
+- The splits overlay's clock no longer replays part of a second now and then (it guessed ahead up to a second between
+  reads and jumped back when a read came late).
+- Keep-running's description no longer says the controller works in the background (on its own it doesn't).
+
 ## [0.5.0] - 2026-10-28
 
 ### Added

@@ -67,6 +67,13 @@ internal sealed class Re1Trainer(Func<int, string?> itemName) : IGameTrainer, Lo
 
     public IReadOnlyList<string> KeepRunningFields { get; } = [Re1Session.Fields.WindowFocused, .. Re1Session.Fields.KeyMap];
 
+    /// <summary>
+    /// The window procedure's WM_ACTIVATE handling skipped (the game then never stops its looping sounds or lets go of the
+    /// controller when another window is clicked), and the sound buffers made with DSBCAPS_GLOBALFOCUS (Windows doesn't
+    /// mute them in the background). Profiles: backgroundFocus, backgroundSound.
+    /// </summary>
+    public IReadOnlyList<string> BackgroundPatches { get; } = ["backgroundFocus", "backgroundSound"];
+
     public TrainerRule CreateKeepRunningRule(Func<bool> inFront)
     {
         // The game pauses while its focus flag is 0 (its WM_ACTIVATE clears it); held at 1, it runs on in the background.

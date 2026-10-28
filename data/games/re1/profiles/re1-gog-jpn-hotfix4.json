@@ -71,6 +71,28 @@
       "evidence": "The same instruction as re1-gog-usa-hotfix4's anchor at 0x40582E, found by its surrounding code (tools/re1/xmap.py); mov eax,[0xC351E8]"
     }
   ],
+  "patches": [
+    {
+      "name": "backgroundFocus",
+      "address": "0x448795",
+      "instruction": "0x448795",
+      "original": "C7 05 74 32 4B 00 00 00 00 00",
+      "patched": "E9 C6 00 00 00 90 90 90 90 90",
+      "verification": "runtime",
+      "description": "The window procedure's WM_ACTIVATE handling skipped: a jump to its DefWindowProcA call (0x441336). The focus flag is no longer cleared, the game's looping sounds aren't stopped (0x480640) and the controller isn't flagged for release (0x4C39CC) when another window is clicked.",
+      "evidence": "Live 2026-10-28 (owner with a real controller (connected before the game started), the patches applied by Lockpick's Trainer (keep-running with \"Controller and sound in the background too\"), each write read back and logged): With another window in front the game kept running, its sound kept playing and the owner's controller kept working (before the patch, with keep-running alone: no sound and the controller did nothing, in the same session). Put back when switched off. The same instruction as re1-gog-usa-hotfix4's at 0x44126B, found by its surrounding code (tools/re1/xmap.py); Static: WM_ACTIVATE at 0x44126B clears the focus flag 0x4B3274, then for WA_INACTIVE sets 0x4C39CC (when [0x4C39C8] = 1) and calls 0x480640, which stops every playing looping sound (0xAC9940 and the table 0xAC99D0-0xAC99E8, GetStatus 0x41D360 / Stop 0x41D300) and marks it for 0x4806B0 to play again; the jump lands on 0x441336, the common path to DefWindowProcA. Live 2026-10-14 (dev harness --background, docs/MEMORY_MAP.md 'Focus and input'): with this patch the game ran with another window in front, read every input of a virtual Xbox controller and rendered normally; the bytes went back on exit."
+    },
+    {
+      "name": "backgroundSound",
+      "address": "0x48B6F1",
+      "instruction": "0x48B6ED",
+      "original": "E2 00 00 00",
+      "patched": "E2 80 00 00",
+      "verification": "runtime",
+      "description": "The sound buffers' DSBUFFERDESC flags 0xE2 (static, frequency, pan, volume) with DSBCAPS_GLOBALFOCUS (0x8000) added, so Windows doesn't mute them while another window is in front. Only buffers made after the patch: the game makes them as it loads sounds.",
+      "evidence": "Live 2026-10-28 (owner with a real controller (connected before the game started), the patches applied by Lockpick's Trainer (keep-running with \"Controller and sound in the background too\"), each write read back and logged): With another window in front the owner heard the game's sounds (keep-running alone: silent). The same instruction as re1-gog-usa-hotfix4's at 0x41EBBD, found by its surrounding code (tools/re1/xmap.py); Static: the only secondary-buffer creation (IDirectSound::CreateSoundBuffer, call [eax+0xC] at 0x41EBCC) sets dwSize 0x14 at 0x41EBB5 and dwFlags 0xE2 at 0x41EBBD ('mov dword [esp+0x24],0xE2'); both DirectSound setups (0x41E900, 0x41F43B) use it, the others are the primary buffers (flags 1)."
+    }
+  ],
   "addresses": [
     {
       "name": "inventoryPointer",
@@ -375,7 +397,7 @@
       "type": "u32",
       "description": "The keyboard map, bytes 0-3 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
       "verification": "runtime",
-      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): Read from the running game: 0x27252826: right, left, down, up arrows (VK 0x27 0x25 0x28 0x26). The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from. Cross-mapped from re1-gog-usa-hotfix4 (0xAC4030) by tools/re1/xmap.py: 6 of 8 code sites that use it there are found here and use 0x4CFD40 at the same instruction.",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): The keyboard map the poll reads (the game copies its default table 0x4AC510- into it at 0x417960, as English copies 0x4D4730- to 0xAC4030). Read at boot: the defaults (arrows 26 28 25 27, V, X C, Z, A, Ctrl, Enter, Space, Esc); a few seconds later the game loaded the player's own table there (on this PC 00 10 00 00 00 40 00 00 00 80 00 00 00 20 00 00 20 00 00 00 40 00 00 00 02 00 00 00 10 00 00 00). Lockpick's keep-running (0.5.0 build) blanked all eight words with the game in the background and put them back exactly when switched off, each write read back. Cross-mapped from re1-gog-usa-hotfix4 (0xAC4030) by tools/re1/xmap.py: 6 of 8 code sites that use it there are found here and use 0x4CFD40 at the same instruction.",
       "write": {
         "min": 0,
         "max": 4294967295,
@@ -392,7 +414,7 @@
       "type": "u32",
       "description": "The keyboard map, bytes 4-7 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
       "verification": "runtime",
-      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): Read from the running game: 0x00005600: V. The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from. Cross-mapped from re1-gog-usa-hotfix4 (0xAC4034) by tools/re1/xmap.py: 4 of 4 code sites that use it there are found here and use 0x4CFD44 at the same instruction.",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): The keyboard map the poll reads (the game copies its default table 0x4AC510- into it at 0x417960, as English copies 0x4D4730- to 0xAC4030). Read at boot: the defaults (arrows 26 28 25 27, V, X C, Z, A, Ctrl, Enter, Space, Esc); a few seconds later the game loaded the player's own table there (on this PC 00 10 00 00 00 40 00 00 00 80 00 00 00 20 00 00 20 00 00 00 40 00 00 00 02 00 00 00 10 00 00 00). Lockpick's keep-running (0.5.0 build) blanked all eight words with the game in the background and put them back exactly when switched off, each write read back. Cross-mapped from re1-gog-usa-hotfix4 (0xAC4034) by tools/re1/xmap.py: 4 of 4 code sites that use it there are found here and use 0x4CFD44 at the same instruction.",
       "write": {
         "min": 0,
         "max": 4294967295,
@@ -409,7 +431,7 @@
       "type": "u32",
       "description": "The keyboard map, bytes 8-11 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
       "verification": "runtime",
-      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): Read from the running game: 0x43580000: X, C. The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from. Not used directly by code in re1-gog-usa-hotfix4 (0xAC4038); it lies between 0xAC4034 and 0xAC4044, which both map by -0x5f42f0 from their own code (4 and 4 sites), so the layout carries over (tools/re1/xmap.py).",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): The keyboard map the poll reads (the game copies its default table 0x4AC510- into it at 0x417960, as English copies 0x4D4730- to 0xAC4030). Read at boot: the defaults (arrows 26 28 25 27, V, X C, Z, A, Ctrl, Enter, Space, Esc); a few seconds later the game loaded the player's own table there (on this PC 00 10 00 00 00 40 00 00 00 80 00 00 00 20 00 00 20 00 00 00 40 00 00 00 02 00 00 00 10 00 00 00). Lockpick's keep-running (0.5.0 build) blanked all eight words with the game in the background and put them back exactly when switched off, each write read back. Not used directly by code in re1-gog-usa-hotfix4 (0xAC4038); it lies between 0xAC4034 and 0xAC4044, which both map by -0x5f42f0 from their own code (4 and 4 sites), so the layout carries over (tools/re1/xmap.py).",
       "write": {
         "min": 0,
         "max": 4294967295,
@@ -426,7 +448,7 @@
       "type": "u32",
       "description": "The keyboard map, bytes 12-15 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
       "verification": "runtime",
-      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): Read from the running game: 0x00005A00: Z. The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from. Not used directly by code in re1-gog-usa-hotfix4 (0xAC403C); it lies between 0xAC4034 and 0xAC4044, which both map by -0x5f42f0 from their own code (4 and 4 sites), so the layout carries over (tools/re1/xmap.py).",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): The keyboard map the poll reads (the game copies its default table 0x4AC510- into it at 0x417960, as English copies 0x4D4730- to 0xAC4030). Read at boot: the defaults (arrows 26 28 25 27, V, X C, Z, A, Ctrl, Enter, Space, Esc); a few seconds later the game loaded the player's own table there (on this PC 00 10 00 00 00 40 00 00 00 80 00 00 00 20 00 00 20 00 00 00 40 00 00 00 02 00 00 00 10 00 00 00). Lockpick's keep-running (0.5.0 build) blanked all eight words with the game in the background and put them back exactly when switched off, each write read back. Not used directly by code in re1-gog-usa-hotfix4 (0xAC403C); it lies between 0xAC4034 and 0xAC4044, which both map by -0x5f42f0 from their own code (4 and 4 sites), so the layout carries over (tools/re1/xmap.py).",
       "write": {
         "min": 0,
         "max": 4294967295,
@@ -443,7 +465,7 @@
       "type": "u32",
       "description": "The keyboard map, bytes 16-19 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
       "verification": "runtime",
-      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): Read from the running game: 0 (unused). The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from. Not used directly by code in re1-gog-usa-hotfix4 (0xAC4040); it lies between 0xAC4034 and 0xAC4044, which both map by -0x5f42f0 from their own code (4 and 4 sites), so the layout carries over (tools/re1/xmap.py).",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): The keyboard map the poll reads (the game copies its default table 0x4AC510- into it at 0x417960, as English copies 0x4D4730- to 0xAC4030). Read at boot: the defaults (arrows 26 28 25 27, V, X C, Z, A, Ctrl, Enter, Space, Esc); a few seconds later the game loaded the player's own table there (on this PC 00 10 00 00 00 40 00 00 00 80 00 00 00 20 00 00 20 00 00 00 40 00 00 00 02 00 00 00 10 00 00 00). Lockpick's keep-running (0.5.0 build) blanked all eight words with the game in the background and put them back exactly when switched off, each write read back. Not used directly by code in re1-gog-usa-hotfix4 (0xAC4040); it lies between 0xAC4034 and 0xAC4044, which both map by -0x5f42f0 from their own code (4 and 4 sites), so the layout carries over (tools/re1/xmap.py).",
       "write": {
         "min": 0,
         "max": 4294967295,
@@ -460,7 +482,7 @@
       "type": "u32",
       "description": "The keyboard map, bytes 20-23 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
       "verification": "runtime",
-      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): Read from the running game: 0 (unused). The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from. Cross-mapped from re1-gog-usa-hotfix4 (0xAC4044) by tools/re1/xmap.py: 4 of 4 code sites that use it there are found here and use 0x4CFD54 at the same instruction.",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): The keyboard map the poll reads (the game copies its default table 0x4AC510- into it at 0x417960, as English copies 0x4D4730- to 0xAC4030). Read at boot: the defaults (arrows 26 28 25 27, V, X C, Z, A, Ctrl, Enter, Space, Esc); a few seconds later the game loaded the player's own table there (on this PC 00 10 00 00 00 40 00 00 00 80 00 00 00 20 00 00 20 00 00 00 40 00 00 00 02 00 00 00 10 00 00 00). Lockpick's keep-running (0.5.0 build) blanked all eight words with the game in the background and put them back exactly when switched off, each write read back. Cross-mapped from re1-gog-usa-hotfix4 (0xAC4044) by tools/re1/xmap.py: 4 of 4 code sites that use it there are found here and use 0x4CFD54 at the same instruction.",
       "write": {
         "min": 0,
         "max": 4294967295,
@@ -477,7 +499,7 @@
       "type": "u32",
       "description": "The keyboard map, bytes 24-27 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
       "verification": "runtime",
-      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): Read from the running game: 0x41000000: A. The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from. Cross-mapped from re1-gog-usa-hotfix4 (0xAC4048) by tools/re1/xmap.py: 4 of 4 code sites that use it there are found here and use 0x4CFD58 at the same instruction.",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): The keyboard map the poll reads (the game copies its default table 0x4AC510- into it at 0x417960, as English copies 0x4D4730- to 0xAC4030). Read at boot: the defaults (arrows 26 28 25 27, V, X C, Z, A, Ctrl, Enter, Space, Esc); a few seconds later the game loaded the player's own table there (on this PC 00 10 00 00 00 40 00 00 00 80 00 00 00 20 00 00 20 00 00 00 40 00 00 00 02 00 00 00 10 00 00 00). Lockpick's keep-running (0.5.0 build) blanked all eight words with the game in the background and put them back exactly when switched off, each write read back. Cross-mapped from re1-gog-usa-hotfix4 (0xAC4048) by tools/re1/xmap.py: 4 of 4 code sites that use it there are found here and use 0x4CFD58 at the same instruction.",
       "write": {
         "min": 0,
         "max": 4294967295,
@@ -494,7 +516,7 @@
       "type": "u32",
       "description": "The keyboard map, bytes 28-31 of 32: one virtual-key code per PSX button the keyboard poll (0x4202F0, GetAsyncKeyState) checks, 0 for none. Keep-running blanks it while the game is in the background (GetAsyncKeyState sees keys typed in any window) and puts the player's map back when it's in front.",
       "verification": "runtime",
-      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): Read from the running game: 0x1B200D11: Ctrl, Enter, Space, Esc. The eight words are the keyboard setup as Windows key codes (arrows, Ctrl, Enter, Space, Esc, letters), the layout the keyboard poll reads from. Cross-mapped from re1-gog-usa-hotfix4 (0xAC404C) by tools/re1/xmap.py: 4 of 4 code sites that use it there are found here and use 0x4CFD5C at the same instruction.",
+      "evidence": "Live 2026-10-28 (lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots): The keyboard map the poll reads (the game copies its default table 0x4AC510- into it at 0x417960, as English copies 0x4D4730- to 0xAC4030). Read at boot: the defaults (arrows 26 28 25 27, V, X C, Z, A, Ctrl, Enter, Space, Esc); a few seconds later the game loaded the player's own table there (on this PC 00 10 00 00 00 40 00 00 00 80 00 00 00 20 00 00 20 00 00 00 40 00 00 00 02 00 00 00 10 00 00 00). Lockpick's keep-running (0.5.0 build) blanked all eight words with the game in the background and put them back exactly when switched off, each write read back. Cross-mapped from re1-gog-usa-hotfix4 (0xAC404C) by tools/re1/xmap.py: 4 of 4 code sites that use it there are found here and use 0x4CFD5C at the same instruction.",
       "write": {
         "min": 0,
         "max": 4294967295,

@@ -189,4 +189,18 @@ public sealed class Re1KeepRunningTests : IDisposable
         Poll();
         Assert.Equal(1, asked);
     }
+
+    [Fact]
+    public void Controller_and_sound_in_the_background_are_offered_only_where_both_patches_were_checked_live()
+    {
+        var patches = Game.BackgroundPatches;
+        Assert.Equal(["backgroundFocus", "backgroundSound"], patches);
+        var japanese = _adapter.Profiles.Single(p => p.Id == "re1-gog-jpn-hotfix4");
+        Assert.All(patches, n => Assert.True(japanese.FindPatch(n) is { IsUsable: true }, n));
+        Assert.Equal(0x448795ul, japanese.FindPatch("backgroundFocus")!.Address);
+        Assert.Equal(0x48B6F1ul, japanese.FindPatch("backgroundSound")!.Address);
+        // GOG English: the focus patch was live with the dev harness; the sound patch waits for its own listen.
+        Assert.True(Gog.FindPatch("backgroundFocus") is { IsUsable: true });
+        Assert.False(Gog.FindPatch("backgroundSound")!.IsUsable);
+    }
 }
