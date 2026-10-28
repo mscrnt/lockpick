@@ -1,8 +1,9 @@
 namespace Lockpick.App.Services;
 
 /// <summary>
-/// Streamer mode (Settings → General, #63): file paths, process ids and the API token are blurred wherever Lockpick
-/// shows them (elements with the style class <c>private</c>), so the app can be on stream. Copy buttons still work.
+/// Streamer mode (Settings → General, #63): the API token is shown as dots wherever Lockpick shows it (elements with the
+/// style class <c>private</c>), so the app can be on stream. Copy buttons still work. Paths and process ids stay
+/// readable. (It used a blur effect, which on some PCs smeared the whole window.)
 /// </summary>
 public static class Privacy
 {

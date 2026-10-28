@@ -159,7 +159,7 @@ The overlay is drawn over the game on your screen, so OBS doesn't see it. For yo
   account. If you also use the script on this PC, it leaves these to Lockpick while Lockpick is connected; its
   hotkeys keep working.
 - **Window Capture** of a popped-out widget window works too (use its green background with a chroma key).
-- **Streamer mode** (Settings → General) blurs file paths, process ids and the API token in Lockpick's window, if you
+- **Streamer mode** (Settings → General) hides the API token in Lockpick's window, if you
   show the app on stream.
 
 For the game itself, **Game Capture** works in every display mode.

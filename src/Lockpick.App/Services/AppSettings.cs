@@ -156,7 +156,7 @@ public sealed record AppSettings
     /// <summary>Lockpick's window per monitor setup (the screens' layout → where the window was), #63.</summary>
     public IReadOnlyDictionary<string, WindowPlacement> WindowPlacements { get; init; } = new Dictionary<string, WindowPlacement>();
 
-    /// <summary>Streamer mode: paths, process ids and the API token are blurred on screen.</summary>
+    /// <summary>Streamer mode: the API token is shown as dots.</summary>
     public bool StreamerMode { get; init; }
 
     /// <summary>Play a sound when a challenge fails or the player dies (the sounds below).</summary>

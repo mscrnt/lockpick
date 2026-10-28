@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-10-27
+
+### Fixed
+- **Lockpick's window on stream:** OBS's Window Capture showed it blank (its usual capture method can't see windows
+  drawn through DirectComposition). Lockpick now draws into a plain window surface, so any capture method works.
+- **Streamer mode** smeared the whole window on some PCs and left trails behind the mouse (a blur effect). It now
+  shows the API token as dots and leaves the rest readable: paths and process ids are no longer hidden.
+
 ## [0.4.0] - 2026-10-27
 
 ### Added

@@ -79,7 +79,7 @@
             </DataTemplate>
           </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <SelectableTextBlock Classes="mono private" Text="{Binding LastCaptureZip}" IsVisible="{Binding LastCaptureZip, Converter={x:Static ObjectConverters.IsNotNull}}" TextWrapping="Wrap" />
+        <SelectableTextBlock Classes="mono" Text="{Binding LastCaptureZip}" IsVisible="{Binding LastCaptureZip, Converter={x:Static ObjectConverters.IsNotNull}}" TextWrapping="Wrap" />
       </StackPanel>
     </Border>
 
@@ -97,7 +97,7 @@
         <TextBlock Grid.Row="2" Classes="label" Text="Timer" />
         <TextBlock Grid.Row="2" Grid.Column="1" Classes="mono" Text="{Binding TimerInfo}" TextWrapping="Wrap" />
         <TextBlock Grid.Row="3" Classes="label" Text="Log file" />
-        <SelectableTextBlock Grid.Row="3" Grid.Column="1" Classes="mono private" Text="{Binding LogFile}" TextWrapping="Wrap" />
+        <SelectableTextBlock Grid.Row="3" Grid.Column="1" Classes="mono" Text="{Binding LogFile}" TextWrapping="Wrap" />
       </Grid>
     </Border>
 

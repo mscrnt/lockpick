@@ -17,7 +17,7 @@
         </StackPanel>
         <TextBlock Classes="headline" Text="{Binding ConnectionTitle}" />
         <TextBlock Text="{Binding ConnectionMessage}" TextWrapping="Wrap" Foreground="{StaticResource LpMutedBrush}" />
-        <TextBlock Classes="mono private" Text="{Binding ProcessText}" TextWrapping="Wrap" Margin="0,6,0,0" />
+        <TextBlock Classes="mono" Text="{Binding ProcessText}" TextWrapping="Wrap" Margin="0,6,0,0" />
       </StackPanel>
     </Border>
 
@@ -31,7 +31,7 @@
         <TextBlock Grid.Row="1" Classes="label" Text="Profile" />
         <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ProfileText}" TextWrapping="Wrap" />
         <TextBlock Grid.Row="2" Classes="label" Text="File" />
-        <TextBlock Grid.Row="2" Grid.Column="1" Classes="mono private" Text="{Binding FileText}" TextWrapping="Wrap" />
+        <TextBlock Grid.Row="2" Grid.Column="1" Classes="mono" Text="{Binding FileText}" TextWrapping="Wrap" />
         <TextBlock Grid.Row="3" Classes="label" Text="SHA-256" />
         <SelectableTextBlock Grid.Row="3" Grid.Column="1" Classes="mono" Text="{Binding HashText}" TextWrapping="Wrap" FontSize="11" />
         <TextBlock Grid.Row="4" Classes="label" Text="PE" />

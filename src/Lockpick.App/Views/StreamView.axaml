@@ -95,7 +95,7 @@
         <TextBlock TextWrapping="Wrap" Foreground="{StaticResource LpMutedBrush}"
                    Text="Lockpick's script for OBS adds these sources (and a Game Capture of the game) with one button, and can record each run, put chapter markers at splits, deaths and fails, save the replay buffer on a death, a fail or a new best, and switch to a &quot;paused&quot; scene while the game isn't in front. Every part is optional." />
         <TextBlock TextWrapping="Wrap" Text="In OBS: Tools → Scripts → + → choose this file:" />
-        <SelectableTextBlock Classes="mono private" Text="{Binding ObsScript}" TextWrapping="Wrap" />
+        <SelectableTextBlock Classes="mono" Text="{Binding ObsScript}" TextWrapping="Wrap" />
         <WrapPanel ItemSpacing="8" LineSpacing="6">
           <Button Content="Show the script" Click="OnShowScript" />
           <Button Content="Copy its path" Click="OnCopyObsLink" Tag="{Binding ObsScript}" />

@@ -187,9 +187,10 @@
       <Setter Property="Foreground" Value="{StaticResource LpRedBrush}" />
     </Style>
 
-    <!-- Streamer mode: what's private (paths, process ids, the API token) is blurred on screen. -->
-    <Style Selector=":is(Control).streamer :is(Control).private">
-      <Setter Property="Effect" Value="blur(9)" />
+    <!-- Streamer mode: what's private (the API token) is shown as dots. Not a blur effect: on some PCs it smeared the
+         whole window and left trails behind the mouse, on screen and on stream. -->
+    <Style Selector=":is(Control).streamer TextBox.private">
+      <Setter Property="PasswordChar" Value="•" />
     </Style>
 
     <!-- Navigation -->

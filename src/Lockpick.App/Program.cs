@@ -18,6 +18,9 @@ internal static class Program
     public static AppBuilder BuildAvaloniaApp() =>
         AppBuilder.Configure<App>()
             .UsePlatformDetect()
+            // A plain redirection surface rather than DirectComposition: OBS's Window Capture (BitBlt) sees the window
+            // instead of a blank frame, so Lockpick can be shown on stream. The overlay has its own layered windows.
+            .With(new Win32PlatformOptions { CompositionMode = [Win32CompositionMode.RedirectionSurface] })
             .WithInterFont()
             .LogToTrace();
 }
