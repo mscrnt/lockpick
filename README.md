@@ -6,16 +6,17 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Discussions](https://img.shields.io/github/discussions/mscrnt/lockpick)](https://github.com/mscrnt/lockpick/discussions)
 
-**Lockpick** is a free companion app for the original **Resident Evil (1996)** on PC: GOG's English or Japanese
-release, or the Japanese version with Classic REbirth that most speedrunners use. Run it next to
+**Lockpick** is a free companion app for the original **Resident Evil (1996)** on PC: GOG's or Steam's English or
+Japanese release, or the Japanese version with Classic REbirth that most speedrunners use. Run it next to
 the game and it shows what the game is doing as you play: your health, the room you're in, a live map, your items,
 your progress and the enemies around you. It also times speedruns the way the leaderboard does, runs challenges such
 as "no damage" or "knife only", puts all of it on your stream, and has optional cheats for practice.
 
 It never changes your game files. It only changes the running game if you switch cheats on.
 
-> **Status:** version **0.3**, "play and stream with one app", is out (see [what's new in 0.3](#new-in-03)). What's
-> next is on the [roadmap](docs/ROADMAP.md).
+> **Status:** version **0.5** is out: the route guide for any split set, the controller and sound in the background,
+> and your whole stream layout in one OBS source (see [what's new in 0.5](#new-in-05)). What's next is on the
+> [roadmap](docs/ROADMAP.md).
 
 ## Screenshots
 
@@ -64,6 +65,24 @@ It never changes your game files. It only changes the running game if you switch
   ([docs/API.md](docs/API.md)).
 - **Installs and updates itself**, with a short first-time setup, and fits any window: ultrawide, 1080p, side by side
   with the game, or portrait.
+
+## New in 0.5
+
+- **The route guide follows any split set** (work in progress): choose *Follow my splits* and Lockpick works out a
+  route for the split set on the Runs page (built in, imported from LiveSplit, or your own) from your own game's
+  files, solving the puzzles and choices on the way. It hasn't been followed through real runs yet: if a step is
+  wrong, record a capture and press the marker key there. The ring on the item and the line on the floor can be
+  switched separately.
+- **Controller and sound in the background:** with *Keep running in the background*, the game keeps going, your
+  controller keeps working and you keep hearing it while another window is in front (GOG's Japanese release so far;
+  more versions as they're checked).
+- **Your whole stream layout in one OBS source:** tick the widgets you want, drag them anywhere on a 16:9 canvas, and
+  add one browser source. Browser sources update 30 times a second.
+- **Overlay widgets in the black bars** beside the game's 4:3 picture, and widgets popped out into their own window
+  leave the game's picture.
+- **Cheats during challenges** (the attempt is marked "with cheats"); turning cheats on turns leaderboard mode off.
+- **More versions:** the Seamless HD pack (Classic REbirth with HD backgrounds), and most of the cheats on GOG's
+  Japanese release.
 
 ## New in 0.4
 
@@ -115,7 +134,8 @@ split into sections in the sidebar, a support bundle for bug reports, and a [pla
    and run it. It installs for your Windows user only (no administrator rights needed). Windows may warn that it
    doesn't know the app, because Lockpick isn't code-signed yet: click *More info → Run anyway*.
 2. The first start helps you find your game and checks that it's a supported version.
-3. Start Resident Evil from its own `ResidentEvil.exe` (or `Biohazard.exe` for the Japanese version), not the GOG
+3. Start Resident Evil from its own `ResidentEvil.exe` (or `Biohazard.exe` for the Japanese version, `Bio.exe` in the
+   Seamless HD pack), not the GOG
    installer's *Launch* button, which starts it as administrator. Lockpick connects by itself.
 
 **Updates:** Lockpick checks for new versions in the background. When one is ready, the version number at the bottom
@@ -131,8 +151,9 @@ so you can uninstall it.
 
 - **GOG's English release**, 1.0 hotfix4 (`ResidentEvil.exe`);
 - **GOG's Japanese release**, 1.0 hotfix4 (`Biohazard.exe`; GOG offers it as a separate download of the same game);
+- **Steam's release**, English and Japanese;
 - **the Japanese 1.01 version with Classic REbirth**, the version the speedrun.com PC board recommends (MediaKite, or
-  GOG's Japanese release with REbirth in its own folder).
+  GOG's Japanese release with REbirth in its own folder), including **the Seamless HD pack** (its `Bio.exe`).
 
 It refuses other versions instead of guessing; see [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md). The PlayStation,
 Saturn and emulator boards aren't supported yet.
@@ -157,10 +178,14 @@ Challenge mode records what Lockpick did. It is not an anti-cheat system.
 ## Known limitations
 
 - Supported: GOG's and Steam's English and Japanese releases, and the Japanese 1.01 version with Classic REbirth. Not
-  yet: emulators. On the Japanese versions, cheats only cover what has been checked in play so far: health, and ammo in
-  the first four slots on GOG's Japanese release. The rest follows as it's tested.
-- Resident Evil pauses and goes black whenever it isn't the active window (that's the original game). An OBS capture
-  shows black while you click elsewhere, and in exclusive fullscreen the game minimizes instead.
+  yet: emulators. Cheats only cover what has been checked in play on each version: everything on GOG's English
+  release, all but Rebecca's items on GOG's Japanese release, health and most ammo counts on the 1.01 version, less on
+  Steam. The rest follows as it's tested.
+- Resident Evil pauses and goes black whenever it isn't the active window (that's the original game).
+  *Keep running in the background* (Trainer) fixes that on GOG's releases, with the controller and sound too on GOG's
+  Japanese release so far. Classic REbirth pauses the game itself unless its `FocusIgnore` is set in its `config.ini`.
+  In exclusive fullscreen the game minimizes instead.
+- The route guide's routes haven't been followed through whole real runs yet; a step can be out of place.
 - The built-in split points come from the community's autosplitter and haven't all been checked in full runs yet.
 - On the load screen, the last game's values show for a few seconds; after a death, values are hidden until the next
   game starts.
