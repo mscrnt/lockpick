@@ -20,7 +20,7 @@ from sim import ITEM_USE_BASE, Sim, State, target_of  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 NAMES = json.loads((ROOT / "data" / "games" / "re1" / "names.json").read_text(encoding="utf-8"))
-RULES = Path(os.environ.get("ROUTESIM_RULES") or Path(__file__).with_name("rules.json"))
+RULES = Path(os.environ.get("ROUTESIM_RULES") or ROOT / "data" / "games" / "re1" / "route-rules.json")
 
 
 def item_name(i: int) -> str:
@@ -55,18 +55,22 @@ def remember(a: State, b: State, ever: set) -> None:
 
 
 def moves(sim: Sim, s: State):
-    """Every move in the current room: (description, kind, function on a state, details). Where a room asks a yes/no
-    question, its doors and spots come twice: answering yes, and answering no."""
+    """Every move in the current room: (description, kind, function on a state, details). A move in a room whose
+    yes/no question is answered No (sim.answers) says so."""
     for text, kind, fn, meta in plain_moves(sim, s):
+        target = meta.get("to_room") if kind == "door" else s.room
+        if sim.answers.get(s.room) or (target and sim.answers.get(target)):
+            meta = {**meta, "answer": "no"}
         yield text, kind, fn, meta
-        if kind in ("door", "spot") and (sim.asks(s.room) or (kind == "door" and sim.asks(meta.get("to_room") or ""))):
-            def answering_no(t, fn=fn):
-                t.answer = 1
-                try:
-                    return fn(t)
-                finally:
-                    t.answer = 0
-            yield f"{text}, answering No", kind, answering_no, {**meta, "answer": "no"}
+
+
+def nearest_object(s: State, zone: list[int]) -> list[int] | None:
+    """The script-placed object nearest a push spot: the thing to push onto it (a statue, a crate)."""
+    if not s.objects:
+        return None
+    cx, cz = zone[0] + zone[2] / 2, zone[1] + zone[3] / 2
+    x, z = min(s.objects.values(), key=lambda p: (p[0] - cx) ** 2 + (p[1] - cz) ** 2)
+    return [x, z]
 
 
 def plain_moves(sim: Sim, s: State):
@@ -88,12 +92,13 @@ def plain_moves(sim: Sim, s: State):
             if (h == 7 and words[0] == 4) or h == 9:
                 # A spot that arms a script flag or opens the item menu (an event): the room may react to an item
                 # used there ("item used is X"; 308's rack takes the Flamethrower back this way).
-                for item in sim.reacts_to(s.room):
+                for item in sorted(sim.reacts_to(s.room)):
                     if s.inventory.get(item, 0):
                         yield f"use {item_name(item)} at spot {slot}", "use",                             lambda t, slot=slot, item=item: sim.use(t, slot, item), {"item": item, "zone": a["zone"]}
             if h in (7, 9):
                 push = " (push something onto it)" if a.get("probe", 0) & 0x04 and not a.get("probe", 0) & 0x01 else ""
-                yield f"step on spot {slot}{push}", "spot", lambda t, slot=slot: sim.at(t, slot),                     {"zone": a["zone"], "push": bool(push)}
+                yield f"step on spot {slot}{push}", "spot", lambda t, slot=slot: sim.at(t, slot),                     {"zone": a["zone"], "push": bool(push),
+                     **({"object": nearest_object(s, a["zone"])} if push and nearest_object(s, a["zone"]) else {})}
     for rule in sim.rules.get("examine", []):
         if s.inventory.get(rule["item"]) and not all(s.inventory.get(i) for i, _ in rule.get("give", [])):
             yield f"examine {item_name(rule['item'])}", "examine", lambda t, item=rule["item"]: sim.examine(t, item),                 {"item": rule["item"]}
@@ -164,6 +169,55 @@ def early(split: dict, route: list[dict]) -> dict | None:
         return None
     return next((m for m in reversed(route) if split["item"] in m["got"] and not m.get("split")
                  and ("in" not in split or m["room"] == split["in"])), None)
+
+
+WORKERS = max(1, min(24, (os.cpu_count() or 2) - 4))
+
+
+def build_sim(install: Path, character: str) -> Sim:
+    rooms, _ = world_mod.build(install, character)
+    rules = json.loads(RULES.read_text(encoding="utf-8"))
+    return Sim(rooms, rules.get(character, {}) | {"newGame": rules.get("newGame", {})}, cameras(install, character),
+               geometry(install, character))
+
+
+def trial(install: str, character: str, splits: list[dict], answers: dict, limit: int = 900):
+    """One playthrough toward a split set with the given answers, in a process of its own (for play_best's pool)."""
+    sim = build_sim(Path(install), character)
+    sim.answers = dict(answers)
+    route, _, s = play(sim, character, splits, None, limit)
+    return route, s.room, 42 in s.inventory, answers
+
+
+def score(route: list[dict], room: str, flare: bool) -> tuple:
+    return sum(1 for m in route if m.get("split")), room == "303" and flare, -len(route)
+
+
+def play_best(install: Path, character: str, splits: list[dict], limit: int = 900, workers: int = WORKERS):
+    """A playthrough toward a split set answering the game's yes/no questions the way that reaches the most splits:
+    from all Yes, every question room's answer is flipped at once in parallel (one playthrough each), the best flip is
+    kept, and the next round tries the rest on top of it while that helps (Chris has to tell Rebecca No in the save
+    room for the Hunter scene that leads to the Master Key). Returns (moves, answers)."""
+    from concurrent.futures import ProcessPoolExecutor
+    sim = build_sim(install, character)
+    route, room, flare, answers = trial(str(install), character, splits, {}, limit)
+    best = (route, room, flare)
+    asked_before: set[str] = set()
+    with ProcessPoolExecutor(max_workers=workers) as pool:
+        while score(*best)[0] < len(splits):
+            asked = sorted({m["room"] for m in best[0]} | {m["to"] for m in best[0]})
+            candidates = [r for r in asked if r in sim.world and sim.asks(r) and not answers.get(r) and r not in asked_before]
+            if not candidates:
+                break
+            asked_before |= set(candidates)
+            results = list(pool.map(trial, [str(install)] * len(candidates), [character] * len(candidates),
+                                    [splits] * len(candidates), [{**answers, r: 1} for r in candidates],
+                                    [limit] * len(candidates)))
+            top = max(results, key=lambda r: score(r[0], r[1], r[2]))
+            if score(top[0], top[1], top[2]) <= score(*best):
+                break
+            best, answers = (top[0], top[1], top[2]), top[3]
+    return best[0], answers
 
 
 def play(sim: Sim, character: str, splits: list[dict] | None = None, shuffle=None, limit: int = 900, log=None):
@@ -297,8 +351,17 @@ def main(argv: list[str]) -> int:
         sets = json.loads((ROOT / "data" / "games" / "re1" / "splits.json").read_text(encoding="utf-8"))["sets"]
         splits = next(x for x in sets if x["id"] == wanted)["splits"]
     print(f"start in 105; {len(problems)} script problems")
-    route, states, s = play(sim, character, splits, shuffle, limit,
-                            log=print if "--verbose" not in argv else None)
+    if splits is not None:
+        route, answers = play_best(install, character, splits, limit)
+        sim.answers = answers
+        route, states, s = play(sim, character, splits, shuffle, limit)  # again here, for the states and the trace
+        for m in route:
+            if m.get("split") and "--verbose" not in argv:
+                print(f"{m['move']:3} {m['label']}  {' '.join(m['gained'])}  [split: {m['split']}]")
+        if answers:
+            print(f"   answering No in {sorted(answers)}")
+    else:
+        route, states, s = play(sim, character, None, shuffle, limit, log=print if "--verbose" not in argv else None)
     if "--verbose" in argv:
         for m in route:
             print(f"{m['move']:3} {m['label']}  {' '.join(m['gained'])}" + (f"  [split: {m['split']}]" if m.get("split") else ""))

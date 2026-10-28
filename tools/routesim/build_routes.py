@@ -25,13 +25,13 @@ GENERATED = {
     "chris": {"id": "re1-chris-full-sim", "name": "Chris full game (simulated)", "category": "Chris"},
 }
 SOURCE = ("Simulated (tools/routesim): a playthrough from a new game to the heliport, worked out from the game's own "
-          "room scripts plus the rules in tools/routesim/rules.json, always taking the nearest thing that moves the "
+          "room scripts plus the rules in data/games/re1/route-rules.json, always taking the nearest thing that moves the "
           "story on (not a speedrun order). Not yet followed in a real game.")
 
 
 SPLIT_SOURCE = ("Simulated (tools/routesim) from the split set of the same name (data/games/re1/splits.json): a "
                 "playthrough from a new game that heads for each split in turn and picks up what it needs on the way, "
-                "worked out from the game's own room scripts plus tools/routesim/rules.json; no glitches (a glitched "
+                "worked out from the game's own room scripts plus data/games/re1/route-rules.json; no glitches (a glitched "
                 "set's splits are reached the ordinary way). Not yet followed in a real game.")
 
 
@@ -40,6 +40,8 @@ def playthrough(install: Path, character: str, splits: list[dict] | None = None,
     rules = json.loads(plan.RULES.read_text(encoding="utf-8"))
     sim = plan.Sim(rooms, rules.get(character, {}) | {"newGame": rules.get("newGame", {})}, plan.cameras(install, character),
                     plan.geometry(install, character))
+    if splits:
+        _, sim.answers = plan.play_best(install, character, splits)
     route, _, s = plan.play(sim, character, splits)
     if to_the_end and (42 not in s.inventory or s.room != "303"):
         raise SystemExit(f"{character}: the playthrough stopped in {s.room} without the flare; not writing a route")

@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "data" / "games" / "re1"
 FIELDS = {0: "flagScenarioA", 1: "flagScenarioB", 2: "flagLocks", 7: "flagRoomItems"}
 NAMES = json.loads((DATA / "names.json").read_text(encoding="utf-8"))
-RULES = json.loads(Path(__file__).with_name("rules.json").read_text(encoding="utf-8"))
+RULES = json.loads((DATA / "route-rules.json").read_text(encoding="utf-8"))
 
 
 def field(bank: int, flag: int) -> str:
@@ -151,11 +151,6 @@ def steps(route: list[dict], rooms: dict, character: str, used: set[int] | None 
         if used is not None and last is not None and len(out) > size:
             used.add(last)
         last, size = index, len(out)
-        if m.get("answer") == "no" and story(m):
-            out.append({"go": m["to"] if m["kind"] == "door" else m["room"], "done": field(*best(story(m), None)),
-                        "hint": "Answer No when asked." + (f" {label(best(story(m), None), m['room'])}"
-                                                           if label(best(story(m), None), m["room"]) else "")})
-            continue
         if m.get("split") and m["kind"] in ("door", "spot") and m["to"] != m["room"] and not m["got"]:
             # A room split: the step is to get there (the item splits are the get steps themselves).
             out.append({"go": m["to"], "hint": f"Split: {m['split']}."})
@@ -218,6 +213,11 @@ def steps(route: list[dict], rooms: dict, character: str, used: set[int] | None 
                 step["hint"] = "A scene plays here."
             if m["kind"] == "spot" and centre(m.get("zone")):
                 step["at"] = centre(m["zone"])
+            if m.get("push") and m.get("object") and m.get("zone"):
+                # Numbered on the maps: 1 the object to push, 2 where it has to go.
+                ox, oz = m["object"]
+                x, z, w, d = m["zone"]
+                step["spots"] = [[ox - 500, oz - 500, 1000, 1000, "push this"], [x, z, w, d, "onto here"]]
         else:
             continue
         if m["kind"] == "use" and centre(m.get("zone")):
@@ -236,6 +236,13 @@ def steps(route: list[dict], rooms: dict, character: str, used: set[int] | None 
                     break
     if used is not None and last is not None and len(out) > size:
         used.add(last)
+    # A step whose move was made where the game's question is answered No (the route needs that branch) says so.
+    for m in route:
+        if m.get("answer") == "no":
+            for s in out:
+                if s.get("in", s.get("go")) in (m["room"], m["to"]) and "Answer No" not in s.get("hint", ""):
+                    s["hint"] = ("Answer No when asked. " + s.get("hint", "")).strip()
+                    break
     out.append({"end": True})
     return out
 

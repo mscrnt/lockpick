@@ -1,4 +1,4 @@
-r"""Which rules in rules.json the game's own data now covers: each rule is dropped in turn and the game played over a
+r"""Which rules in data/games/re1/route-rules.json the game's own data now covers: each rule is dropped in turn and the game played over a
 few shuffled orders; a rule is still needed if a playthrough then gets stuck, makes the move it guards before its
 flags allow (gates, ways), or never gets the flags it sets (use, spots, kills, examine, heldBy).
 
@@ -15,7 +15,7 @@ from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-RULES = HERE / "rules.json"
+RULES = HERE.parents[1] / "data" / "games" / "re1" / "route-rules.json"
 KINDS = ("gates", "ways", "use", "spots", "kills", "examine", "heldBy")
 
 

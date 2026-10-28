@@ -77,7 +77,7 @@ def main(argv: list[str]) -> int:
             character = "jill" if (before["rawFields"].get("character", {}).get("value", 0) & 3) == 1 else "chris"
             if character not in sims:
                 worlds[character], _ = world_mod.build(install, character)
-                rules = json.loads(Path(__file__).with_name("rules.json").read_text(encoding="utf-8"))
+                rules = json.loads(Path(__file__).resolve().parents[2] / "data" / "games" / "re1" / "route-rules.json".read_text(encoding="utf-8"))
                 sims[character] = Sim(worlds[character], rules.get(character, {}))
             sim = sims[character]
             s = State(character)

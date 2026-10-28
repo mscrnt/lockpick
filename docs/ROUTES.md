@@ -47,7 +47,7 @@ scripts of the player's own room files, taking the nearest thing that moves the 
 player needs, each with the story flag that says it's done, the spot the line points at and the flag's label as the
 hint. Both reach the flare at the heliport (Jill 110 steps, Chris 102). Jill's covers every get and use step of the
 hand-made route above, in a different order (nearest first, not the fastest). What the scripts don't say (walls,
-water, the lab computer, Plant 42's death, the Doom books) is in `tools/routesim/rules.json`, each rule with its
+water, the lab computer, Plant 42's death, the Doom books) is in `data/games/re1/route-rules.json`, each rule with its
 source. Regenerate with `python tools/routesim/build_routes.py <install>` after changing the tools or the rules
 (`--check` compares). **Not followed in a real game yet.**
 

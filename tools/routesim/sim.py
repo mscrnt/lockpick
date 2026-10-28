@@ -22,6 +22,7 @@ STAGE, ROOM, CAMERA, CHARACTER, FWD_ACTION, ENT_ACTION, USED_ITEM, PICKED_ITEM =
 # for 30F/310, 302: 0/1 for 300/301 where the lifts arrive): it holds the room the player came from.
 CAME_FROM = 3
 MENU_CHOICE = 5
+COUNTDOWN_LEFT = 30000  # what a timer reads on a route that keeps moving (more than any script tests for)
 NO_ACTION = 0xFF
 PENDING_DOOR = 1000  # not a game byte: a door a script sends the player through once the frame ends
 KNOWN_FIELDS = {STAGE, ROOM, CAME_FROM, CHARACTER, FWD_ACTION, ENT_ACTION, USED_ITEM, PICKED_ITEM}
@@ -47,6 +48,7 @@ class State:
     enemies: list[dict] = field(default_factory=list)
     events: dict[int, Event] = field(default_factory=dict)  # slot -> running event
     pos: tuple[int, int] | None = None  # where the player stands (a door's arrival, a script's move, the last spot)
+    objects: dict = field(default_factory=dict)  # this visit's script-placed objects: slot -> (x, z)
     mods: dict = field(default_factory=dict)  # this visit's collision changes: (list, record) -> (x1, z1, x0, z0, mode)
 
     def key(self) -> tuple:
@@ -71,6 +73,7 @@ class Sim:
         self.log: list[str] = []
         self.cameras = cameras  # room -> function (x, z) -> camera id or None (tools/rdt/rdt_map.py)
         self.geometry = geometry  # room -> reach.Room or None: where the player can walk
+        self.answers: dict[str, int] = {}  # room -> the answer to its yes/no question (0 yes, the default; 1 no)
 
     def where(self, s: State, zone: list[int], probe: int = 0x81) -> tuple[int, int] | None:
         """Where the player can stand to reach a zone from where they are (the collision records as the room's scripts
@@ -100,12 +103,15 @@ class Sim:
                 return True if camera is None else compare(camera, c["cmp"], c["value"])
             if c["field"] == MENU_CHOICE and c["value"] in (0, 1):
                 # The answer to a yes/no question (bit 0: 0 yes, 1 no; decomp g_menu_choice_id): the player's choice.
-                return compare(s.answer, c["cmp"], c["value"])
+                return compare(self.answers.get(s.room, 0), c["cmp"], c["value"])
             if c["field"] not in KNOWN_FIELDS:
                 return True  # camera, a message being up, attract: the player can walk to any camera
             return compare(s.fields.get(c["field"], 0), c["cmp"], c["value"])
         if op == 0x07:
-            return compare(0, c["cmp"], c["value"])  # random roll / countdown: 0
+            # Word 3 is the random seed (rolls come up 0); word 4 the countdown timer (decomp g_fading_state words): a
+            # route is on time, so plenty is left (Chris reaching 601 in time for Rebecca and the Hunter, B[51];
+            # the lab's self-destruct not run out).
+            return compare(COUNTDOWN_LEFT if c["field"] == 4 else 0, c["cmp"], c["value"])
         if op == 0x10:
             return s.fields.get(USED_ITEM, 0) == c["item"]
         if op == 0x11:
@@ -174,6 +180,8 @@ class Sim:
             s.enemies.append(c)
         elif op == 0x20:
             s.pos = (c["pos"][0], c["pos"][2])
+        elif op == 0x1F:
+            s.objects[c["slot"]] = (c["pos"][0], c["pos"][2])
         elif op == 0x30:
             s.mods[(c["list"], c["index"])] = (*c["box"], c["mode"])
         elif op == 0x14:
@@ -270,7 +278,7 @@ class Sim:
         s.fields[STAGE], s.fields[ROOM] = int(room[0]) - 1, int(room[1:], 16)
         s.fields[CAMERA] = None
         s.fields[FWD_ACTION] = s.fields[ENT_ACTION] = NO_ACTION
-        s.actions, s.enemies, s.events, s.mods = {}, [], {}, {}
+        s.actions, s.enemies, s.events, s.mods, s.objects = {}, [], {}, {}, {}
         for b in (4, 9):
             s.flags[b].clear()
         visited = self.rules.get("visitedFlag", {}).get(room)

@@ -43,23 +43,26 @@ def splits_of(saved: dict, borrowed: dict[str, dict]) -> tuple[list[dict], list[
     return out, manual
 
 
-def check(install: str, path: str, borrowed: dict) -> str:
+def check(install: str, path: str, borrowed: dict, answers: dict | None = None) -> tuple[str, bool, dict]:
+    """(the report line, whether every split was reached, the set) for one set, with the given answers."""
     saved = json.loads(Path(path).read_text(encoding="utf-8-sig"))
     character = saved.get("character", "jill")
     splits, manual = splits_of(saved, borrowed)
-    rooms, _ = world_mod.build(Path(install), character)
-    rules = json.loads(plan.RULES.read_text(encoding="utf-8"))
-    sim = plan.Sim(rooms, rules.get(character, {}) | {"newGame": rules.get("newGame", {})},
-                   plan.cameras(Path(install), character), plan.geometry(Path(install), character))
-    route, _, s = plan.play(sim, character, splits)
+    route, room, flare, _ = plan.trial(install, character, splits, answers or {})
+    return report(saved, path, character, splits, manual, route, room, flare, answers or {})
+
+
+def report(saved, path, character, splits, manual, route, room, flare, answers) -> tuple[str, bool, dict]:
     hit = [m["split"] for m in route if m.get("split")]
     missed = [x["name"] for x in splits if x["name"] not in hit]
     ends = any(x.get("end") for x in splits)
-    finished = s.room == "303" and 42 in s.inventory
-    verdict = "OK" if not missed and (finished or not ends) else "MISSED"
-    return (f"{verdict:6} {saved.get('name', Path(path).stem)[:48]:48} {character:5} {len(hit)}/{len(splits)} splits"
+    finished = room == "303" and flare
+    ok = not missed and (finished or not ends)
+    line = (f"{'OK' if ok else 'MISSED':6} {saved.get('name', Path(path).stem)[:48]:48} {character:5} {len(hit)}/{len(splits)} splits"
+            + (f"; answering No in {sorted(answers)}" if answers else "")
             + (f"; missed {missed}" if missed else "") + (f"; manual {manual}" if manual else "")
-            + ("" if finished or not ends else f"; stopped in {s.room}"))
+            + ("" if finished or not ends else f"; stopped in {room}"))
+    return line, ok, {"path": path, "character": character, "splits": splits, "manual": manual, "saved": saved}
 
 
 def main(argv: list[str]) -> int:
@@ -84,9 +87,17 @@ def main(argv: list[str]) -> int:
             for s in json.loads(f.read_text(encoding="utf-8-sig")).get("splits", []):
                 if s.get("kind") in ("room", "item"):
                     borrowed.setdefault(norm(s["name"]), s)
-    with ProcessPoolExecutor(max_workers=6) as pool:
-        for line in pool.map(check, [install] * len(files), files, [borrowed] * len(files)):
+    # Every set at once with all-Yes answers, then the answer search (itself parallel) for the ones that miss splits.
+    with ProcessPoolExecutor(max_workers=plan.WORKERS) as pool:
+        first = list(pool.map(check, [install] * len(files), files, [borrowed] * len(files)))
+    for line, ok, info in first:
+        if ok:
             print(line, flush=True)
+            continue
+        route, answers = plan.play_best(Path(install), info["character"], info["splits"])
+        _, room, flare, _ = plan.trial(install, info["character"], info["splits"], answers)
+        print(report(info["saved"], info["path"], info["character"], info["splits"], info["manual"], route, room, flare,
+                     answers)[0], flush=True)
     return 0
 
 

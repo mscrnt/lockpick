@@ -42,9 +42,9 @@ What the scripts can't say is assumed in the player's favour: distance and facin
 and on entering a room every camera test passes (the player can walk to any camera); standing at a spot, the camera
 is the one that shows it (`tools/rdt/rdt_map.py`).
 
-## Rules (`rules.json`)
+## Rules (`data/games/re1/route-rules.json`)
 
-What the room scripts don't say lives in `rules.json`, each entry with its reason and source (a labelled flag, the
+What the room scripts don't say lives in `data/games/re1/route-rules.json`, each entry with its reason and source (a labelled flag, the
 decomp's notes, a live flag log, or a walkthrough's facts in our own words):
 
 - **gates**: an item lies behind a wall, a plant or water until a flag says it's open (the piano's secret room, the
@@ -65,7 +65,7 @@ decomp's notes, a live flag log, or a walkthrough's facts in our own words):
   2026-10-27, Jill: from the main hall through the 2F Wesker search, 107 and 108 every move matched (the zombie past
   Kenneth got up a few seconds after the harness's walk of 104 moved on, so Barry's scene came late); it found three things
   the simulator now knows: the new game's real state (control in the dining room, the flags and inventory read live,
-  `rules.json` `newGame`), Jill's missing ink ribbons, and the Shield key behind the clock. Saves stay read-only and
+  `data/games/re1/route-rules.json` `newGame`), Jill's missing ink ribbons, and the Shield key behind the clock. Saves stay read-only and
   are checked against a fresh backup.
 - **Shuffled orders**: `plan.py --seed N` breaks ties between equally near moves another way. 24 seeds (both
   characters) all reach the heliport; before the collision changes were read, one Chris order rode the alley lift
