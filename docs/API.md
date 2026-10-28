@@ -61,7 +61,7 @@ The app lists every widget's address with its size and a **Copy OBS link** butto
 ### Lockpick's OBS script
 
 `obs/lockpick.lua` ships next to Lockpick.exe (OBS → Tools → Scripts → +). OBS's Lua has no network, so Lockpick
-writes two files for it in `%LOCALAPPDATA%\Lockpick\obs`: `connection.json` (the API's port and token, rewritten when
+writes two files for it in `%LOCALAPPDATA%\Lockpick\obs` (the portable zip: its own `data\obs`): `connection.json` (the API's port and token, rewritten when
 they change) and `events.txt` (emptied at each start; one line per moment: `time-ms<TAB>kind<TAB>detail`, kinds
 `run-start`, `split`, `run-end`, `finished`, `new-best`, `death`, `challenge-fail`, `game-active`, `game-inactive`).
 The script's settings, each optional: **Add Lockpick to this scene** (the browser sources above and a Game Capture of

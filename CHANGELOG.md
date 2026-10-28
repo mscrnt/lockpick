@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.4.3] - 2026-10-27
+
+### Fixed
+- **OBS script with the portable zip:** it looked for Lockpick's files in %LOCALAPPDATA%\Lockpick, but the portable
+  zip keeps them in its own `data` folder, so the script kept asking for the API to be turned on (and its hotkeys,
+  recording and chapters didn't reach Lockpick). It now finds the portable data folder from where it is.
+
 ## [0.4.2] - 2026-10-27
 
 ### Changed

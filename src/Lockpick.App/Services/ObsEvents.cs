@@ -59,7 +59,8 @@ public sealed class ObsEvents : IDisposable
         _timer = new Timer(_ => { CheckGame(); ReadCommands(); }, null, TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(200));
     }
 
-    /// <summary>Where the files are (the script finds them in %LOCALAPPDATA%\Lockpick\obs).</summary>
+    /// <summary>Where the files are: %LOCALAPPDATA%\Lockpick\obs, or the portable zip's data\obs (the script finds
+    /// either from where it ships).</summary>
     public string Directory { get; }
 
     /// <summary>Each moment as it is written to events.txt (Lockpick's WebSocket link to OBS acts on the same ones).</summary>

@@ -1,7 +1,8 @@
 --[[
 Lockpick for OBS (#66). Add it in OBS: Tools -> Scripts -> + -> this file (it ships next to Lockpick.exe).
 
-Lockpick writes two files for it in %LOCALAPPDATA%\Lockpick\obs (OBS's Lua has no network):
+Lockpick writes two files for it in its data folder's obs folder (OBS's Lua has no network): %LOCALAPPDATA%\Lockpick\obs,
+or the portable zip's own data\obs (found from where this script is):
   connection.json - the API's port and token: "Add Lockpick to this scene" makes the browser sources with them;
                     "websocket": true while Lockpick drives this OBS through its WebSocket server (Stream -> OBS),
                     when the script leaves recording, chapters, the replay buffer and the scene to Lockpick
@@ -16,7 +17,22 @@ Every action is optional (the script's settings). Nothing here changes the game 
 
 obs = obslua
 
-local folder = (os.getenv("LOCALAPPDATA") or "") .. "\\Lockpick\\obs\\"
+-- Lockpick's OBS folder, found the way Lockpick finds its data: the portable zip (a ".portable" marker in the folder
+-- above "current", where this script ships in current\obs) keeps it in its own data folder; otherwise %LOCALAPPDATA%.
+local function data_folder()
+  local ok, here = pcall(script_path)
+  if ok and type(here) == "string" and here ~= "" then
+    local root = here:gsub("[/\\]+$", ""):gsub("[/\\][^/\\]+$", ""):gsub("[/\\][^/\\]+$", "")
+    local marker = io.open(root .. "\\.portable", "rb")
+    if marker then
+      marker:close()
+      return root .. "\\data\\obs\\"
+    end
+  end
+  return (os.getenv("LOCALAPPDATA") or "") .. "\\Lockpick\\obs\\"
+end
+
+local folder = data_folder()
 local options = {}
 local offset = nil          -- how far events.txt has been read (nil: not yet opened; start at its end)
 local run = 0               -- counts runs: a stop still waiting from the run before isn't this one's
