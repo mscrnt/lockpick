@@ -71,7 +71,7 @@
       <StackPanel Spacing="8">
         <TextBlock Classes="caption" Text="ONE BROWSER SOURCE FOR EVERYTHING" />
         <TextBlock TextWrapping="Wrap" Foreground="{StaticResource LpMutedBrush}"
-                   Text="Tick the widgets your stream should show and choose where each sits and how large. One OBS Browser Source shows them all, transparent; what you change here shows in OBS within a second. Widgets in the same place are stacked." />
+                   Text="Tick the widgets your stream should show and choose where each sits and how large, or drag them anywhere on the canvas below. One OBS Browser Source shows them all, transparent; what you change here shows in OBS within a second. Widgets in the same place are stacked." />
         <ItemsControl ItemsSource="{Binding LayoutRows}">
           <ItemsControl.ItemTemplate>
             <DataTemplate x:DataType="vm:StreamLayoutRow">
@@ -86,6 +86,9 @@
             </DataTemplate>
           </ItemsControl.ItemTemplate>
         </ItemsControl>
+        <c:OverlayLayoutEditor x:Name="StreamEditor" Rows="{Binding LayoutRows}" Canvas="True" MaxWidth="900" HorizontalAlignment="Left"
+                               AutomationProperties.Name="Stream layout: drag widgets to place them on the canvas" />
+        <Button Content="Back to the corners" Command="{Binding ResetLayoutSpotsCommand}" HorizontalAlignment="Left" />
         <WrapPanel ItemSpacing="8" LineSpacing="6" IsVisible="{Binding LayoutUrl, Converter={x:Static ObjectConverters.IsNotNull}}">
           <Button Content="Copy OBS link" Click="OnCopyObsLink" Tag="{Binding LayoutUrl}" Classes="accent"
                   AutomationProperties.Name="Copy the OBS link for the one browser source" />

@@ -6,6 +6,22 @@ namespace Lockpick.App.Services;
 /// </summary>
 public readonly record struct WidgetSpot(double X, double Y);
 
+/// <summary>A widget as the layout editor sees it: where it sits (a corner, <see cref="OverlayCorners.Custom"/> with its
+/// spot, or <see cref="OverlayLayout.Off"/>) and its size in percent.</summary>
+public interface ILayoutRow
+{
+    string Id { get; }
+
+    string Corner { get; }
+
+    WidgetSpot? Spot { get; }
+
+    int SizePercent { get; }
+
+    /// <summary>In a window of its own, so not on this layout for now.</summary>
+    bool PoppedOut { get; }
+}
+
 /// <summary>
 /// Places the overlay's widgets on the game's picture, for the overlay and for the layout editor's preview alike:
 /// widgets in the same corner stack from it; a widget placed by hand sits at its spot; a full-screen one (the room

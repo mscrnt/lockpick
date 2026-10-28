@@ -63,6 +63,8 @@ public sealed record WidgetPicture(byte[] Pixels, int Width, int Height);
 /// <summary>
 /// One widget of the stream layout (every widget the player ticked, in one browser source): where it sits
 /// (<c>top-left</c>, <c>top-centre</c>, <c>top-right</c>, <c>bottom-left</c>, <c>bottom-right</c>) and how large (1 = the
-/// overlay's usual size). Widgets in the same place are stacked in this order.
+/// overlay's usual size). Widgets in the same place are stacked in this order. A widget placed by hand has the corner
+/// <c>spot</c> and its spot: <paramref name="X"/> and <paramref name="Y"/> from 0 (left / top) to 1 (right / bottom) of the
+/// room it has on the canvas (the canvas less the margins and the widget itself).
 /// </summary>
-public sealed record StreamPlacement(string Id, string Corner, double Scale);
+public sealed record StreamPlacement(string Id, string Corner, double Scale, double? X = null, double? Y = null);

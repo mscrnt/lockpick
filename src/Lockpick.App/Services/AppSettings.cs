@@ -412,8 +412,9 @@ public static class ButtonStyles
     ];
 }
 
-/// <summary>One widget in the stream layout: shown or not, its place (<see cref="OverlayCorners.All"/>) and size in percent.</summary>
-public sealed record StreamWidgetChoice(bool Shown, string Corner, int Size);
+/// <summary>One widget in the stream layout: shown or not, its place (<see cref="OverlayCorners.All"/>, or
+/// <see cref="OverlayCorners.Custom"/> at its spot <paramref name="X"/>, <paramref name="Y"/>) and size in percent.</summary>
+public sealed record StreamWidgetChoice(bool Shown, string Corner, int Size, double? X = null, double? Y = null);
 
 /// <summary>
 /// The stream layout: every widget the player ticks, in one OBS Browser Source (/overlay/stream), each in its place
@@ -440,24 +441,31 @@ public static class StreamLayout
     public static StreamWidgetChoice Of(AppSettings settings, string id)
     {
         var fallback = Widgets.FirstOrDefault(w => w.Id == id).Default ?? new(false, OverlayCorners.TopRight, 100);
-        return settings.StreamLayout.TryGetValue(id, out var choice) && choice is not null
-            ? choice with
-            {
-                Corner = OverlayCorners.All.Contains(choice.Corner) ? choice.Corner : fallback.Corner,
-                Size = Math.Clamp(choice.Size, 25, 600),
-            }
-            : fallback;
+        if (!settings.StreamLayout.TryGetValue(id, out var choice) || choice is null)
+        {
+            return fallback;
+        }
+
+        var spot = choice.Corner == OverlayCorners.Custom && choice.X is { } x && choice.Y is { } y;
+        return choice with
+        {
+            Corner = spot || OverlayCorners.All.Contains(choice.Corner) ? choice.Corner : fallback.Corner,
+            Size = Math.Clamp(choice.Size, 25, 600),
+            X = spot ? Math.Clamp(choice.X!.Value, 0, 1) : null,
+            Y = spot ? Math.Clamp(choice.Y!.Value, 0, 1) : null,
+        };
     }
 
     /// <summary>The ticked widgets for the browser source, in stacking order.</summary>
     public static IReadOnlyList<Lockpick.Api.StreamPlacement> Placements(AppSettings settings) =>
     [
         .. Widgets.Select(w => (w.Id, Choice: Of(settings, w.Id))).Where(w => w.Choice.Shown)
-            .Select(w => new Lockpick.Api.StreamPlacement(w.Id, Place(w.Choice.Corner), w.Choice.Size / 100.0)),
+            .Select(w => new Lockpick.Api.StreamPlacement(w.Id, Place(w.Choice.Corner), w.Choice.Size / 100.0, w.Choice.X, w.Choice.Y)),
     ];
 
     private static string Place(string corner) => corner switch
     {
+        OverlayCorners.Custom => "spot",
         OverlayCorners.TopLeft => "top-left",
         OverlayCorners.TopCentre => "top-centre",
         OverlayCorners.BottomLeft => "bottom-left",

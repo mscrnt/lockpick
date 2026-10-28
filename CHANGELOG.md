@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.4.7] - 2026-10-28
+
+### Added
+- **Drag widgets anywhere in the one browser source** (Stream → OBS): the card has the overlay's layout editor on a
+  16:9 canvas (the game's 4:3 picture outlined): drag a widget and it keeps that spot ("Your spot"); OBS follows
+  within a second. *Back to the corners* undoes it. Sizes, margins and spots scale with the browser source's height,
+  so the layout looks the same on a 1080p or 1440p canvas.
+
 ## [0.4.6] - 2026-10-27
 
 (0.4.5 was tagged but never published: its build stopped on a test that timed out on the build machine.)

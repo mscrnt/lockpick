@@ -70,7 +70,7 @@ public sealed partial class StreamTile : ObservableObject
 public sealed record ObsLinkRow(string Name, string Url, string Size);
 
 /// <summary>One widget of the stream layout (one browser source for every widget): ticked or not, where, how large.</summary>
-public sealed partial class StreamLayoutRow : ObservableObject
+public sealed partial class StreamLayoutRow : ObservableObject, ILayoutRow
 {
     private readonly Action _save;
     private readonly bool _loading = true;
@@ -83,14 +83,24 @@ public sealed partial class StreamLayoutRow : ObservableObject
         Shown = choice.Shown;
         Corner = choice.Corner;
         Size = $"{choice.Size}%";
+        Spot = choice.X is { } x && choice.Y is { } y ? new WidgetSpot(x, y) : null;
         _loading = false;
     }
+
+    /// <summary>Where it sits when placed by hand (the layout editor), or null.</summary>
+    public WidgetSpot? Spot { get; set; }
+
+    string ILayoutRow.Corner => Shown ? Corner : OverlayLayout.Off;
+
+    public int SizePercent => Choice.Size;
+
+    public bool PoppedOut => false;
 
     public string Id { get; }
 
     public string Name { get; }
 
-    public static IReadOnlyList<string> CornerChoices => OverlayCorners.All;
+    public static IReadOnlyList<string> CornerChoices { get; } = [.. OverlayCorners.All, OverlayCorners.Custom];
 
     public static IReadOnlyList<string> SizeChoices { get; } = [.. StreamLayout.Sizes.Select(s => $"{s}%")];
 
@@ -104,7 +114,8 @@ public sealed partial class StreamLayoutRow : ObservableObject
     public partial string Size { get; set; } = "150%";
 
     public StreamWidgetChoice Choice =>
-        new(Shown, Corner, int.TryParse(Size.TrimEnd('%'), System.Globalization.CultureInfo.InvariantCulture, out var size) ? size : 100);
+        new(Shown, Corner, int.TryParse(Size.TrimEnd('%'), System.Globalization.CultureInfo.InvariantCulture, out var size) ? size : 100,
+            Corner == OverlayCorners.Custom ? Spot?.X : null, Corner == OverlayCorners.Custom ? Spot?.Y : null);
 
     partial void OnShownChanged(bool value) => Save();
 
@@ -175,6 +186,36 @@ public sealed partial class StreamViewModel : PageViewModel
     {
         StreamLayout = LayoutRows.ToDictionary(r => r.Id, r => r.Choice),
     });
+
+    /// <summary>A widget dragged in the stream layout's editor: it keeps that spot (and is shown).</summary>
+    public void PlaceLayoutWidget(string id, WidgetSpot spot)
+    {
+        if (LayoutRows.FirstOrDefault(r => r.Id == id) is not { } row)
+        {
+            return;
+        }
+
+        row.Spot = spot;
+        if (row.Corner == OverlayCorners.Custom)
+        {
+            SaveLayout();
+        }
+        else
+        {
+            row.Corner = OverlayCorners.Custom; // saves
+        }
+    }
+
+    /// <summary>The widgets placed by hand go back to their own corners.</summary>
+    [RelayCommand]
+    private void ResetLayoutSpots()
+    {
+        foreach (var row in LayoutRows.Where(r => r.Corner == OverlayCorners.Custom))
+        {
+            row.Spot = null;
+            row.Corner = StreamLayout.Widgets.First(w => w.Id == row.Id).Default.Corner;
+        }
+    }
 
     /// <summary>Lockpick's OBS script, next to Lockpick.exe.</summary>
     public string ObsScript { get; } = Path.Combine(AppContext.BaseDirectory, "obs", "lockpick.lua");

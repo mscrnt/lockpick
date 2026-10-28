@@ -5,7 +5,7 @@ using Lockpick.App.Services;
 namespace Lockpick.App.ViewModels;
 
 /// <summary>One overlay widget in Settings: the corner it sits in (or off), and its own window (pop-out).</summary>
-public sealed partial class OverlayWidgetRow : ObservableObject
+public sealed partial class OverlayWidgetRow : ObservableObject, ILayoutRow
 {
     private readonly Action<OverlayWidgetRow> _apply;
     private readonly WidgetWindows _windows;

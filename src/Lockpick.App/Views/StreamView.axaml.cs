@@ -1,12 +1,17 @@
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
+using Lockpick.App.ViewModels;
 
 namespace Lockpick.App.Views;
 
 public partial class StreamView : UserControl
 {
-    public StreamView() => InitializeComponent();
+    public StreamView()
+    {
+        InitializeComponent();
+        StreamEditor.Placed += (_, placed) => (DataContext as StreamViewModel)?.PlaceLayoutWidget(placed.Id, placed.Spot);
+    }
 
     private void OnShowScript(object? sender, RoutedEventArgs e)
     {
