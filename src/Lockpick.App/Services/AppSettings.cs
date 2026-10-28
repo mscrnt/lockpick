@@ -126,6 +126,10 @@ public sealed record AppSettings
     /// <summary>Where each widget placed by hand sits (widget id → spot), for the corner <see cref="OverlayCorners.Custom"/>.</summary>
     public IReadOnlyDictionary<string, WidgetSpot> OverlayWidgetSpots { get; init; } = new Dictionary<string, WidgetSpot>();
 
+    /// <summary>The stream layout (Stream → OBS → One browser source): each widget ticked or not, where and how large
+    /// (widget id → choice; missing: the widget's default, <see cref="StreamLayout"/>).</summary>
+    public IReadOnlyDictionary<string, StreamWidgetChoice> StreamLayout { get; init; } = new Dictionary<string, StreamWidgetChoice>();
+
     /// <summary>How the overlay's map looks and which views its hotkey cycles through.</summary>
     public MapOverlaySettings MapOverlay { get; init; } = new();
 
@@ -401,6 +405,60 @@ public static class ButtonStyles
         (PlayStation, "PlayStation"),
         (Keyboard, "Keyboard"),
     ];
+}
+
+/// <summary>One widget in the stream layout: shown or not, its place (<see cref="OverlayCorners.All"/>) and size in percent.</summary>
+public sealed record StreamWidgetChoice(bool Shown, string Corner, int Size);
+
+/// <summary>
+/// The stream layout: every widget the player ticks, in one OBS Browser Source (/overlay/stream), each in its place
+/// (widgets in the same place stacked, in this list's order) at its own size times the size chosen. Separate from the
+/// overlay on the game, so the stream can show more (or less) than the player sees.
+/// </summary>
+public static class StreamLayout
+{
+    /// <summary>The sizes a widget can have, in percent of the overlay's usual size.</summary>
+    public static IReadOnlyList<int> Sizes { get; } = [50, 75, 100, 125, 150, 200, 250, 300, 400];
+
+    /// <summary>The widgets in the layout and how they start: what a runner's stream shows most, in their own corners.</summary>
+    public static IReadOnlyList<(string Id, string Name, StreamWidgetChoice Default)> Widgets { get; } =
+    [
+        (OverlayLayout.Status, "Time, HP, room, challenge", new(true, OverlayCorners.TopRight, 150)),
+        (OverlayLayout.Splits, "Run splits", new(true, OverlayCorners.TopLeft, 150)),
+        (OverlayLayout.Route, "Route guide (the next step and its buttons)", new(false, OverlayCorners.TopLeft, 150)),
+        (OverlayLayout.Banner, "Big messages (challenge failed, died, run finished)", new(true, OverlayCorners.TopCentre, 150)),
+        (OverlayLayout.Enemies, "Enemies in the room (HP)", new(false, OverlayCorners.BottomLeft, 150)),
+        (OverlayLayout.Feed, "What just happened", new(true, OverlayCorners.BottomLeft, 150)),
+        (OverlayLayout.Minimap, "Minimap", new(true, OverlayCorners.BottomRight, 150)),
+    ];
+
+    public static StreamWidgetChoice Of(AppSettings settings, string id)
+    {
+        var fallback = Widgets.FirstOrDefault(w => w.Id == id).Default ?? new(false, OverlayCorners.TopRight, 100);
+        return settings.StreamLayout.TryGetValue(id, out var choice) && choice is not null
+            ? choice with
+            {
+                Corner = OverlayCorners.All.Contains(choice.Corner) ? choice.Corner : fallback.Corner,
+                Size = Math.Clamp(choice.Size, 25, 600),
+            }
+            : fallback;
+    }
+
+    /// <summary>The ticked widgets for the browser source, in stacking order.</summary>
+    public static IReadOnlyList<Lockpick.Api.StreamPlacement> Placements(AppSettings settings) =>
+    [
+        .. Widgets.Select(w => (w.Id, Choice: Of(settings, w.Id))).Where(w => w.Choice.Shown)
+            .Select(w => new Lockpick.Api.StreamPlacement(w.Id, Place(w.Choice.Corner), w.Choice.Size / 100.0)),
+    ];
+
+    private static string Place(string corner) => corner switch
+    {
+        OverlayCorners.TopLeft => "top-left",
+        OverlayCorners.TopCentre => "top-centre",
+        OverlayCorners.BottomLeft => "bottom-left",
+        OverlayCorners.BottomRight => "bottom-right",
+        _ => "top-right",
+    };
 }
 
 public static class OverlayLayout

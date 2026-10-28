@@ -52,8 +52,9 @@ http://127.0.0.1:1996/overlay/hud?token=<token>&corner=top-right&scale=1
 |---|---|---|
 | `/overlay/hud` | In-game time, HP, the room, the challenge (clean, or failed with the reason) | `corner` = `top-right` (default), `top-left`, `bottom-right`, `bottom-left`; `scale` 0.5–4 |
 | `/overlay/splits` | The run's splits: the category, the splits around the current one with times and differences to the personal best (gold for a best segment), the in-game clock, PB and sum of best | `corner` = `top-left` (default) or another; `scale` 0.5–4; `rows` 3–30 (default 8) |
-| `/overlay/widget` | Any overlay widget, live (`id` = `status`, `minimap`, `enemies`, `splits`, `feed` or `banner`), as large as fits, top left | `width` and `height` (size the source to them); `align` = `center` (default), `left`, `right`; `valign` = `top` (default), `middle`, `bottom`; `fps` 1–30 (default 10) |
-| `/overlay/livesplit` | The run with LiveSplit's look (livesplit-core) | `width`, `height`, `fps` |
+| `/overlay/widget` | Any overlay widget, live (`id` = `status`, `minimap`, `enemies`, `splits`, `feed` or `banner`), as large as fits, top left | `width` and `height` (size the source to them); `align` = `center` (default), `left`, `right`; `valign` = `top` (default), `middle`, `bottom`; `fps` 1–60 (default 30) |
+| `/overlay/livesplit` | The run with LiveSplit's look (livesplit-core) | `width`, `height`, `fps` 1–60 (default 30) |
+| `/overlay/stream` | Every widget ticked in Lockpick (Stream → OBS → *One browser source for everything*), each in its place at its own size times the size chosen there; changes in Lockpick show within a second. Size the source like the canvas | `fps` 1–60 (default 30); `margin` (default 24 px from the edges); `gap` (default 12 px between stacked widgets) |
 | `/overlay/feed` | What just happened, in plain words (pickups, kills, enemies appearing, damage, story events), the newest at the bottom, each line for a while | `corner` = `bottom-left` (default) or another; `scale`; `lines` 1–20 (default 5); `seconds` (default 20); `types` = event types to show (default `Happened`; e.g. add `SplitReached,RunEnded,ChallengeFailed`) |
 
 The app lists every widget's address with its size and a **Copy OBS link** button (Stream → OBS).

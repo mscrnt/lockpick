@@ -6,6 +6,20 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.4.4] - 2026-10-27
+
+### Added
+- **One browser source for everything** (Stream → OBS): tick the widgets your stream should show (time and HP, splits,
+  the route guide, big messages, enemies, what just happened, the minimap), choose where each sits and how large, and
+  add one OBS Browser Source the size of your canvas. Changes in Lockpick show in OBS within a second; widgets in the
+  same place are stacked. Separate from the overlay on the game. (`/overlay/stream`, `GET /api/v1/stream-layout`,
+  `scale` on `/api/v1/widget/{id}.png`.)
+
+### Changed
+- **Browser sources update faster:** widget pictures 30 times a second by default (`fps` up to 60), asked for on a
+  steady beat instead of after each one arrives; widgets that haven't changed aren't drawn again. The splits page's
+  clock is drawn every screen frame, to the hundredth. The HUD shows "with cheats" for an attempt the trainer changed.
+
 ## [0.4.3] - 2026-10-27
 
 ### Fixed

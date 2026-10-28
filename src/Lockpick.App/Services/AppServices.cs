@@ -194,6 +194,12 @@ public sealed class AppServices : IAsyncDisposable
     private async Task<Lockpick.Api.WidgetPicture?> WidgetAsync(string id, int width, int height) =>
         DrawWidget is { } draw ? await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => draw(id, width, height)) : null;
 
+    /// <summary>Draws an overlay widget at its own size times a scale (the stream layout's browser source); set by the app.</summary>
+    public Func<string, double, Lockpick.Api.WidgetPicture?>? DrawWidgetAtScale { get; set; }
+
+    private async Task<Lockpick.Api.WidgetPicture?> WidgetAtScaleAsync(string id, double scale) =>
+        DrawWidgetAtScale is { } draw ? await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => draw(id, scale)) : null;
+
     /// <summary>What a split set's splits are judged against: the comparison the player chose (Runs page; LiveSplit's
     /// history), or Lockpick's own personal best and best segments.</summary>
     public Core.Runs.RunComparison ComparisonFor(Core.Runs.SplitSet set) => LiveSplitEngine.Against(set, RunLibrary.Comparison(set));
@@ -201,7 +207,8 @@ public sealed class AppServices : IAsyncDisposable
     public void CreateApi(ICaptureControl capture)
     {
         Api ??= new ApiServer(new ApiHost(Source, Adapter, Trainer, capture, AppVersion, Challenges, Runs, ComparisonFor, Feed,
-                LiveSplitEngine.Available ? LiveSplitEngine.Render : null, WidgetAsync),
+                LiveSplitEngine.Available ? LiveSplitEngine.Render : null, WidgetAsync, WidgetAtScaleAsync,
+                () => StreamLayout.Placements(Settings.Current)),
             LoggerFactory.CreateLogger("Api"));
     }
 

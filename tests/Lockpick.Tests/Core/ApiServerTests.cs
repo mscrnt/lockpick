@@ -143,6 +143,41 @@ public sealed class ApiServerTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task The_stream_layout_is_one_page_with_the_ticked_widgets_at_their_own_size()
+    {
+        Assert.Equal(HttpStatusCode.NotFound, (await _client.GetAsync("stream-layout")).StatusCode); // none in this host
+
+        string? asked = null;
+        await using var server = new ApiServer(new ApiHost(_source, _adapter, _trainer, _capture, "9.9.9",
+            WidgetAtScale: (id, scale) =>
+            {
+                asked = $"{id} x{scale}";
+                return Task.FromResult<WidgetPicture?>(new WidgetPicture(new byte[2 * 2 * 4], 2, 2));
+            },
+            StreamLayout: () => [new StreamPlacement("status", "top-right", 1.5), new StreamPlacement("minimap", "bottom-right", 2)]),
+            NullLogger.Instance);
+        Assert.Null(await server.StartAsync(new ApiOptions { Port = 0, Token = Token }));
+        using var client = new HttpClient { BaseAddress = new Uri(server.Address!, ApiServer.Prefix + "/") };
+        client.DefaultRequestHeaders.Authorization = new("Bearer", Token);
+
+        var layout = await Json(await client.GetAsync("stream-layout"));
+        var widgets = layout.GetProperty("widgets");
+        Assert.Equal(2, widgets.GetArrayLength());
+        Assert.Equal("minimap", widgets[1].GetProperty("id").GetString());
+        Assert.Equal("bottom-right", widgets[1].GetProperty("corner").GetString());
+        Assert.Equal(2, widgets[1].GetProperty("scale").GetDouble());
+
+        var status = await client.GetAsync("widget/status.png?scale=99");
+        Assert.Equal("image/png", status.Content.Headers.ContentType?.MediaType);
+        Assert.Equal("status x6", asked); // the size kept in bounds
+
+        using var obs = new HttpClient { BaseAddress = server.Address };
+        var page = await (await obs.GetAsync($"overlay/stream?token={Token}")).Content.ReadAsStringAsync();
+        Assert.Contains("/api/v1/stream-layout", page, StringComparison.Ordinal);
+        Assert.Contains("scale=", page, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task It_listens_on_this_PC_only_unless_allowed()
     {
         Assert.True(IPAddress.IsLoopback(IPAddress.Parse(_server.Address!.Host)));

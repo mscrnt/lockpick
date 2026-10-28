@@ -53,9 +53,10 @@
   const $ = id => document.getElementById(id);
   let run = null, fetchedAt = 0;
 
-  function clock(seconds) {
-    const tenths = Math.floor(seconds * 10) % 10, s = Math.floor(seconds), h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60;
-    return (h > 0 ? h + ":" + String(m).padStart(2, "0") : m) + ":" + String(s % 60).padStart(2, "0") + "." + tenths;
+  function clock(seconds, hundredths) {
+    const s = Math.floor(seconds), h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60;
+    const part = hundredths ? String(Math.floor(seconds * 100) % 100).padStart(2, "0") : String(Math.floor(seconds * 10) % 10);
+    return (h > 0 ? h + ":" + String(m).padStart(2, "0") : m) + ":" + String(s % 60).padStart(2, "0") + "." + part;
   }
 
   function delta(seconds) {
@@ -108,7 +109,7 @@
         cell("time", s.timeSeconds != null ? clock(s.timeSeconds) : s.personalBestSeconds != null ? clock(s.personalBestSeconds) : "—"));
       rows.append(row);
     }
-    $("clock").textContent = t != null ? clock(t) : "0:00.0";
+    $("clock").textContent = t != null ? clock(t, true) : "0:00.00";
     $("clock").className = behind ? "behind" : "";
     const pb = [];
     if (run.personalBestSeconds != null) pb.push("PB " + clock(run.personalBestSeconds));
@@ -121,11 +122,14 @@
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .then(r => { run = r; fetchedAt = performance.now(); })
       .catch(() => { run = null; })
-      .finally(() => setTimeout(poll, 250));
+      .finally(() => setTimeout(poll, 100));
   }
 
+  // Drawn every screen frame (the clock runs on between answers from Lockpick).
+  function frame() { render(); requestAnimationFrame(frame); }
+
   poll();
-  setInterval(render, 100);
+  requestAnimationFrame(frame);
 </script>
 </body>
 </html>

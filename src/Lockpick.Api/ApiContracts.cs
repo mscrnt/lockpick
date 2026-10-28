@@ -53,7 +53,16 @@ public sealed record ApiHost(
     Func<Lockpick.Core.Runs.SplitSet, Lockpick.Core.Runs.RunComparison>? Comparison = null,
     Lockpick.Core.Insight.EventFeed? Feed = null,
     Func<int, int, byte[]?>? LiveSplitPicture = null,
-    Func<string, int, int, Task<WidgetPicture?>>? Widget = null);
+    Func<string, int, int, Task<WidgetPicture?>>? Widget = null,
+    Func<string, double, Task<WidgetPicture?>>? WidgetAtScale = null,
+    Func<IReadOnlyList<StreamPlacement>>? StreamLayout = null);
 
 /// <summary>An overlay widget drawn for a browser source: premultiplied BGRA, as large as fitted the box asked.</summary>
 public sealed record WidgetPicture(byte[] Pixels, int Width, int Height);
+
+/// <summary>
+/// One widget of the stream layout (every widget the player ticked, in one browser source): where it sits
+/// (<c>top-left</c>, <c>top-centre</c>, <c>top-right</c>, <c>bottom-left</c>, <c>bottom-right</c>) and how large (1 = the
+/// overlay's usual size). Widgets in the same place are stacked in this order.
+/// </summary>
+public sealed record StreamPlacement(string Id, string Corner, double Scale);

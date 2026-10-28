@@ -24,6 +24,7 @@ public sealed class WidgetRenderer : IDisposable
     private readonly Dictionary<string, Entry> _entries;
     private readonly Dictionary<string, int> _watchers = [];
     private readonly Dictionary<string, long> _requested = [];
+    private readonly Dictionary<(string Id, double Scale, int Width, int Height), (int Version, Lockpick.Api.WidgetPicture Picture)> _browserPictures = [];
 
     public WidgetRenderer(AppServices services, OverlayViewModel model)
     {
@@ -98,7 +99,40 @@ public sealed class WidgetRenderer : IDisposable
         }
 
         _requested[id] = Environment.TickCount64; // keeps its data updating (e.g. the map) while OBS shows it
-        return HasContent(id) && RenderToFit(id, width, height, 96) is var (pixels, w, h) ? new Lockpick.Api.WidgetPicture(pixels, w, h) : null;
+        return HasContent(id) ? Cached((id, 0, width, height), () => RenderToFit(id, width, height, 96)) : null;
+    }
+
+    /// <summary>The widget for the stream layout (the API): its own size times <paramref name="scale"/>, or null while it
+    /// has nothing to show.</summary>
+    public Lockpick.Api.WidgetPicture? ForBrowserAtScale(string id, double scale)
+    {
+        if (!_entries.ContainsKey(id))
+        {
+            return null;
+        }
+
+        _requested[id] = Environment.TickCount64; // keeps its data updating (e.g. the map) while OBS shows it
+        return HasContent(id) ? Cached((id, scale, 0, 0), () => Render(id, scale, 96)) : null;
+    }
+
+    /// <summary>The browser's last picture of the widget while its look hasn't changed (browser sources ask 30 times a
+    /// second; most widgets change far less often), else a new one.</summary>
+    private Lockpick.Api.WidgetPicture? Cached((string Id, double Scale, int Width, int Height) key, Func<(byte[] Pixels, int Width, int Height)?> draw)
+    {
+        var version = Version(key.Id);
+        if (!Live(key.Id) && _browserPictures.TryGetValue(key, out var last) && last.Version == version)
+        {
+            return last.Picture;
+        }
+
+        if (draw() is not var (pixels, w, h))
+        {
+            return null;
+        }
+
+        var picture = new Lockpick.Api.WidgetPicture(pixels, w, h);
+        _browserPictures[key] = (version, picture);
+        return picture;
     }
 
     /// <summary>The widget at the overlay's <paramref name="scale"/> for a monitor at <paramref name="dpi"/> (premultiplied BGRA).</summary>

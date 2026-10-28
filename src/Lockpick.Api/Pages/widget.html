@@ -6,7 +6,7 @@
 <!--
   One of Lockpick's overlay widgets (the same picture as on the overlay and in its pop-out window) for an OBS
   Browser Source: status (time, HP, room, challenge), minimap, enemies, splits, feed or banner.
-  URL: http://127.0.0.1:<port>/overlay/widget?id=<widget>&token=<token>[&width=400][&height=400][&fps=10]
+  URL: http://127.0.0.1:<port>/overlay/widget?id=<widget>&token=<token>[&width=400][&height=400][&fps=30]
        [&align=center|left|right][&valign=top|middle|bottom]
   Size the browser source to width × height; the widget is drawn as large as fits on a transparent background,
   centred along the width and at the top unless align / valign say otherwise. Nothing here can change the game.
@@ -25,7 +25,7 @@
   const id = (params.get("id") || "status").replace(/[^a-z0-9-]/gi, "");
   const width = Math.min(2000, Math.max(64, parseInt(params.get("width")) || 400));
   const height = Math.min(2000, Math.max(64, parseInt(params.get("height")) || 400));
-  const every = 1000 / Math.min(30, Math.max(1, parseFloat(params.get("fps")) || 10));
+  const every = 1000 / Math.min(60, Math.max(1, parseFloat(params.get("fps")) || 30));
   const place = { left: "flex-start", center: "center", right: "flex-end", top: "flex-start", middle: "center", bottom: "flex-end" };
   document.body.style.justifyContent = place[params.get("align")] || "center";
   document.body.style.alignItems = place[params.get("valign")] || "flex-start";
@@ -34,10 +34,13 @@
 
   // Two images in turn: the next picture loads behind the shown one, so the widget never flickers. When the widget
   // has nothing to show (e.g. no enemies), the server answers 204 and the page goes blank until it has.
+  // The next picture is asked for "every" ms after the last was asked for (not after it arrived), so the rate holds.
   function next() {
+    const asked = performance.now();
+    const later = () => setTimeout(next, Math.max(0, every - (performance.now() - asked)));
     const back = shown[1 - front];
-    back.onload = () => { back.style.display = "block"; shown[front].style.display = "none"; front = 1 - front; setTimeout(next, every); };
-    back.onerror = () => { shown[front].style.display = "none"; setTimeout(next, every); };
+    back.onload = () => { back.style.display = "block"; shown[front].style.display = "none"; front = 1 - front; later(); };
+    back.onerror = () => { shown[front].style.display = "none"; later(); };
     back.src = "/api/v1/widget/" + id + ".png?token=" + encodeURIComponent(token) + "&width=" + width + "&height=" + height + "&t=" + Date.now();
   }
 
