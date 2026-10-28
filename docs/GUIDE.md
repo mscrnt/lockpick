@@ -211,7 +211,7 @@ door or spot that matters, the buttons to press appear (Xbox, PlayStation or you
 or the one you pick). The steps tick off by themselves as you play, also from a loaded save; **Skip** and **Back** move
 by hand. On the overlay it's the *Route guide* widget (Settings → Overlay), and *Route guide in the game picture* draws the way
 on the floor of the game's own picture, with a ring where the step is and the buttons at the bottom middle; the
-Route guide card has a switch for each (*the way*, *the buttons*). The draft route hasn't been followed through
+Route guide card has a switch for each (*the way* on the floor, *the spot* for the ring and a puzzle's numbers, *the buttons*). The draft route hasn't been followed through
 a whole run yet, so a step can be out of place: skip it.
 
 ## Helping out: captures

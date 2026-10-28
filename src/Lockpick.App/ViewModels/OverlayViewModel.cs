@@ -350,7 +350,8 @@ public sealed partial class OverlayViewModel : ObservableObject
 
     /// <summary>The route guide has something to draw in the game picture (a step with a way, in a game, a switch on).</summary>
     public bool HasRoutePicture => Map.InGame && Map.Map is not null && Map.Guide.Plan is not null && !Map.Guide.Busy
-        && (Map.Guide.LineInPicture || (Map.Guide.PromptsInPicture && Map.Guide.Prompts.Count > 0) || Map.Guide.Clocks.Length > 0);
+        && (Map.Guide.LineInPicture || Map.Guide.SpotInPicture || (Map.Guide.PromptsInPicture && Map.Guide.Prompts.Count > 0)
+            || Map.Guide.Clocks.Length > 0);
 
     private void Show(GameSnapshot? snapshot)
     {

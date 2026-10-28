@@ -88,7 +88,7 @@
                          Map="{Binding Map.Map}" CameraId="{Binding Map.CameraId}" HasPlayer="{Binding Map.HasPlayer}"
                          PlayerX="{Binding Map.PlayerX}" PlayerY="{Binding Map.PlayerY}" PlayerZ="{Binding Map.PlayerZ}"
                          Route="{Binding Map.Guide.Plan}" Prompts="{Binding Map.Guide.Prompts}"
-                         ShowLine="{Binding Map.Guide.LineInPicture}" ShowPrompts="{Binding Map.Guide.PromptsInPicture}"
+                         ShowLine="{Binding Map.Guide.LineInPicture}" ShowSpot="{Binding Map.Guide.SpotInPicture}" ShowPrompts="{Binding Map.Guide.PromptsInPicture}"
                          RouteBrush="{StaticResource LpRouteBrush}" TextBrush="{StaticResource LpTextBrush}" PlateBrush="#E00B0F0E"
                          Clocks="{Binding Map.Guide.Clocks}" ClockBrush="{StaticResource LpAmberBrush}" />
   </LayoutTransformControl>

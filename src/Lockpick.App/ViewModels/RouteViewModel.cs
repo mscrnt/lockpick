@@ -45,6 +45,7 @@ public sealed partial class RouteViewModel : ObservableObject
         SelectedRoute = Routes.FirstOrDefault(r => r.Id == services.Settings.Current.RouteId) ?? Routes[0];
         SelectedStyle = Styles.FirstOrDefault(s => s.Id == services.Settings.Current.ButtonStyle) ?? Styles[0];
         LineInPicture = services.Settings.Current.RouteInPicture;
+        SpotInPicture = services.Settings.Current.RouteSpotInPicture;
         PromptsInPicture = services.Settings.Current.PromptsInPicture;
         _loading = false;
         services.Route.Changed += (_, _) => Dispatcher.UIThread.Post(Refresh);
@@ -71,9 +72,14 @@ public sealed partial class RouteViewModel : ObservableObject
     [ObservableProperty]
     public partial ButtonStyleChoice? SelectedStyle { get; set; }
 
-    /// <summary>The way drawn in the game's picture (on the overlay).</summary>
+    /// <summary>The way drawn in the game's picture (on the overlay): the line on the floor.</summary>
     [ObservableProperty]
     public partial bool LineInPicture { get; set; }
+
+    /// <summary>Where the step is, drawn in the game's picture: the ring (on the item, the spot or the door the way leaves
+    /// by) and a puzzle's numbers.</summary>
+    [ObservableProperty]
+    public partial bool SpotInPicture { get; set; }
 
     /// <summary>The buttons shown in the game's picture, beside what they're for.</summary>
     [ObservableProperty]
@@ -161,6 +167,14 @@ public sealed partial class RouteViewModel : ObservableObject
         if (!_loading)
         {
             _services.Settings.Save(_services.Settings.Current with { RouteInPicture = value });
+        }
+    }
+
+    partial void OnSpotInPictureChanged(bool value)
+    {
+        if (!_loading)
+        {
+            _services.Settings.Save(_services.Settings.Current with { RouteSpotInPicture = value });
         }
     }
 

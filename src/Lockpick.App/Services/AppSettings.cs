@@ -91,8 +91,11 @@ public sealed record AppSettings
     /// <summary>Whose buttons the route guide shows (<see cref="ButtonStyles"/>): the pad in use, or one kind always.</summary>
     public string ButtonStyle { get; init; } = ButtonStyles.Auto;
 
-    /// <summary>Draw the route guide's way (the line, the ring, a puzzle's numbers) in the game's own picture.</summary>
+    /// <summary>Draw the route guide's way (the line on the floor) in the game's own picture.</summary>
     public bool RouteInPicture { get; init; } = true;
+
+    /// <summary>Draw where the route guide's step is (the ring, a puzzle's numbers) in the game's own picture.</summary>
+    public bool RouteSpotInPicture { get; init; } = true;
 
     /// <summary>Show the route guide's buttons at the bottom middle of the game's own picture.</summary>
     public bool PromptsInPicture { get; init; } = true;

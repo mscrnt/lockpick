@@ -28,6 +28,7 @@ public sealed class WorldRouteControl : Control
         AvaloniaProperty.Register<WorldRouteControl, IReadOnlyList<PromptRow>?>(nameof(Prompts));
     public static readonly StyledProperty<bool> ShowLineProperty = AvaloniaProperty.Register<WorldRouteControl, bool>(nameof(ShowLine), true);
     public static readonly StyledProperty<bool> ShowPromptsProperty = AvaloniaProperty.Register<WorldRouteControl, bool>(nameof(ShowPrompts), true);
+    public static readonly StyledProperty<bool> ShowSpotProperty = AvaloniaProperty.Register<WorldRouteControl, bool>(nameof(ShowSpot), true);
     public static readonly StyledProperty<double> PictureWidthProperty = AvaloniaProperty.Register<WorldRouteControl, double>(nameof(PictureWidth));
     public static readonly StyledProperty<double> PictureHeightProperty = AvaloniaProperty.Register<WorldRouteControl, double>(nameof(PictureHeight));
     public static readonly StyledProperty<double> InsetProperty = AvaloniaProperty.Register<WorldRouteControl, double>(nameof(Inset));
@@ -43,7 +44,7 @@ public sealed class WorldRouteControl : Control
     static WorldRouteControl()
     {
         AffectsRender<WorldRouteControl>(MapProperty, CameraIdProperty, PlayerXProperty, PlayerYProperty, PlayerZProperty, HasPlayerProperty,
-            RouteProperty, PromptsProperty, ShowLineProperty, ShowPromptsProperty, PictureWidthProperty, PictureHeightProperty, InsetProperty,
+            RouteProperty, PromptsProperty, ShowLineProperty, ShowPromptsProperty, ShowSpotProperty, PictureWidthProperty, PictureHeightProperty, InsetProperty,
             RouteBrushProperty, TextBrushProperty, PlateBrushProperty, ClocksProperty, ClockBrushProperty);
     }
 
@@ -69,6 +70,9 @@ public sealed class WorldRouteControl : Control
     public bool ShowLine { get => GetValue(ShowLineProperty); set => SetValue(ShowLineProperty, value); }
 
     public bool ShowPrompts { get => GetValue(ShowPromptsProperty); set => SetValue(ShowPromptsProperty, value); }
+
+    /// <summary>The ring where the step is and a puzzle's numbers (apart from the line, which <see cref="ShowLine"/> draws).</summary>
+    public bool ShowSpot { get => GetValue(ShowSpotProperty); set => SetValue(ShowSpotProperty, value); }
 
     public double PictureWidth { get => GetValue(PictureWidthProperty); set => SetValue(PictureWidthProperty, value); }
 
@@ -119,7 +123,7 @@ public sealed class WorldRouteControl : Control
                 : (RoutePoint?)null;
             if (target is { } t && At(t.X, t.Z, floor) is { } ring)
             {
-                if (ShowLine)
+                if (ShowSpot)
                 {
                     context.DrawEllipse(null, new Pen(Brushes.Black, 6), ring, 14, 7);
                     context.DrawEllipse(null, new Pen(brush, 3), ring, 14, 7);
@@ -127,7 +131,7 @@ public sealed class WorldRouteControl : Control
             }
         }
 
-        if (plan.SpotsRoom == map.RoomId && ShowLine)
+        if (plan.SpotsRoom == map.RoomId && ShowSpot)
         {
             for (var i = 0; i < plan.Spots.Count; i++)
             {

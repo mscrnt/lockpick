@@ -74,7 +74,9 @@
         <WrapPanel Orientation="Horizontal" ItemSpacing="12" IsVisible="{Binding Guide.IsOn}">
           <TextBlock Text="In the game picture:" Foreground="{StaticResource LpMutedBrush}" VerticalAlignment="Center" />
           <CheckBox Content="the way" IsChecked="{Binding Guide.LineInPicture}" AutomationProperties.Name="Draw the way in the game picture"
-                    ToolTip.Tip="Draw the way on the floor in the game's picture, with a ring where the step is and a puzzle's numbers (needs the overlay on: Settings → Overlay)." />
+                    ToolTip.Tip="Draw the way on the floor in the game's picture (needs the overlay on: Settings → Overlay)." />
+          <CheckBox Content="the spot" IsChecked="{Binding Guide.SpotInPicture}" AutomationProperties.Name="Ring the step's spot in the game picture"
+                    ToolTip.Tip="A ring on the item or spot the step is about (or the door the way leaves by), and a puzzle's numbers, in the game's picture (needs the overlay on)." />
           <CheckBox Content="the buttons" IsChecked="{Binding Guide.PromptsInPicture}" AutomationProperties.Name="Show the buttons in the game picture"
                     ToolTip.Tip="Show the buttons to press at the bottom middle of the game's picture." />
         </WrapPanel>

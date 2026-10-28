@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- **Route guide: the ring without the line** (Map → Route guide, "In the game picture"): *the spot* (the ring on the
+  item, spot or door, and a puzzle's numbers) has its own switch now, apart from *the way* (the line on the floor).
+
 ### Fixed
 - **GOG Japanese: the item box and enemy HP** are live-checked now (a tester's 33-minute capture: items stored into the
   box's entries, every enemy slot's HP through fights and kills), so adding items to the box works past its first entry.
