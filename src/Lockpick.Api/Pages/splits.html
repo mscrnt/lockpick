@@ -71,10 +71,16 @@
     return e;
   }
 
-  // Between reads the clock runs on by itself (at most a second, so a paused game doesn't drift).
+  // Between reads the clock runs on by itself, a quarter of a second at most (the game's clock stops in loads and
+  // pauses, and a late answer must not make it jump back), and never goes backwards within an attempt: the next read
+  // catches it up instead of replaying a moment.
+  let shown = null, shownAttempt = null;
   function now() {
     if (!run || run.gameTimeSeconds == null) return null;
-    return run.state === "running" ? run.gameTimeSeconds + Math.min(1, (performance.now() - fetchedAt) / 1000) : run.gameTimeSeconds;
+    if (run.state !== "running") { shown = null; return run.gameTimeSeconds; }
+    const t = run.gameTimeSeconds + Math.min(0.25, (performance.now() - fetchedAt) / 1000);
+    if (shownAttempt !== run.attempt || shown == null || t >= shown || shown - t > 2) { shown = t; shownAttempt = run.attempt; }
+    return shown;
   }
 
   function render() {
