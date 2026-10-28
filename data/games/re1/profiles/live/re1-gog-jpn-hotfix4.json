@@ -112,6 +112,276 @@
       "date": "2026-10-28",
       "session": "lab: GOG Japanese Biohazard.exe on this PC, a virtual Xbox pad, community saves loaded into new Japanese slots",
       "seen": "After loading a Jill save with all 8 slots full (community save \"Jill Rocky Balboa\"), slot 8 held shield key (0x0135), the save file's own entry; all 8 slots matched the file byte for byte (id low byte, quantity high byte), the bazooka in slot 5 equipped (equippedSlot 5)."
+    },
+    "enemy1Hp": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "Set when a room's enemies loaded (with enemy1Type), lower after each hit and -1 when the enemy died (9 kills in this slot), the room's enemy flag set with it; as enemy0Hp."
+    },
+    "enemy2Hp": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "Set when a room's enemies loaded (with enemy2Type), lower after each hit and -1 when the enemy died (4 kills in this slot), the room's enemy flag set with it; as enemy0Hp."
+    },
+    "enemy3Hp": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "Set when a room's enemies loaded (with enemy3Type), lower after each hit and -1 when the enemy died (3 kills in this slot), the room's enemy flag set with it; as enemy0Hp."
+    },
+    "enemy4Hp": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "Set when a room's enemies loaded (with enemy4Type), lower after each hit and -1 when the enemy died (2 kills in this slot), the room's enemy flag set with it; as enemy0Hp."
+    },
+    "enemy5Hp": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "Set when a room's enemies loaded (with enemy5Type), lower after each hit and -1 when the enemy died (2 kills in this slot), the room's enemy flag set with it; as enemy0Hp."
+    },
+    "enemy6Hp": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "Set when a room's enemies loaded (with enemy6Type), lower after each hit and -1 when the enemy died (3 kills in this slot), the room's enemy flag set with it; as enemy0Hp."
+    },
+    "enemy7Hp": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "Set when a room's enemies loaded (with enemy7Type), lower after each hit and -1 when the enemy died (2 kills in this slot), the room's enemy flag set with it; as enemy0Hp."
+    },
+    "box1": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box2": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box3": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box4": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box5": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box6": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box7": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box8": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box9": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box10": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box11": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box12": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box13": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box14": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box15": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box16": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box17": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box18": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box19": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box20": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box21": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box22": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box23": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box24": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box25": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box26": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box27": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box28": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box29": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box30": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box31": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box32": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box33": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box34": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box35": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box36": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box37": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box38": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box39": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box40": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box41": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box42": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box43": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box44": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box45": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box46": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
+    },
+    "box47": {
+      "date": "2026-10-28",
+      "session": "tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)",
+      "seen": "At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English."
     }
   },
   "addresses": {

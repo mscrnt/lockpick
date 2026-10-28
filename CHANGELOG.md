@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+- **GOG Japanese: the item box and enemy HP** are live-checked now (a tester's 33-minute capture: items stored into the
+  box's entries, every enemy slot's HP through fights and kills), so adding items to the box works past its first entry.
+  Only Rebecca's item counts still wait for a live check on the Japanese build.
+
 ## [0.5.1] - 2026-10-28
 
 ### Added

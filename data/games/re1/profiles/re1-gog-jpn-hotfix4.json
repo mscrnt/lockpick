@@ -916,8 +916,12 @@
       "address": "0xC387B6",
       "type": "u16",
       "description": "Item box entry 2 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE98E6); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE98E6); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -928,8 +932,12 @@
       "address": "0xC387B8",
       "type": "u16",
       "description": "Item box entry 3 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE98E8); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE98E8); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -940,8 +948,12 @@
       "address": "0xC387BA",
       "type": "u16",
       "description": "Item box entry 4 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE98EA); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE98EA); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -1017,8 +1029,8 @@
       "address": "0xC35548",
       "type": "i16",
       "description": "Enemy slot 1: HP.",
-      "verification": "static",
-      "evidence": "Cross-mapped from re1-gog-usa-hotfix4 (0xBE6678) by tools/re1/xmap.py: 2 of 2 code sites that use it there are found here and use 0xC35548 at the same instruction.",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): Set when a room's enemies loaded (with enemy1Type), lower after each hit and -1 when the enemy died (9 kills in this slot), the room's enemy flag set with it; as enemy0Hp. Cross-mapped from re1-gog-usa-hotfix4 (0xBE6678) by tools/re1/xmap.py: 2 of 2 code sites that use it there are found here and use 0xC35548 at the same instruction.",
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp Entities.h",
@@ -1056,8 +1068,8 @@
       "address": "0xC356D4",
       "type": "i16",
       "description": "Enemy slot 2: HP.",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE6804); it is part of 'actorSlots' (0xBE6464, 0x2E68 bytes), whose references map by +0x4eed0 at 135 of 142 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): Set when a room's enemies loaded (with enemy2Type), lower after each hit and -1 when the enemy died (4 kills in this slot), the room's enemy flag set with it; as enemy0Hp. Not used directly by code in re1-gog-usa-hotfix4 (0xBE6804); it is part of 'actorSlots' (0xBE6464, 0x2E68 bytes), whose references map by +0x4eed0 at 135 of 142 code sites, so the layout carries over (tools/re1/xmap.py).",
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp Entities.h",
@@ -1095,8 +1107,8 @@
       "address": "0xC35860",
       "type": "i16",
       "description": "Enemy slot 3: HP.",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE6990); it is part of 'actorSlots' (0xBE6464, 0x2E68 bytes), whose references map by +0x4eed0 at 135 of 142 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): Set when a room's enemies loaded (with enemy3Type), lower after each hit and -1 when the enemy died (3 kills in this slot), the room's enemy flag set with it; as enemy0Hp. Not used directly by code in re1-gog-usa-hotfix4 (0xBE6990); it is part of 'actorSlots' (0xBE6464, 0x2E68 bytes), whose references map by +0x4eed0 at 135 of 142 code sites, so the layout carries over (tools/re1/xmap.py).",
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp Entities.h",
@@ -1134,8 +1146,8 @@
       "address": "0xC359EC",
       "type": "i16",
       "description": "Enemy slot 4: HP.",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE6B1C); it is part of 'actorSlots' (0xBE6464, 0x2E68 bytes), whose references map by +0x4eed0 at 135 of 142 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): Set when a room's enemies loaded (with enemy4Type), lower after each hit and -1 when the enemy died (2 kills in this slot), the room's enemy flag set with it; as enemy0Hp. Not used directly by code in re1-gog-usa-hotfix4 (0xBE6B1C); it is part of 'actorSlots' (0xBE6464, 0x2E68 bytes), whose references map by +0x4eed0 at 135 of 142 code sites, so the layout carries over (tools/re1/xmap.py).",
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp Entities.h",
@@ -1173,8 +1185,8 @@
       "address": "0xC35B78",
       "type": "i16",
       "description": "Enemy slot 5: HP.",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE6CA8); it is part of 'actorSlots' (0xBE6464, 0x2E68 bytes), whose references map by +0x4eed0 at 135 of 142 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): Set when a room's enemies loaded (with enemy5Type), lower after each hit and -1 when the enemy died (2 kills in this slot), the room's enemy flag set with it; as enemy0Hp. Not used directly by code in re1-gog-usa-hotfix4 (0xBE6CA8); it is part of 'actorSlots' (0xBE6464, 0x2E68 bytes), whose references map by +0x4eed0 at 135 of 142 code sites, so the layout carries over (tools/re1/xmap.py).",
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp Entities.h",
@@ -1212,8 +1224,8 @@
       "address": "0xC35D04",
       "type": "i16",
       "description": "Enemy slot 6: HP.",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE6E34); it is part of 'actorSlots' (0xBE6464, 0x2E68 bytes), whose references map by +0x4eed0 at 135 of 142 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): Set when a room's enemies loaded (with enemy6Type), lower after each hit and -1 when the enemy died (3 kills in this slot), the room's enemy flag set with it; as enemy0Hp. Not used directly by code in re1-gog-usa-hotfix4 (0xBE6E34); it is part of 'actorSlots' (0xBE6464, 0x2E68 bytes), whose references map by +0x4eed0 at 135 of 142 code sites, so the layout carries over (tools/re1/xmap.py).",
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp Entities.h",
@@ -1251,8 +1263,8 @@
       "address": "0xC35E90",
       "type": "i16",
       "description": "Enemy slot 7: HP.",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE6FC0); it is part of 'actorSlots' (0xBE6464, 0x2E68 bytes), whose references map by +0x4eed0 at 135 of 142 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): Set when a room's enemies loaded (with enemy7Type), lower after each hit and -1 when the enemy died (2 kills in this slot), the room's enemy flag set with it; as enemy0Hp. Not used directly by code in re1-gog-usa-hotfix4 (0xBE6FC0); it is part of 'actorSlots' (0xBE6464, 0x2E68 bytes), whose references map by +0x4eed0 at 135 of 142 code sites, so the layout carries over (tools/re1/xmap.py).",
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp Entities.h",
@@ -1745,8 +1757,12 @@
       "address": "0xC387BC",
       "type": "u16",
       "description": "Item box entry 5 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE98EC); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE98EC); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -1757,8 +1773,12 @@
       "address": "0xC387BE",
       "type": "u16",
       "description": "Item box entry 6 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE98EE); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE98EE); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -1769,8 +1789,12 @@
       "address": "0xC387C0",
       "type": "u16",
       "description": "Item box entry 7 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE98F0); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE98F0); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -1781,8 +1805,12 @@
       "address": "0xC387C2",
       "type": "u16",
       "description": "Item box entry 8 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE98F2); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE98F2); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -1793,8 +1821,12 @@
       "address": "0xC387C4",
       "type": "u16",
       "description": "Item box entry 9 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE98F4); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE98F4); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -1805,8 +1837,12 @@
       "address": "0xC387C6",
       "type": "u16",
       "description": "Item box entry 10 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE98F6); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE98F6); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -1817,8 +1853,12 @@
       "address": "0xC387C8",
       "type": "u16",
       "description": "Item box entry 11 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE98F8); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE98F8); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -1829,8 +1869,12 @@
       "address": "0xC387CA",
       "type": "u16",
       "description": "Item box entry 12 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE98FA); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE98FA); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -1841,8 +1885,12 @@
       "address": "0xC387CC",
       "type": "u16",
       "description": "Item box entry 13 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE98FC); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE98FC); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -1853,8 +1901,12 @@
       "address": "0xC387CE",
       "type": "u16",
       "description": "Item box entry 14 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE98FE); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE98FE); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -1865,8 +1917,12 @@
       "address": "0xC387D0",
       "type": "u16",
       "description": "Item box entry 15 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE9900); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE9900); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -1877,8 +1933,12 @@
       "address": "0xC387D2",
       "type": "u16",
       "description": "Item box entry 16 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE9902); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE9902); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -1889,8 +1949,12 @@
       "address": "0xC387D4",
       "type": "u16",
       "description": "Item box entry 17 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE9904); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE9904); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -1901,8 +1965,12 @@
       "address": "0xC387D6",
       "type": "u16",
       "description": "Item box entry 18 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE9906); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE9906); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -1913,8 +1981,12 @@
       "address": "0xC387D8",
       "type": "u16",
       "description": "Item box entry 19 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE9908); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE9908); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -1925,8 +1997,12 @@
       "address": "0xC387DA",
       "type": "u16",
       "description": "Item box entry 20 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE990A); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE990A); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -1937,8 +2013,12 @@
       "address": "0xC387DC",
       "type": "u16",
       "description": "Item box entry 21 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE990C); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE990C); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -1949,8 +2029,12 @@
       "address": "0xC387DE",
       "type": "u16",
       "description": "Item box entry 22 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE990E); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE990E); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -1961,8 +2045,12 @@
       "address": "0xC387E0",
       "type": "u16",
       "description": "Item box entry 23 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE9910); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE9910); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -1973,8 +2061,12 @@
       "address": "0xC387E2",
       "type": "u16",
       "description": "Item box entry 24 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE9912); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE9912); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -1985,8 +2077,12 @@
       "address": "0xC387E4",
       "type": "u16",
       "description": "Item box entry 25 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE9914); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE9914); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -1997,8 +2093,12 @@
       "address": "0xC387E6",
       "type": "u16",
       "description": "Item box entry 26 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE9916); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE9916); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -2009,8 +2109,12 @@
       "address": "0xC387E8",
       "type": "u16",
       "description": "Item box entry 27 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE9918); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE9918); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -2021,8 +2125,12 @@
       "address": "0xC387EA",
       "type": "u16",
       "description": "Item box entry 28 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE991A); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE991A); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -2033,8 +2141,12 @@
       "address": "0xC387EC",
       "type": "u16",
       "description": "Item box entry 29 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE991C); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE991C); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -2045,8 +2157,12 @@
       "address": "0xC387EE",
       "type": "u16",
       "description": "Item box entry 30 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE991E); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE991E); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -2057,8 +2173,12 @@
       "address": "0xC387F0",
       "type": "u16",
       "description": "Item box entry 31 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE9920); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE9920); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -2069,8 +2189,12 @@
       "address": "0xC387F2",
       "type": "u16",
       "description": "Item box entry 32 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE9922); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE9922); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -2081,8 +2205,12 @@
       "address": "0xC387F4",
       "type": "u16",
       "description": "Item box entry 33 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE9924); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE9924); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -2093,8 +2221,12 @@
       "address": "0xC387F6",
       "type": "u16",
       "description": "Item box entry 34 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE9926); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE9926); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -2105,8 +2237,12 @@
       "address": "0xC387F8",
       "type": "u16",
       "description": "Item box entry 35 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE9928); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE9928); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -2117,8 +2253,12 @@
       "address": "0xC387FA",
       "type": "u16",
       "description": "Item box entry 36 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE992A); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE992A); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -2129,8 +2269,12 @@
       "address": "0xC387FC",
       "type": "u16",
       "description": "Item box entry 37 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE992C); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE992C); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -2141,8 +2285,12 @@
       "address": "0xC387FE",
       "type": "u16",
       "description": "Item box entry 38 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE992E); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE992E); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -2153,8 +2301,12 @@
       "address": "0xC38800",
       "type": "u16",
       "description": "Item box entry 39 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE9930); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE9930); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -2165,8 +2317,12 @@
       "address": "0xC38802",
       "type": "u16",
       "description": "Item box entry 40 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE9932); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE9932); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -2177,8 +2333,12 @@
       "address": "0xC38804",
       "type": "u16",
       "description": "Item box entry 41 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE9934); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE9934); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -2189,8 +2349,12 @@
       "address": "0xC38806",
       "type": "u16",
       "description": "Item box entry 42 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE9936); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE9936); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -2201,8 +2365,12 @@
       "address": "0xC38808",
       "type": "u16",
       "description": "Item box entry 43 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE9938); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE9938); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -2213,8 +2381,12 @@
       "address": "0xC3880A",
       "type": "u16",
       "description": "Item box entry 44 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE993A); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE993A); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -2225,8 +2397,12 @@
       "address": "0xC3880C",
       "type": "u16",
       "description": "Item box entry 45 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE993C); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE993C); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -2237,8 +2413,12 @@
       "address": "0xC3880E",
       "type": "u16",
       "description": "Item box entry 46 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE993E); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE993E); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -2249,8 +2429,12 @@
       "address": "0xC38810",
       "type": "u16",
       "description": "Item box entry 47 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Not used directly by code in re1-gog-usa-hotfix4 (0xBE9940); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Not used directly by code in re1-gog-usa-hotfix4 (0xBE9940); it is part of 'itemBox' (0xBE98E4, 0x60 bytes), whose references map by +0x4eed0 at 13 of 14 code sites, so the layout carries over (tools/re1/xmap.py).",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
@@ -2261,8 +2445,12 @@
       "address": "0xC38812",
       "type": "u16",
       "description": "Item box entry 48 (low byte id, high byte quantity).",
-      "verification": "static",
-      "evidence": "Cross-mapped from re1-gog-usa-hotfix4 (0xBE9942) by tools/re1/xmap.py: 1 of 1 code sites that use it there are found here and use 0xC38812 at the same instruction.",
+      "verification": "runtime",
+      "evidence": "Live 2026-10-28 (tester's training capture LockpickCapture-20261028-144400 (Lockpick 0.4.6, 33 minutes of a Jill game on GOG Japanese: the guardhouse, the lab, the courtyard)): At the item box (14:55:45) the items stored went from the inventory into box entries 47, 46 and 45 in turn (clip x15 0x0F0B, Beretta x15 0x0F02, then 0x0434), each leaving its inventory slot and the slots after it shifting up; entries 0 and 1 held the box's starting clip x15 (0x0F0B) from the start. One contiguous array of 48 two-byte entries (id, quantity), as in GOG English. Cross-mapped from re1-gog-usa-hotfix4 (0xBE9942) by tools/re1/xmap.py: 1 of 1 code sites that use it there are found here and use 0xC38812 at the same instruction.",
+      "write": {
+        "min": 0,
+        "max": 65535
+      },
       "sources": [
         "static cross-map from re1-gog-usa-hotfix4",
         "re1-gog-usa-hotfix4: ecruells/resident-evil-pc-decomp BioCard.h"
