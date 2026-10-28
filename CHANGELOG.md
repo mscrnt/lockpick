@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-28
+
 ### Added
 - **The route guide follows any split set** (Map → Route guide → *Follow my splits*; work in progress): the split
   set chosen on the Runs page, built in, imported from LiveSplit or your own, gets a route worked out by Lockpick from
