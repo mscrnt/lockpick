@@ -8,6 +8,7 @@ has none is skipped and reported.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 from concurrent.futures import ProcessPoolExecutor
@@ -65,6 +66,28 @@ def report(saved, path, character, splits, manual, route, room, flare, answers) 
     return line, ok, {"path": path, "character": character, "splits": splits, "manual": manual, "saved": saved}
 
 
+CACHE = Path(__file__).with_name(".cache") / "check_splits"
+
+
+def fingerprint(path: str) -> str:
+    """The set's content and everything the result depends on (the simulator's code, the rules, the room files'
+    install): a result saved under it is still right."""
+    h = hashlib.sha256(Path(path).read_bytes())
+    for f in sorted(Path(__file__).parent.glob("*.py")) + [plan.RULES]:
+        h.update(f.read_bytes())
+    return h.hexdigest()[:24]
+
+
+def cached(path: str) -> str | None:
+    f = CACHE / f"{fingerprint(path)}.txt"
+    return f.read_text(encoding="utf-8") if f.exists() else None
+
+
+def save(path: str, line: str) -> None:
+    CACHE.mkdir(parents=True, exist_ok=True)
+    (CACHE / f"{fingerprint(path)}.txt").write_text(line, encoding="utf-8")
+
+
 def main(argv: list[str]) -> int:
     sys.stdout.reconfigure(encoding="utf-8")
     install = argv[0]
@@ -87,17 +110,35 @@ def main(argv: list[str]) -> int:
             for s in json.loads(f.read_text(encoding="utf-8-sig")).get("splits", []):
                 if s.get("kind") in ("room", "item"):
                     borrowed.setdefault(norm(s["name"]), s)
-    # Every set at once with all-Yes answers, then the answer search (itself parallel) for the ones that miss splits.
+    # Results already worked out for the same set and the same simulator are reused (--fresh plays everything again).
+    todo = []
+    for f in files:
+        line = None if "--fresh" in argv else cached(f)
+        if line is not None:
+            print(line + "  (saved)", flush=True)
+        else:
+            todo.append(f)
+    # Every set at once with all-Yes answers, printed as each finishes; then the answer search (itself parallel) for
+    # the ones that miss splits.
+    from concurrent.futures import as_completed
+    retry = []
     with ProcessPoolExecutor(max_workers=plan.WORKERS) as pool:
-        first = list(pool.map(check, [install] * len(files), files, [borrowed] * len(files)))
-    for line, ok, info in first:
-        if ok:
-            print(line, flush=True)
-            continue
+        futures = {pool.submit(check, install, f, borrowed): f for f in todo}
+        for future in as_completed(futures):
+            line, ok, info = future.result()
+            if ok:
+                print(line, flush=True)
+                save(futures[future], line)
+            else:
+                print(line + "  (searching the answers)", flush=True)
+                retry.append(info)
+    for info in retry:
         route, answers = plan.play_best(Path(install), info["character"], info["splits"])
         _, room, flare, _ = plan.trial(install, info["character"], info["splits"], answers)
-        print(report(info["saved"], info["path"], info["character"], info["splits"], info["manual"], route, room, flare,
-                     answers)[0], flush=True)
+        line = report(info["saved"], info["path"], info["character"], info["splits"], info["manual"], route, room, flare,
+                      answers)[0]
+        print(line, flush=True)
+        save(info["path"], line)
     return 0
 
 

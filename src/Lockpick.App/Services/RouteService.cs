@@ -2,6 +2,7 @@ using Lockpick.Core.Adapters;
 using Lockpick.Core.Maps;
 using Lockpick.Core.Monitoring;
 using Lockpick.Core.Routes;
+using Lockpick.Core.Runs;
 using Lockpick.Core.State;
 using Lockpick.Platform.Windows;
 using Microsoft.Extensions.Logging;
@@ -29,7 +30,10 @@ public sealed class RouteService : IDisposable
     private readonly IGameAdapter _adapter;
     private readonly SettingsStore _settings;
     private readonly Func<string?> _executable;
+    private readonly Func<SplitSet?> _splitSet;
     private readonly ILogger _log;
+    private readonly Dictionary<string, Route?> _planned = [];
+    private string? _planningKey;
     private readonly Lock _gate = new();
     private DateTimeOffset _last;
     private (string Exe, PlayableCharacter Character)? _roomsFor;
@@ -39,12 +43,13 @@ public sealed class RouteService : IDisposable
     private int _loads;
     private int _busy;
 
-    public RouteService(IGameStateSource source, IGameAdapter adapter, SettingsStore settings, Func<string?> executable, ILogger log)
+    public RouteService(IGameStateSource source, IGameAdapter adapter, SettingsStore settings, Func<string?> executable, Func<SplitSet?> splitSet, ILogger log)
     {
         _source = source;
         _adapter = adapter;
         _settings = settings;
         _executable = executable;
+        _splitSet = splitSet;
         _log = log;
         _source.SnapshotChanged += OnSnapshot;
     }
@@ -54,6 +59,9 @@ public sealed class RouteService : IDisposable
 
     /// <summary>Where the player is on the route; null with no route chosen, outside a game, or while the rooms load.</summary>
     public RouteView? View { get; private set; }
+
+    /// <summary>What "follow my splits" is doing when there's no route to show yet (working one out, or why it can't).</summary>
+    public string? Planning { get; private set; }
 
     /// <summary>The routes for the game (built in).</summary>
     public IReadOnlyList<Route> Routes => [.. _adapter.CreateRunRules(_adapter.Profiles[0])?.Routes ?? [], .. OwnRoutes.Value];
@@ -172,9 +180,9 @@ public sealed class RouteService : IDisposable
     public const string FollowSplits = "@splits";
 
     /// <summary>
-    /// The route to follow: the one chosen, or with <see cref="FollowSplits"/> the route made from the run's split set
-    /// (tools/routesim writes one per built-in set, id "&lt;set id&gt;-sim"); for a set of the player's own, the
-    /// full-game route of the character being played.
+    /// The route to follow: the one chosen, or with <see cref="FollowSplits"/> one Lockpick works out for the split set
+    /// chosen on the Runs page (any set: built in, imported from LiveSplit or the player's own), from the room files of
+    /// the game being played. Working one out takes seconds, in the background; until it's ready there's no route.
     /// </summary>
     private Route? Resolve(GameSnapshot snapshot)
     {
@@ -184,14 +192,70 @@ public sealed class RouteService : IDisposable
             return Routes.FirstOrDefault(r => r.Id == id);
         }
 
-        var forSet = Routes.FirstOrDefault(r => r.Id == $"{_settings.Current.RunSetId}-sim");
-        if (forSet is not null)
+        if (_splitSet() is not { } set)
         {
-            return forSet;
+            Planning = "Choose a split set on the Runs page to follow it.";
+            return null;
         }
 
-        var character = snapshot.Character.TryGet(out var c) ? c : PlayableCharacter.Unknown;
-        return Routes.FirstOrDefault(r => r.Id.EndsWith("-full-sim", StringComparison.Ordinal) && r.Character == character);
+        if (_executable() is not { } exe)
+        {
+            Planning = "The route for your splits is worked out from the game's own files: start the game once.";
+            return null;
+        }
+
+        var key = $"{exe}|{set.Id}|{string.Join(';', set.Splits.Select(s => $"{s.Name}={s.Trigger}"))}";
+        if (_planned.TryGetValue(key, out var planned))
+        {
+            // Not worked out: the route made for a built-in set when Lockpick was built, if it has one.
+            planned ??= Routes.FirstOrDefault(r => r.Id == $"{set.Id}-sim");
+            Planning = planned is null ? $"Couldn't work out a route for \"{set.Name}\" from its splits." : null;
+            return planned;
+        }
+
+        if (_planningKey != key)
+        {
+            _planningKey = key;
+            Planning = $"Working out a route for \"{set.Name}\"…";
+            _ = Task.Run(() => PlanFor(key, exe, set));
+        }
+
+        return null;
+    }
+
+    private void PlanFor(string key, string exe, SplitSet set)
+    {
+        var clock = System.Diagnostics.Stopwatch.StartNew();
+        Route? route = null;
+        try
+        {
+            route = _adapter.PlanRoute(exe, set, CancellationToken.None);
+            _log.LogInformation("Route guide: planned \"{Set}\" in {Seconds:0.0} s ({Steps} steps)", set.Name, clock.Elapsed.TotalSeconds,
+                route?.Steps.Count ?? 0);
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or ArgumentException or KeyNotFoundException
+            or IndexOutOfRangeException or UnauthorizedAccessException or InvalidDataException)
+        {
+            _log.LogWarning(ex, "Route guide: couldn't plan \"{Set}\"", set.Name);
+        }
+
+        lock (_gate)
+        {
+            _planned[key] = route;
+            if (_planningKey == key)
+            {
+                _planningKey = null;
+            }
+
+            _guide = null;
+            _last = default;
+        }
+
+        Changed?.Invoke(this, EventArgs.Empty);
+        if (_source.Latest is { } snapshot)
+        {
+            Update(snapshot);
+        }
     }
 
     private void Update(GameSnapshot snapshot)
@@ -201,6 +265,11 @@ public sealed class RouteService : IDisposable
         {
             _last = snapshot.CapturedAt;
             var route = Resolve(snapshot);
+            if (route is not null)
+            {
+                Planning = null;
+            }
+
             if (route is null || !Rooms(snapshot, route.Character))
             {
                 view = null;

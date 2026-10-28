@@ -68,7 +68,8 @@ public sealed class AppServices : IAsyncDisposable
             ? string.Create(System.Globalization.CultureInfo.InvariantCulture, $"{(int)wr.Time.TotalMinutes}:{wr.Time.Seconds:D2}.{wr.Time.Milliseconds / 100} {wr.Runner}")
             : null);
         TrainerHotkeys = new TrainerHotkeys(_log);
-        Route = new RouteService(source, adapter, settings, ResolveInstalledExecutable, loggerFactory.CreateLogger("Route"));
+        Route = new RouteService(source, adapter, settings, ResolveInstalledExecutable, () => RunLibrary.Find(settings.Current.RunSetId),
+            loggerFactory.CreateLogger("Route"));
         EnsureGamepad();
         TrainerHotkeys.Pressed += (_, action) =>
         {

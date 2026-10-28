@@ -139,6 +139,13 @@ public sealed class Re1Adapter : IGameAdapter
         return new Re1RoomMaps(install.DataDirectoryFor(Path.GetFileName(executablePath)), knowledge.Item, knowledge.Fills);
     }
 
+    /// <summary>A route for any split set, worked out by the route simulator from the room files of the game being played.</summary>
+    public Core.Routes.Route? PlanRoute(string executablePath, Core.Runs.SplitSet splits, CancellationToken cancel)
+    {
+        var install = Re1Install.Inspect(Path.GetDirectoryName(executablePath) ?? ".");
+        return Routing.Re1RoutePlanning.Plan(install.DataDirectoryFor(Path.GetFileName(executablePath)), splits, Knowledge.Value, cancel);
+    }
+
     public static IEnumerable<VersionProfile> LoadEmbeddedProfiles()
     {
         var assembly = typeof(Re1Adapter).Assembly;

@@ -55,6 +55,13 @@ public interface IGameAdapter
     /// </summary>
     Maps.IRoomMapSource? CreateRoomMaps(string executablePath) => null;
 
+    /// <summary>
+    /// Works out a route for <paramref name="splits"/> from the player's own install of the game run from
+    /// <paramref name="executablePath"/> (the route guide's "follow my splits" for any split set); null when the adapter
+    /// can't. Slow (seconds): call it off the UI thread.
+    /// </summary>
+    Routes.Route? PlanRoute(string executablePath, Runs.SplitSet splits, CancellationToken cancel) => null;
+
     /// <summary>The folder the game writes its saves to, for the executable at <paramref name="executablePath"/>; null if unknown.</summary>
     string? SaveDirectory(string executablePath) => null;
 

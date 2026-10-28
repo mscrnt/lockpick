@@ -37,7 +37,7 @@ public sealed partial class RouteViewModel : ObservableObject
         Routes =
         [
             new RouteChoice(null, "No route"),
-            new RouteChoice(RouteService.FollowSplits, "Follow my splits (the route for the split set on the Runs page)"),
+            new RouteChoice(RouteService.FollowSplits, "Follow my splits (work in progress: worked out for the split set on the Runs page)"),
             .. services.Route.Routes.Select(r => new RouteChoice(r.Id, r.Verified ? r.Name : $"{r.Name} (draft)")),
         ];
         Styles = [.. ButtonStyles.All.Select(s => new ButtonStyleChoice(s.Id, s.Name))];
@@ -185,6 +185,7 @@ public sealed partial class RouteViewModel : ObservableObject
         HasStep = IsOn && view is not null;
         Waiting = IsOn && !HasStep;
         Status = !IsOn ? string.Empty
+            : _services.Route.Planning is { } planning ? planning
             : _services.Source.Latest?.InGameplay is not { HasValue: true, Value: true } ? "The guide starts when you're in a game."
             : "Reading the game's rooms…";
         if (view is null)
