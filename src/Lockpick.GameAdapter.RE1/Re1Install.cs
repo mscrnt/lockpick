@@ -106,9 +106,16 @@ public sealed record Re1Install(string Directory, RebirthInstall? Rebirth, Steam
     /// <summary>The room files of the game run as <paramref name="executableName"/>: both releases can share a folder.</summary>
     public string DataDirectoryFor(string executableName)
     {
-        var own = Path.Combine(Directory, string.Equals(executableName, "Biohazard.exe", StringComparison.OrdinalIgnoreCase) ? "JPN" : "USA");
+        var own = Path.Combine(Directory, IsJapanese(executableName) ? "JPN" : "USA");
         return System.IO.Directory.Exists(own) ? own : DataDirectory;
     }
+
+    /// <summary>The names the Japanese game's executable has: Biohazard.exe, or Bio.exe where a pack bundles the 1.01
+    /// executable with Classic REbirth (the Seamless HD pack). Which build it is comes from its hash.</summary>
+    public static IReadOnlyList<string> JapaneseExecutables { get; } = ["Biohazard.exe", "Bio.exe"];
+
+    public static bool IsJapanese(string executableName) =>
+        JapaneseExecutables.Contains(Path.GetFileName(executableName), StringComparer.OrdinalIgnoreCase);
 
     private static readonly string[] DataFolders = ["USA", "JPN"];
 

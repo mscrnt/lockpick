@@ -11,6 +11,9 @@ All notable changes to this project are documented here. The format follows
   item, spot or door, and a puzzle's numbers) has its own switch now, apart from *the way* (the line on the floor).
 
 ### Fixed
+- **The Seamless HD pack** (Classic REbirth with the HD backgrounds, its game folder running `Bio.exe`): Lockpick looked
+  only for `ResidentEvil.exe` and `Biohazard.exe`, so it never saw the game. `Bio.exe` is the Japanese 1.01 executable
+  and is supported like any other copy of it (identified by its hash; the room files and REbirth's saves as usual).
 - **GOG Japanese: the item box and enemy HP** are live-checked now (a tester's 33-minute capture: items stored into the
   box's entries, every enemy slot's HP through fights and kills), so adding items to the box works past its first entry.
   Only Rebecca's item counts still wait for a live check on the Japanese build.

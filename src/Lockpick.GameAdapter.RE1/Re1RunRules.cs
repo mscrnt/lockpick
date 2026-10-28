@@ -131,7 +131,7 @@ public sealed class Re1RunRules : IRunRules
             return CheckSteam(directory, executablePath, steam);
         }
 
-        var japanese = string.Equals(Path.GetFileName(executablePath), "Biohazard.exe", StringComparison.OrdinalIgnoreCase);
+        var japanese = Re1Install.IsJapanese(executablePath);
         var expected = japanese ? JapaneseManifest.Value : EnglishManifest.Value;
         var other = japanese ? EnglishManifest.Value : JapaneseManifest.Value;
         var rebirth = japanese ? install.Rebirth : null;
@@ -185,7 +185,7 @@ public sealed class Re1RunRules : IRunRules
         }
 
         // REbirth: data differences warn instead of failing (see above); the rest are findings.
-        var findings = RebirthFindings(directory, rebirth);
+        var findings = RebirthFindings(directory, Path.GetFileName(executablePath), rebirth);
         if (changed.Count + missing.Count > 0)
         {
             var differ = changed.Concat(missing.Select(m => m + " (missing)")).ToList();
@@ -249,15 +249,15 @@ public sealed class Re1RunRules : IRunRules
         return new InstallCheck(language.Release, changed, missing, extra, findings);
     }
 
-    private static List<InstallFinding> RebirthFindings(string directory, RebirthInstall rebirth)
+    private static List<InstallFinding> RebirthFindings(string directory, string executable, RebirthInstall rebirth)
     {
         var findings = new List<InstallFinding>();
         var known = Re1Install.Known;
-        var exeHash = Re1Install.Hash(Path.Combine(directory, "Biohazard.exe"));
+        var exeHash = Re1Install.Hash(Path.Combine(directory, executable));
         findings.Add(exeHash is not null && known.Executables.TryGetValue(exeHash, out var exeRelease)
-            ? new InstallFinding(InstallFindingLevel.Pass, $"Biohazard.exe is {exeRelease}.")
+            ? new InstallFinding(InstallFindingLevel.Pass, $"{executable} is {exeRelease}.")
             : new InstallFinding(InstallFindingLevel.Warn,
-                $"Biohazard.exe ({(exeHash is null ? "unreadable" : exeHash[..12] + "…")}) isn't one Lockpick knows, so it can't confirm it's an official release (REbirth installs the Japanese 1.01 executable)."));
+                $"{executable} ({(exeHash is null ? "unreadable" : exeHash[..12] + "…")}) isn't one Lockpick knows, so it can't confirm it's an official release (REbirth installs the Japanese 1.01 executable)."));
         findings.Add(rebirth.Version is { } version
             ? new InstallFinding(InstallFindingLevel.Pass, $"Classic REbirth {version} (allowed by the rules).")
             : new InstallFinding(InstallFindingLevel.Warn, "ddraw.dll is a Classic REbirth build Lockpick doesn't know (a newer one?): check its version."));

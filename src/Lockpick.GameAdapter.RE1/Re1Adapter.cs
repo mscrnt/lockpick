@@ -46,8 +46,9 @@ public sealed class Re1Adapter : IGameAdapter
     public string DisplayName => "Resident Evil";
 
     /// <summary>GOG's English release runs as ResidentEvil.exe; the Japanese PC game (MediaKite, GOG/Steam Japanese, with
-    /// or without Classic REbirth) as Biohazard.exe. Which build it is comes from the hash (profiles).</summary>
-    public IReadOnlyCollection<string> ExecutableNames { get; } = ["ResidentEvil.exe", "Biohazard.exe"];
+    /// or without Classic REbirth) as Biohazard.exe, or Bio.exe in packs that bundle it with REbirth (the Seamless HD
+    /// pack). Which build it is comes from the hash (profiles).</summary>
+    public IReadOnlyCollection<string> ExecutableNames { get; } = ["ResidentEvil.exe", .. Re1Install.JapaneseExecutables];
 
     public IReadOnlyList<VersionProfile> Profiles { get; }
 

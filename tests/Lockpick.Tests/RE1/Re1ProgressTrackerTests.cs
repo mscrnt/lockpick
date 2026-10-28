@@ -95,6 +95,10 @@ public class Re1ProgressTrackerTests
         Assert.Equal(1, adapter.SaveSlot("savedat1.dat"));
         Assert.Equal(8, adapter.SaveSlot("SAVEDAT8.DAT"));
         Assert.Equal(3, adapter.SaveSlot("savedat3.daj")); // GOG's Japanese build
+        // The Seamless HD pack bundles the Japanese 1.01 exe with REbirth as Bio.exe: found, and read with the JPN data.
+        Assert.Contains("Bio.exe", adapter.ExecutableNames);
+        Assert.True(Re1Install.IsJapanese(@"G:\Games\RE HD\re1hd\Bio.exe"));
+        Assert.False(Re1Install.IsJapanese("ResidentEvil.exe"));
         Assert.Null(adapter.SaveSlot("savedat9.dat"));
         Assert.Null(adapter.SaveSlot("savedat1.dat.tmp"));
         Assert.Null(adapter.SaveSlot("notes.txt"));

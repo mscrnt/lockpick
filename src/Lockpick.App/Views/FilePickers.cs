@@ -8,7 +8,7 @@ internal static class FilePickers
 {
     private static readonly FilePickerFileType GameExecutable = new("Resident Evil (ResidentEvil.exe, or Biohazard.exe for the Japanese game)")
     {
-        Patterns = ["ResidentEvil.exe", "Biohazard.exe", "*.exe"],
+        Patterns = ["ResidentEvil.exe", "Biohazard.exe", "Bio.exe", "*.exe"],
     };
 
     private static readonly FilePickerFileType Splits = new("LiveSplit splits (*.lss)") { Patterns = ["*.lss"] };
