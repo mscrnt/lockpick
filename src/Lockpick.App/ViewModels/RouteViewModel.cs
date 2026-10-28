@@ -34,7 +34,12 @@ public sealed partial class RouteViewModel : ObservableObject
     public RouteViewModel(AppServices services)
     {
         _services = services;
-        Routes = [new RouteChoice(null, "No route"), .. services.Route.Routes.Select(r => new RouteChoice(r.Id, r.Verified ? r.Name : $"{r.Name} (draft)"))];
+        Routes =
+        [
+            new RouteChoice(null, "No route"),
+            new RouteChoice(RouteService.FollowSplits, "Follow my splits (the route for the split set on the Runs page)"),
+            .. services.Route.Routes.Select(r => new RouteChoice(r.Id, r.Verified ? r.Name : $"{r.Name} (draft)")),
+        ];
         Styles = [.. ButtonStyles.All.Select(s => new ButtonStyleChoice(s.Id, s.Name))];
         _loading = true;
         SelectedRoute = Routes.FirstOrDefault(r => r.Id == services.Settings.Current.RouteId) ?? Routes[0];

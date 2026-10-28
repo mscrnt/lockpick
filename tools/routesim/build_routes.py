@@ -1,5 +1,6 @@
 r"""Plays RE1 through in the simulator as Jill and as Chris and writes the two full-game routes into
-data/games/re1/routes.json (the hand-made routes there stay as they are).
+data/games/re1/routes.json, and one route per built-in split set (data/games/re1/splits.json), made by heading for
+each split in turn (the hand-made routes there stay as they are).
 
     python tools/routesim/build_routes.py "G:\GOG Games\Resident Evil" [--check]
 
@@ -10,6 +11,7 @@ from __future__ import annotations
 
 import json
 import sys
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -27,24 +29,19 @@ SOURCE = ("Simulated (tools/routesim): a playthrough from a new game to the heli
           "story on (not a speedrun order). Not yet followed in a real game.")
 
 
-def playthrough(install: Path, character: str) -> list[dict]:
+SPLIT_SOURCE = ("Simulated (tools/routesim) from the split set of the same name (data/games/re1/splits.json): a "
+                "playthrough from a new game that heads for each split in turn and picks up what it needs on the way, "
+                "worked out from the game's own room scripts plus tools/routesim/rules.json; no glitches (a glitched "
+                "set's splits are reached the ordinary way). Not yet followed in a real game.")
+
+
+def playthrough(install: Path, character: str, splits: list[dict] | None = None, to_the_end: bool = True) -> list[dict]:
     rooms, _ = world_mod.build(install, character)
     rules = json.loads(plan.RULES.read_text(encoding="utf-8"))
     sim = plan.Sim(rooms, rules.get(character, {}) | {"newGame": rules.get("newGame", {})}, plan.cameras(install, character),
                     plan.geometry(install, character))
-    s = plan.new_game(sim, character)
-    ever: set = set()
-    plan.remember(plan.State(character), s, ever)
-    route = []
-    for n in range(800):
-        found = plan.nearest(sim, s, ever)
-        if found is None:
-            break
-        path, t = found
-        plan.remember(s, t, ever)
-        s = t
-        route += [{"move": n, **step, "gained": gained} for step, gained in path]
-    if 42 not in s.inventory or s.room != "303":
+    route, _, s = plan.play(sim, character, splits)
+    if to_the_end and (42 not in s.inventory or s.room != "303"):
         raise SystemExit(f"{character}: the playthrough stopped in {s.room} without the flare; not writing a route")
     return export.steps(route, rooms, character)
 
@@ -79,12 +76,18 @@ def main(argv: list[str]) -> int:
     doc = json.loads(text)
     if dump(doc) != text and "--check" not in argv:
         print("note: routes.json isn't in the generator's layout; it will be rewritten in it")
-    ids = {g["id"] for g in GENERATED.values()}
+    sets = json.loads((export.DATA / "splits.json").read_text(encoding="utf-8"))["sets"]
+    jobs = [(meta, character, None) for character, meta in GENERATED.items()]
+    jobs += [({"id": f"{x['id']}-sim", "name": f"{x['name']} (simulated)", "category": x.get("category", x["name"])},
+              x["character"], x["splits"]) for x in sets]
+    ids = {meta["id"] for meta, _, _ in jobs}
     routes = [r for r in doc["routes"] if r["id"] not in ids]
-    for character, meta in GENERATED.items():
-        steps = playthrough(install, character)
-        routes.append({**meta, "character": character, "verified": False, "source": SOURCE, "steps": steps})
-        print(f"{character}: {len(steps)} steps")
+    with ProcessPoolExecutor(max_workers=4) as pool:
+        results = list(pool.map(playthrough, [install] * len(jobs), [c for _, c, _ in jobs], [s for _, _, s in jobs]))
+    for (meta, character, splits), steps in zip(jobs, results):
+        source = SOURCE if splits is None else SPLIT_SOURCE
+        routes.append({**meta, "character": character, "verified": False, "source": source, "steps": steps})
+        print(f"{meta['id']}: {len(steps)} steps")
     out = dump({**doc, "routes": routes})
     if "--check" in argv:
         if out != text:

@@ -10,6 +10,10 @@ python tools/routesim/plan.py "G:\GOG Games\Resident Evil" jill [--steps 600] [-
 python tools/routesim/build_routes.py "G:\GOG Games\Resident Evil" [--check]
 ```
 
+`plan.py --splits <set id>` plays toward a split set's splits in turn instead (`data/games/re1/splits.json`): each
+round it first looks for the way to the next split, and makes the nearest progress when there's none yet; the moves
+that reach a split carry its name. `build_routes.py` writes those routes too (`<set id>-sim`).
+
 `plan.py` prints the playthrough, move by move, with what each move changed (`+1:172` = flag 172 of bank 1 set,
 `-7:42` = room item 42 taken). `build_routes.py` plays both characters and writes the two routes
 (`re1-jill-full-sim`, `re1-chris-full-sim`); `--check` only compares (run it after changing the tools or the rules).

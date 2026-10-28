@@ -122,6 +122,7 @@ def steps(route: list[dict], rooms: dict, character: str, used: set[int] | None 
                and any(b == 2 and how == "+" for b, _, how in m["flags"])}
     needed |= {g for rule in RULES.get(character, {}).get("examine", []) for g, _ in rule.get("give", [])}
     needed.add(42)  # the flare that ends the game
+    needed |= {i for m in route if m.get("split") for i in m["got"]}  # an item split is a step whatever it's for
     out: list[dict] = []
 
     def story(m: dict) -> list[tuple[int, int]]:
@@ -150,6 +151,10 @@ def steps(route: list[dict], rooms: dict, character: str, used: set[int] | None 
         if used is not None and last is not None and len(out) > size:
             used.add(last)
         last, size = index, len(out)
+        if m.get("split") and m["kind"] in ("door", "spot") and m["to"] != m["room"] and not m["got"]:
+            # A room split: the step is to get there (the item splits are the get steps themselves).
+            out.append({"go": m["to"], "hint": f"Split: {m['split']}."})
+            continue
         if index in brought and story(m):
             for g in brought[index]:
                 where = m["to"] if m["kind"] == "door" else m["room"]
@@ -214,6 +219,16 @@ def steps(route: list[dict], rooms: dict, character: str, used: set[int] | None 
             step["at"] = centre(m["zone"])
         if not out or out[-1] != step:
             out.append(step)
+    if used is not None and last is not None and len(out) > size:
+        used.add(last)
+        last = None
+    # An item split's step is its get: say so (the room splits are steps of their own).
+    for m in route:
+        if m.get("split") and m["got"]:
+            for s in out:
+                if s.get("get") in m["got"] and s.get("in") in (m["room"], None) and not s.get("hint", "").startswith("Split"):
+                    s["hint"] = f"Split: {m['split']}." + (f" {s['hint']}" if s.get("hint") else "")
+                    break
     if used is not None and last is not None and len(out) > size:
         used.add(last)
     out.append({"end": True})

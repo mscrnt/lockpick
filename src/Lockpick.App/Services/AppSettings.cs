@@ -26,6 +26,9 @@ public static class AppPaths
 
     public static string Logs => Path.Combine(DataRoot, "logs");
 
+    /// <summary>Routes made for the player's own split sets (tools/routesim/route_for_splits.py), next to the built-in ones.</summary>
+    public static string Routes => Path.Combine(DataRoot, "routes");
+
     public static string Recordings => Path.Combine(DataRoot, "recordings");
 
     public static string Profiles => Path.Combine(DataRoot, "profiles");

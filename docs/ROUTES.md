@@ -51,6 +51,14 @@ water, the lab computer, Plant 42's death, the Doom books) is in `tools/routesim
 source. Regenerate with `python tools/routesim/build_routes.py <install>` after changing the tools or the rules
 (`--check` compares). **Not followed in a real game yet.**
 
+**Routes for a split set: "Follow my splits".** For every built-in split set (`splits.json`) the simulator also
+writes a route, `<set id>-sim`: it heads for each split in turn (the room transitions and the items), from wherever the
+player is, and makes the nearest progress whenever the next split can't be reached yet (the key, the scene that opens
+the way). Each split is a step of its own ("Split: Yawn 1"); a key-item split got on the way to an earlier one is the
+step that took it. The route picker's "Follow my splits" uses the route for the split set chosen on the Runs page,
+and the character's full-game route for a set of the player's own (those can't be simulated in the app yet).
+Glitched sets are reached the ordinary way.
+
 **Time limits:** a route's `timers` count down in game time from when a start flag goes on until a stop flag is set:
 Richard's serum, 15 minutes from "serum errand starts" (`flagScenarioA2` 0x40000) to "serum given" (`flagScenarioB3`
 0x04000000). The 15 minutes come from the owner's answer in ask mode and a walkthrough; the game's own deadline isn't

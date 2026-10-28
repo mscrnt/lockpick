@@ -56,7 +56,36 @@ public sealed class RouteService : IDisposable
     public RouteView? View { get; private set; }
 
     /// <summary>The routes for the game (built in).</summary>
-    public IReadOnlyList<Route> Routes => _adapter.CreateRunRules(_adapter.Profiles[0])?.Routes ?? [];
+    public IReadOnlyList<Route> Routes => [.. _adapter.CreateRunRules(_adapter.Profiles[0])?.Routes ?? [], .. OwnRoutes.Value];
+
+    /// <summary>
+    /// Routes for the player's own split sets, from the data folder's routes folder (each file a routes.json of its own,
+    /// written by tools/routesim/route_for_splits.py); a file that doesn't read is skipped.
+    /// </summary>
+    private static readonly Lazy<IReadOnlyList<Route>> OwnRoutes = new(() =>
+    {
+        var routes = new List<Route>();
+        if (!Directory.Exists(AppPaths.Routes))
+        {
+            return routes;
+        }
+
+        foreach (var file in Directory.EnumerateFiles(AppPaths.Routes, "*.json"))
+        {
+            try
+            {
+                using var stream = File.OpenRead(file);
+                routes.AddRange(RouteFile.Parse(stream));
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException or System.Text.Json.JsonException
+                or InvalidDataException or KeyNotFoundException or InvalidOperationException or FormatException)
+            {
+                // A broken file shouldn't take the built-in routes with it.
+            }
+        }
+
+        return routes;
+    });
 
     /// <summary>The controller pressed last (Keyboard until one is).</summary>
     public ButtonKind LastPad { get; private set; } = ButtonKind.Keyboard;
@@ -139,13 +168,39 @@ public sealed class RouteService : IDisposable
         });
     }
 
+    /// <summary>The route choice that follows the run's split set (Runs page) instead of naming a route.</summary>
+    public const string FollowSplits = "@splits";
+
+    /// <summary>
+    /// The route to follow: the one chosen, or with <see cref="FollowSplits"/> the route made from the run's split set
+    /// (tools/routesim writes one per built-in set, id "&lt;set id&gt;-sim"); for a set of the player's own, the
+    /// full-game route of the character being played.
+    /// </summary>
+    private Route? Resolve(GameSnapshot snapshot)
+    {
+        var id = _settings.Current.RouteId;
+        if (id != FollowSplits)
+        {
+            return Routes.FirstOrDefault(r => r.Id == id);
+        }
+
+        var forSet = Routes.FirstOrDefault(r => r.Id == $"{_settings.Current.RunSetId}-sim");
+        if (forSet is not null)
+        {
+            return forSet;
+        }
+
+        var character = snapshot.Character.TryGet(out var c) ? c : PlayableCharacter.Unknown;
+        return Routes.FirstOrDefault(r => r.Id.EndsWith("-full-sim", StringComparison.Ordinal) && r.Character == character);
+    }
+
     private void Update(GameSnapshot snapshot)
     {
         RouteView? view;
         lock (_gate)
         {
             _last = snapshot.CapturedAt;
-            var route = Routes.FirstOrDefault(r => r.Id == _settings.Current.RouteId);
+            var route = Resolve(snapshot);
             if (route is null || !Rooms(snapshot, route.Character))
             {
                 view = null;

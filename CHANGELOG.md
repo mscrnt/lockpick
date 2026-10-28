@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- **Routes for every built-in split set**, and a "Follow my splits" choice in the route guide: it follows the route
+  made for the split set picked on the Runs page (each split a step of its own), or the character's full-game route
+  for a split set of your own. Made by the route simulator heading for each split in turn; drafts until followed in a
+  real run.
+
 ## [0.4.1] - 2026-10-27
 
 ### Changed

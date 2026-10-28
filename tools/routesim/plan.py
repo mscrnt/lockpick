@@ -86,8 +86,9 @@ def moves(sim: Sim, s: State):
         yield "kill the enemies", "kill", lambda t: sim.kill(t), {}
 
 
-def nearest(sim: Sim, start: State, ever: set, max_states: int = 6000, shuffle=None):
-    """Breadth-first over door moves to the closest productive move; returns (path, state) or None."""
+def nearest(sim: Sim, start: State, ever: set, max_states: int = 6000, shuffle=None, goal=None):
+    """Breadth-first over door moves to the closest productive move; returns (path, state) or None. With `goal`
+    (a split: (state before, state after) -> bool), the closest move that reaches it instead, progress or not."""
     queue = deque([(start, [])])
     visited = {start.key()}
     count = 0
@@ -109,17 +110,80 @@ def nearest(sim: Sim, start: State, ever: set, max_states: int = 6000, shuffle=N
                     + [[b, f, "-"] for b in (0, 1, 2, 3, 7) for f in sorted(s.flags[b] - t.flags[b])],
                     "got": sorted(i for i in t.inventory if i not in s.inventory),
                     "lost": sorted(i for i in s.inventory if i not in t.inventory), "_state": t}
-            if gained:
+            if goal is not None:
+                if goal(s, t):
+                    return path + [(step, gained)], t
+            elif gained:
                 return path + [(step, gained)], t
             # Doors, and moves that only undo something (they open other ways), are steps on the way.
             # Moves that arm something in the room (a spot that makes an item pickable) are steps too, keyed by what
             # they armed since the saved flags don't change.
-            key = t.key() if kind == "door" or t.room != s.room or undone(s, t) else                 (t.key(), armed(t), frozenset(t.flags[4])) if (armed(t), t.flags[4]) != (armed(s), s.flags[4]) else None
+            key = t.key() if kind == "door" or t.room != s.room or undone(s, t) else \
+                (t.key(), armed(t), frozenset(t.flags[4])) if (armed(t), t.flags[4]) != (armed(s), s.flags[4]) else None
             if key is not None and key not in visited:
                 visited.add(key)
                 queue.append((t, path + [(step, [])]))
                 count += 1
     return None
+
+
+def split_goal(split: dict):
+    """A split of data/games/re1/splits.json as a goal: (state before a move, state after) -> reached."""
+    if split.get("end"):
+        return lambda a, b: b.room == "303" and 42 in b.inventory
+    if "item" in split:
+        return lambda a, b: split["item"] in b.inventory and split["item"] not in a.inventory \
+            and ("in" not in split or a.room == split["in"])
+    room = split["room"]
+    if split.get("fromOtherStage"):
+        return lambda a, b: b.room == room and a.room[0] != room[0]
+    return lambda a, b: b.room == room and a.room == split["from"]
+
+
+def play(sim: Sim, character: str, splits: list[dict] | None = None, shuffle=None, limit: int = 900, log=None):
+    """Plays from a new game: (moves, states, final state). With `splits`, heads for each split in turn (when it's
+    reachable from where the player is) and makes the nearest progress otherwise; the move that reaches a split carries
+    its name. Without, the nearest progress every time, to the flare at the heliport."""
+    s = new_game(sim, character)
+    ever: set = set()
+    remember(State(character), s, ever)
+    route, states = [], [s]
+    goals = list(splits or [])
+    wait = 0  # after the next split was out of reach, try again only after a few more steps of progress
+    for n in range(limit):
+        found, reached = None, None
+        while goals and ((goals[0].get("end") and len(goals) > 1) or ("item" in goals[0] and ("item", goals[0]["item"]) in ever)):
+            done = goals.pop(0)
+            if "item" in done:
+                # Got before its split came up (on the way to an earlier one): the split is the move that took it.
+                took = next((m for m in reversed(route) if done["item"] in m["got"]), None)
+                if took is not None and not took.get("split"):
+                    took["split"] = done["name"]
+        if goals and wait <= 0:
+            found = nearest(sim, s, ever, max_states=900, shuffle=shuffle, goal=split_goal(goals[0]))
+            if found is not None:
+                reached = goals.pop(0)
+            else:
+                wait = 3
+        wait -= 1
+        if found is None:
+            found = nearest(sim, s, ever, shuffle=shuffle)
+        if found is None:
+            break
+        path, t = found
+        remember(s, t, ever)
+        s = t
+        for i, (step, gained) in enumerate(path):
+            states.append(step.pop("_state"))
+            if reached is not None and i == len(path) - 1:
+                step["split"] = reached["name"]
+            route.append({"move": n, **step, "gained": gained})
+            if log and (gained or step.get("split")):
+                log(f"{n:3} {step['label']}  {' '.join(gained)}" + (f"  [split: {step['split']}]" if step.get("split") else ""))
+        if splits is not None and not goals and (s.room == "303" and 42 in s.inventory
+                                                 or not any(x.get("end") for x in splits)):
+            break  # the last split (a set that doesn't run to the ending stops there)
+    return route, states, s
 
 
 FIELD_WORDS = {0: ("flagScenarioA", 4), 1: ("flagScenarioB", 8), 2: ("flagLocks", 2), 3: ("flagEnemies", 8),
@@ -194,38 +258,35 @@ def new_game(sim: Sim, character: str) -> State:
 def main(argv: list[str]) -> int:
     sys.stdout.reconfigure(encoding="utf-8")
     install, character = Path(argv[0]), argv[1]
-    limit = int(argv[argv.index("--steps") + 1]) if "--steps" in argv else 400
+    limit = int(argv[argv.index("--steps") + 1]) if "--steps" in argv else 900
     rooms, problems = world_mod.build(install, character)
     rules = json.loads(RULES.read_text(encoding="utf-8")) if RULES.exists() else {}
     sim = Sim(rooms, rules.get(character, {}) | {"newGame": rules.get("newGame", {})}, cameras(install, character),
               None if "--no-collision" in argv else geometry(install, character))
-    s = new_game(sim, character)
-    ever: set = set()
-    remember(State(character), s, ever)
     shuffle = None
     if "--seed" in argv:
         import random
         shuffle = random.Random(int(argv[argv.index("--seed") + 1])).shuffle
-    print(f"start in {s.room}; {len(problems)} script problems")
-    route = []
-    trace = open(argv[argv.index("--trace") + 1], "w", encoding="utf-8") if "--trace" in argv else None
-    if trace is not None:
-        trace.write(json.dumps(snapshot(sim, s, {"label": "new game", "kind": "start", "room": s.room, "to": s.room})) + "\n")
-    for n in range(limit):
-        found = nearest(sim, s, ever, shuffle=shuffle)
-        if found is None:
-            print(f"-- stuck in {s.room} after {n} moves; holding {', '.join(item_name(i) for i in s.inventory)}")
-            break
-        path, t = found
-        remember(s, t, ever)
-        s = t
-        for step, gained in path:
-            state = step.pop("_state")
-            if trace is not None:
+    splits = None
+    if "--splits" in argv:
+        wanted = argv[argv.index("--splits") + 1]
+        sets = json.loads((ROOT / "data" / "games" / "re1" / "splits.json").read_text(encoding="utf-8"))["sets"]
+        splits = next(x for x in sets if x["id"] == wanted)["splits"]
+    print(f"start in 105; {len(problems)} script problems")
+    route, states, s = play(sim, character, splits, shuffle, limit,
+                            log=print if "--verbose" not in argv else None)
+    if "--verbose" in argv:
+        for m in route:
+            print(f"{m['move']:3} {m['label']}  {' '.join(m['gained'])}" + (f"  [split: {m['split']}]" if m.get("split") else ""))
+    if not (s.room == "303" and 42 in s.inventory):
+        print(f"-- stuck in {s.room} after {len(route)} moves; holding {', '.join(item_name(i) for i in s.inventory)}")
+    else:
+        print(f"-- the end: the flare at the heliport after {len(route)} moves")
+    if "--trace" in argv:
+        with open(argv[argv.index("--trace") + 1], "w", encoding="utf-8") as trace:
+            trace.write(json.dumps(snapshot(sim, states[0], {"label": "new game", "room": states[0].room, "to": states[0].room})) + "\n")
+            for state, step in zip(states[1:], route):
                 trace.write(json.dumps(snapshot(sim, state, step)) + "\n")
-            route.append({"move": n, **step, "gained": gained})
-            if gained or "--verbose" in argv:
-                print(f"{n:3} {step['label']}  {' '.join(gained)}")
     if "--json" in argv:
         Path(argv[argv.index("--json") + 1]).write_text(json.dumps(route, indent=1), encoding="utf-8")
     if "--reach" in argv:

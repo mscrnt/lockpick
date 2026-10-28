@@ -182,7 +182,10 @@ class Player:
             except ap.Failed:
                 continue
             visited.append(camera)
-            self.calm(60)
+            # A camera switch can start a scene a few frames later (104: the switch to camera 4 starts event 2, which
+            # plays the Kenneth movie, FMV 3): give it a moment to begin, then wait until it's over.
+            ap.wait_for(lambda: bool(ap.flags() & ap.CUTSCENE) or done(), 3)
+            self.calm(120)
             if done():
                 break
         return visited
