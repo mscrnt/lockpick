@@ -36,11 +36,12 @@ public sealed class ChallengeServiceTests : IDisposable
     private static ChallengeDefinition Preset(string id) => ChallengeDefinition.Presets.Single(p => p.Id == id);
 
     [Fact]
-    public void Starting_a_challenge_turns_on_challenge_mode_and_waits_for_a_game()
+    public void Starting_a_challenge_leaves_the_trainer_alone_and_waits_for_a_game()
     {
         _source.Poll(Game(inGame: false));
+        _trainer.SetMode(TrainerMode.Trainer);
         _challenges.Start(Preset("no-damage"));
-        Assert.Equal(TrainerMode.Challenge, _trainer.Mode);
+        Assert.Equal(TrainerMode.Trainer, _trainer.Mode);
         Assert.Equal(ChallengeState.Waiting, _challenges.Status.State);
 
         _source.Poll(Game());
@@ -85,20 +86,43 @@ public sealed class ChallengeServiceTests : IDisposable
     }
 
     [Fact]
-    public void Turning_the_trainer_on_fails_the_challenge()
+    public void A_locked_challenge_turns_on_challenge_mode_and_turning_the_trainer_on_fails_it()
     {
         _source.Poll(Game());
-        _challenges.Start(Preset("speedrun"));
+        _challenges.Start(Preset("speedrun"), lockTrainer: true);
+        Assert.Equal(TrainerMode.Challenge, _trainer.Mode);
         _trainer.SetMode(TrainerMode.Trainer);
         Assert.Equal(ChallengeState.Failed, _challenges.Status.State);
         Assert.Contains("trainer", _challenges.Status.FailReason, StringComparison.Ordinal);
+
+        _challenges.Stop();
+        Assert.Equal(TrainerMode.Trainer, _trainer.Mode);
+    }
+
+    [Fact]
+    public void Cheats_during_a_challenge_mark_the_attempt_and_a_new_attempt_starts_clean()
+    {
+        _host.Memory.WriteI16(TrainerServiceTests.Hp, 50).WriteU8(TrainerServiceTests.MaxHp, 96);
+        _source.Poll(Game() with { RawFields = new Dictionary<string, Field<long>> { ["hp"] = Field<long>.Valid(50), ["maxHp"] = Field<long>.Valid(96) } });
+        _challenges.Start(Preset("no-damage"));
+        _trainer.SetMode(TrainerMode.Trainer);
+        Assert.Equal(ChallengeState.Running, _challenges.Status.State);
+        Assert.False(_challenges.Status.WithCheats);
+
+        Assert.Equal(TrainerResult.Applied, _trainer.Write("hp", 96).Result);
+        Assert.Equal(ChallengeState.Running, _challenges.Status.State);
+        Assert.True(_challenges.Status.WithCheats);
+
+        _challenges.Retry();
+        Assert.False(_challenges.Status.WithCheats);
+        Assert.Equal(TrainerMode.Trainer, _trainer.Mode);
     }
 
     [Fact]
     public void A_new_game_or_load_starts_a_new_attempt_and_stop_goes_back_to_read_only()
     {
         _source.Poll(Game());
-        _challenges.Start(Preset("no-damage"));
+        _challenges.Start(Preset("no-damage"), lockTrainer: true);
         _source.Raise(new PlayerDamaged(DateTimeOffset.UtcNow, 10, 86));
         _source.Raise(new GameLoaded(DateTimeOffset.UtcNow, TimeSpan.Zero, true));
         Assert.Equal(ChallengeState.Running, _challenges.Status.State);

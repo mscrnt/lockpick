@@ -104,7 +104,7 @@ It never changes your game files. It only changes the running game if you switch
   adds chapter markers at splits and deaths, saves your replay buffer on a death or a new best, switches to a
   "paused" scene when the game isn't in front, and gives you OBS hotkeys for Lockpick. Or Lockpick does the same
   through OBS's WebSocket server, for OBS on another PC too.
-- **Streamer mode** blurs file paths and other private details if you show Lockpick's window on stream.
+- **Streamer mode** hides the API token if you show Lockpick's window on stream.
 
 **Also new:** a death counter, sounds when you fail a challenge or die (Windows sounds or your own), every page
 split into sections in the sidebar, a support bundle for bug reports, and a [player guide](docs/GUIDE.md).

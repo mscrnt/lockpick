@@ -216,10 +216,10 @@ public sealed partial class ChallengesViewModel : PageViewModel
         (StatusTitle, StatusDetail) = status.State switch
         {
             ChallengeState.Off => ("No challenge running",
-                "Pick a challenge below and press Start. Lockpick can't change your game while it runs."),
+                "Pick a challenge below and press Start. Cheats stay as you set them; an attempt they changed is marked \"with cheats\"."),
             ChallengeState.Waiting => ($"{name}: ready",
                 $"Start a new game or load a save in Resident Evil. The attempt begins when you're in the game ({rules})."),
-            ChallengeState.Running => ($"{name}: attempt {status.Attempt} — still clean",
+            ChallengeState.Running => ($"{name}: attempt {status.Attempt} — {(status.WithCheats ? "with cheats" : "still clean")}",
                 $"Playing since {status.AttemptStarted?.ToLocalTime():HH:mm:ss} ({rules}). A new game or a loaded save starts a new attempt."),
             _ => ($"{name}: failed — {status.FailReason}",
                 (status.FailedAtGameTime is { } t ? $"In-game time {(int)t.TotalHours:D2}:{t.Minutes:D2}:{t.Seconds:D2}. " : string.Empty)

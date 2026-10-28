@@ -224,4 +224,26 @@ public sealed class OverlayLayoutTests : IDisposable
         Assert.False(MapViews.IsFull(MapViews.Around));
         Assert.False(MapViews.IsFull(MapViews.Hidden));
     }
+
+    [Fact]
+    public void The_stream_layout_has_ticked_widgets_in_corners_or_at_spots_placed_by_hand()
+    {
+        var settings = new AppSettings
+        {
+            StreamLayout = new Dictionary<string, StreamWidgetChoice>
+            {
+                [OverlayLayout.Splits] = new(true, OverlayCorners.Custom, 100, 0.5, 2), // a spot (kept on the canvas)
+                [OverlayLayout.Minimap] = new(true, OverlayCorners.Custom, 900),        // "your spot" with no spot: its corner
+                [OverlayLayout.Feed] = new(false, OverlayCorners.BottomLeft, 150),      // not ticked
+            },
+        };
+
+        var placements = StreamLayout.Placements(settings);
+        var splits = Assert.Single(placements, p => p.Id == OverlayLayout.Splits);
+        Assert.Equal(("spot", 0.5, 1.0, 1.0), (splits.Corner, splits.X, splits.Y, splits.Scale));
+        var minimap = Assert.Single(placements, p => p.Id == OverlayLayout.Minimap);
+        Assert.Equal(("bottom-right", (double?)null, 6.0), (minimap.Corner, minimap.X, minimap.Scale));
+        Assert.DoesNotContain(placements, p => p.Id == OverlayLayout.Feed);
+        Assert.Contains(placements, p => p.Id == OverlayLayout.Status && p.Corner == "top-right"); // the default
+    }
 }

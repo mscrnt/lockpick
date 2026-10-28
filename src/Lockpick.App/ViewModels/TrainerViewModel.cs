@@ -186,19 +186,27 @@ public sealed partial class TrainerViewModel : PageViewModel
 
     public bool IsChallenge => Mode == TrainerMode.Challenge;
 
-    /// <summary>Cheats on (Trainer Mode, write access) or off (read-only). Not while a challenge runs.</summary>
+    /// <summary>
+    /// Cheats on (Trainer Mode, write access) or off (read-only). Turning them on turns leaderboard mode off: a run with
+    /// cheats is practice, not one for the leaderboards. Any other challenge keeps running (its attempt marked "with cheats").
+    /// </summary>
     [RelayCommand(CanExecute = nameof(CanToggleCheats))]
     private void ToggleCheats()
     {
-        if (_trainer is null || ChallengeActive)
+        if (_trainer is null)
         {
             return;
+        }
+
+        if (Mode != TrainerMode.Trainer && _services.LeaderboardGuard.Enabled)
+        {
+            _services.LeaderboardGuard.SetEnabled(false);
         }
 
         _trainer.SetMode(Mode == TrainerMode.Trainer ? TrainerMode.ReadOnly : TrainerMode.Trainer);
     }
 
-    private bool CanToggleCheats() => _trainer is not null && !ChallengeActive;
+    private bool CanToggleCheats() => _trainer is not null;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ToggleCheatsCommand))]
@@ -375,11 +383,12 @@ public sealed partial class TrainerViewModel : PageViewModel
             Mode = _trainer.Mode;
             CanWrite = Mode == TrainerMode.Trainer && _trainer.HasWriteAccess;
             var challenge = _services.Challenges.Status;
-            ChallengeActive = challenge.State != Lockpick.Core.Challenges.ChallengeState.Off;
+            // Only a locked challenge (leaderboard mode's record runs) keeps cheats off; any other leaves them alone.
+            ChallengeActive = challenge.State != Lockpick.Core.Challenges.ChallengeState.Off && _trainer.Mode == TrainerMode.Challenge;
             var attached = State.Status.State == ConnectionState.Attached;
             ModeText = Mode switch
             {
-                _ when ChallengeActive => $"A challenge is running ({challenge.Challenge?.Name}). Cheats stay off until you stop it (Runs → Challenges).",
+                _ when ChallengeActive => "Leaderboard mode is on, so cheats are off. Turning cheats on turns leaderboard mode off: a run with cheats doesn't count for the leaderboards.",
                 TrainerMode.ReadOnly => "Cheats are off: Lockpick only reads the game and has no way to change it.",
                 TrainerMode.Challenge => "Challenge Mode: Lockpick refuses every change.",
                 _ when _trainer.HasWriteAccess => "Cheats are on. Every change is checked against the game's limits, read back and logged below.",

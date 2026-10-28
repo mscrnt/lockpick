@@ -120,6 +120,11 @@ public sealed record AppSettings
     /// <summary>Each overlay widget's corner, or "Off" (<see cref="OverlayLayout"/>); missing: the widget's default.</summary>
     public IReadOnlyDictionary<string, string> OverlayWidgetCorners { get; init; } = new Dictionary<string, string>();
 
+    /// <summary>The overlay's widgets may sit in the black bars beside the game's picture (GOG's 4:3 picture in a wider
+    /// window): corners and spots are on the whole game window. The route in the picture and the full-screen maps stay
+    /// on the picture.</summary>
+    public bool OverlayUseBars { get; init; }
+
     /// <summary>Each widget's size on the overlay, in percent of the usual (widget id → 50–200; missing: 100).</summary>
     public IReadOnlyDictionary<string, int> OverlayWidgetSizes { get; init; } = new Dictionary<string, int>();
 
@@ -128,6 +133,10 @@ public sealed record AppSettings
 
     /// <summary>Where each widget placed by hand sits (widget id → spot), for the corner <see cref="OverlayCorners.Custom"/>.</summary>
     public IReadOnlyDictionary<string, WidgetSpot> OverlayWidgetSpots { get; init; } = new Dictionary<string, WidgetSpot>();
+
+    /// <summary>The stream layout (Stream → OBS → One browser source): each widget ticked or not, where and how large
+    /// (widget id → choice; missing: the widget's default, <see cref="StreamLayout"/>).</summary>
+    public IReadOnlyDictionary<string, StreamWidgetChoice> StreamLayout { get; init; } = new Dictionary<string, StreamWidgetChoice>();
 
     /// <summary>How the overlay's map looks and which views its hotkey cycles through.</summary>
     public MapOverlaySettings MapOverlay { get; init; } = new();
@@ -159,7 +168,7 @@ public sealed record AppSettings
     /// <summary>Lockpick's window per monitor setup (the screens' layout → where the window was), #63.</summary>
     public IReadOnlyDictionary<string, WindowPlacement> WindowPlacements { get; init; } = new Dictionary<string, WindowPlacement>();
 
-    /// <summary>Streamer mode: paths, process ids and the API token are blurred on screen.</summary>
+    /// <summary>Streamer mode: the API token is shown as dots.</summary>
     public bool StreamerMode { get; init; }
 
     /// <summary>Play a sound when a challenge fails or the player dies (the sounds below).</summary>
@@ -406,6 +415,68 @@ public static class ButtonStyles
     ];
 }
 
+/// <summary>One widget in the stream layout: shown or not, its place (<see cref="OverlayCorners.All"/>, or
+/// <see cref="OverlayCorners.Custom"/> at its spot <paramref name="X"/>, <paramref name="Y"/>) and size in percent.</summary>
+public sealed record StreamWidgetChoice(bool Shown, string Corner, int Size, double? X = null, double? Y = null);
+
+/// <summary>
+/// The stream layout: every widget the player ticks, in one OBS Browser Source (/overlay/stream), each in its place
+/// (widgets in the same place stacked, in this list's order) at its own size times the size chosen. Separate from the
+/// overlay on the game, so the stream can show more (or less) than the player sees.
+/// </summary>
+public static class StreamLayout
+{
+    /// <summary>The sizes a widget can have, in percent of the overlay's usual size.</summary>
+    public static IReadOnlyList<int> Sizes { get; } = [50, 75, 100, 125, 150, 200, 250, 300, 400];
+
+    /// <summary>The widgets in the layout and how they start: what a runner's stream shows most, in their own corners.</summary>
+    public static IReadOnlyList<(string Id, string Name, StreamWidgetChoice Default)> Widgets { get; } =
+    [
+        (OverlayLayout.Status, "Time, HP, room, challenge", new(true, OverlayCorners.TopRight, 150)),
+        (OverlayLayout.Splits, "Run splits", new(true, OverlayCorners.TopLeft, 150)),
+        (OverlayLayout.Route, "Route guide (the next step and its buttons)", new(false, OverlayCorners.TopLeft, 150)),
+        (OverlayLayout.Banner, "Big messages (challenge failed, died, run finished)", new(true, OverlayCorners.TopCentre, 150)),
+        (OverlayLayout.Enemies, "Enemies in the room (HP)", new(false, OverlayCorners.BottomLeft, 150)),
+        (OverlayLayout.Feed, "What just happened", new(true, OverlayCorners.BottomLeft, 150)),
+        (OverlayLayout.Minimap, "Minimap", new(true, OverlayCorners.BottomRight, 150)),
+    ];
+
+    public static StreamWidgetChoice Of(AppSettings settings, string id)
+    {
+        var fallback = Widgets.FirstOrDefault(w => w.Id == id).Default ?? new(false, OverlayCorners.TopRight, 100);
+        if (!settings.StreamLayout.TryGetValue(id, out var choice) || choice is null)
+        {
+            return fallback;
+        }
+
+        var spot = choice.Corner == OverlayCorners.Custom && choice.X is { } x && choice.Y is { } y;
+        return choice with
+        {
+            Corner = spot || OverlayCorners.All.Contains(choice.Corner) ? choice.Corner : fallback.Corner,
+            Size = Math.Clamp(choice.Size, 25, 600),
+            X = spot ? Math.Clamp(choice.X!.Value, 0, 1) : null,
+            Y = spot ? Math.Clamp(choice.Y!.Value, 0, 1) : null,
+        };
+    }
+
+    /// <summary>The ticked widgets for the browser source, in stacking order.</summary>
+    public static IReadOnlyList<Lockpick.Api.StreamPlacement> Placements(AppSettings settings) =>
+    [
+        .. Widgets.Select(w => (w.Id, Choice: Of(settings, w.Id))).Where(w => w.Choice.Shown)
+            .Select(w => new Lockpick.Api.StreamPlacement(w.Id, Place(w.Choice.Corner), w.Choice.Size / 100.0, w.Choice.X, w.Choice.Y)),
+    ];
+
+    private static string Place(string corner) => corner switch
+    {
+        OverlayCorners.Custom => "spot",
+        OverlayCorners.TopLeft => "top-left",
+        OverlayCorners.TopCentre => "top-centre",
+        OverlayCorners.BottomLeft => "bottom-left",
+        OverlayCorners.BottomRight => "bottom-right",
+        _ => "top-right",
+    };
+}
+
 public static class OverlayLayout
 {
     public const string Off = "Off";
@@ -435,6 +506,10 @@ public static class OverlayLayout
 
     /// <summary>The sizes a widget can have, in percent.</summary>
     public static IReadOnlyList<int> Sizes { get; } = [50, 75, 100, 125, 150, 200];
+
+    /// <summary>The widget belongs on the game's picture even when widgets may use the black bars: it is drawn to line
+    /// up with the picture (the route on the floor) or covers it (a full-screen map view).</summary>
+    public static bool OnPicture(string id, bool full) => full || id == RoutePicture;
 
     /// <summary>The widget's size factor on the overlay (1 = the usual).</summary>
     public static double SizeOf(AppSettings settings, string id) =>

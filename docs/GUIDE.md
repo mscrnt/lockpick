@@ -58,7 +58,10 @@ narrow window they appear as a row above the page instead). Each page remembers 
 Runs → *Challenges*: pick one, add rules if you like, press **Start challenge**: Lockpick switches to the splits, with
 the challenge above the timer. Then start a new game or load a save — the attempt begins when you're in the game.
 
-- **Speedrun:** finish as fast as you can. Lockpick can't change your game while it runs, so the run is clean.
+- **Speedrun:** finish as fast as you can.
+
+Cheats stay as you set them during a challenge: if the trainer changes the game, the attempt shows "with cheats"
+instead of "clean". Only leaderboard mode (record runs for speedrun.com) locks the trainer off.
 - **No damage:** one hit (or poison) and the attempt is over.
 - **Knife only:** firing any other weapon ends the attempt (carrying one is fine).
 
@@ -159,7 +162,7 @@ The overlay is drawn over the game on your screen, so OBS doesn't see it. For yo
   account. If you also use the script on this PC, it leaves these to Lockpick while Lockpick is connected; its
   hotkeys keep working.
 - **Window Capture** of a popped-out widget window works too (use its green background with a chroma key).
-- **Streamer mode** (Settings → General) blurs file paths, process ids and the API token in Lockpick's window, if you
+- **Streamer mode** (Settings → General) hides the API token in Lockpick's window, if you
   show the app on stream.
 
 For the game itself, **Game Capture** works in every display mode.

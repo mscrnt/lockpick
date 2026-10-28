@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lockpick stream layout</title>
+<!--
+  Every widget the player ticked in Lockpick (Stream → OBS → One browser source), in one OBS Browser Source.
+  URL: http://127.0.0.1:<port>/overlay/stream?token=<token>[&fps=30][&margin=24][&gap=24]
+  Size the browser source like the canvas (e.g. 1920×1080). Each widget sits in its place (a corner or the top centre,
+  widgets in the same place stacked) or at the spot it was dragged to in Lockpick, drawn at its own size times the size
+  chosen there. Sizes, margins and spots are for a 1080-high canvas and scale with the source's height, so the layout
+  looks the same at 1440p. Changes in Lockpick show here within a second: nothing to change in OBS. The background is
+  transparent; nothing here can change the game.
+-->
+<style>
+  html, body { margin: 0; background: transparent; overflow: hidden; width: 100%; height: 100%; }
+  .place { position: absolute; display: flex; flex-direction: column; gap: var(--gap); }
+  .top { top: var(--margin); }
+  .bottom { bottom: var(--margin); }
+  .left { left: var(--margin); align-items: flex-start; }
+  .right { right: var(--margin); align-items: flex-end; }
+  .centre { left: 50%; transform: translateX(-50%); align-items: center; }
+  #spot { position: absolute; inset: 0; }
+  #spot > .widget { position: absolute; }
+  .widget { display: none; }
+  .widget.shown { display: block; }
+  img { display: block; }
+</style>
+</head>
+<body>
+<div class="place top left" id="top-left"></div>
+<div class="place top centre" id="top-centre"></div>
+<div class="place top right" id="top-right"></div>
+<div class="place bottom left" id="bottom-left"></div>
+<div class="place bottom right" id="bottom-right"></div>
+<div id="spot"></div>
+<script>
+  const params = new URLSearchParams(location.search);
+  const token = params.get("token") || "";
+  const every = 1000 / Math.min(60, Math.max(1, parseFloat(params.get("fps")) || 30));
+  const number = (name, fallback) => Math.min(400, Math.max(0, parseFloat(params.get(name)) || fallback));
+  const marginUnits = number("margin", 24), gapUnits = number("gap", marginUnits);
+  const widgets = new Map(); // id -> { element, scale, x, y, images, front, stopped }
+
+  // Lockpick's layout is for a 1080-high canvas: everything scales with the source's real height.
+  const k = () => Math.max(0.25, (window.innerHeight || 1080) / 1080);
+  function sizes() {
+    document.documentElement.style.setProperty("--margin", (marginUnits * k()) + "px");
+    document.documentElement.style.setProperty("--gap", (gapUnits * k()) + "px");
+    for (const w of widgets.values()) place(w);
+  }
+
+  // A widget placed by hand: x and y from 0 to 1 of the room it has (the canvas less the margins and itself).
+  function place(w) {
+    if (w.x == null || !w.element.classList.contains("shown")) return;
+    const img = w.images[w.front], m = marginUnits * k();
+    const roomX = Math.max(0, window.innerWidth - 2 * m - img.naturalWidth);
+    const roomY = Math.max(0, window.innerHeight - 2 * m - img.naturalHeight);
+    w.element.style.left = (m + w.x * roomX) + "px";
+    w.element.style.top = (m + w.y * roomY) + "px";
+  }
+
+  // One widget: two images in turn, so the next picture loads behind the shown one and it never flickers. While it
+  // has nothing to show (e.g. no enemies in the room) the server answers 204 and it takes no room in its stack.
+  function start(id) {
+    const element = document.createElement("div");
+    element.className = "widget";
+    const images = [document.createElement("img"), document.createElement("img")];
+    images[1].style.display = "none";
+    images.forEach(i => { i.alt = ""; element.appendChild(i); });
+    const w = { element, scale: 1, x: null, y: null, images, front: 0, stopped: false };
+    // The next picture is asked for "every" ms after the last was asked for (not after it arrived), so the rate holds.
+    function next() {
+      if (w.stopped) return;
+      const asked = performance.now();
+      const later = () => setTimeout(next, Math.max(0, every - (performance.now() - asked)));
+      const back = w.images[1 - w.front];
+      back.onload = () => {
+        back.style.display = "block"; w.images[w.front].style.display = "none"; w.front = 1 - w.front;
+        element.classList.add("shown"); place(w); later();
+      };
+      back.onerror = () => { element.classList.remove("shown"); later(); };
+      // Rounded, so Lockpick can hand out the same picture while the widget hasn't changed.
+      back.src = "/api/v1/widget/" + encodeURIComponent(id) + ".png?token=" + encodeURIComponent(token)
+        + "&scale=" + (Math.round(w.scale * k() * 100) / 100) + "&t=" + Date.now();
+    }
+    widgets.set(id, w);
+    next();
+    return w;
+  }
+
+  // The layout from Lockpick: which widgets, where and how large (rechecked every second).
+  function layout() {
+    fetch("/api/v1/stream-layout?token=" + encodeURIComponent(token), { cache: "no-store" })
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(data => {
+        const wanted = new Set();
+        for (const p of data.widgets || []) {
+          const w = widgets.get(p.id) || start(p.id);
+          w.scale = p.scale;
+          const free = p.corner === "spot" && p.x != null && p.y != null;
+          w.x = free ? p.x : null;
+          w.y = free ? p.y : null;
+          if (!free) { w.element.style.left = ""; w.element.style.top = ""; }
+          const into = free ? document.getElementById("spot") : document.getElementById(p.corner) || document.getElementById("top-right");
+          into.appendChild(w.element); // in the layout's order (appending moves it to the end of its place)
+          place(w);
+          wanted.add(p.id);
+        }
+        for (const [id, w] of widgets) {
+          if (!wanted.has(id)) { w.stopped = true; w.element.remove(); widgets.delete(id); }
+        }
+      })
+      .catch(() => {}) // Lockpick closed or restarting: keep what's shown and ask again
+      .finally(() => setTimeout(layout, 1000));
+  }
+
+  window.addEventListener("resize", sizes);
+  sizes();
+  layout();
+</script>
+</body>
+</html>

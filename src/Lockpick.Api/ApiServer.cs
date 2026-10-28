@@ -42,11 +42,15 @@ public sealed class ApiServer : IAsyncDisposable
         "POST /trainer/health/unlock", "POST /trainer/ammo {enabled}", "GET /trainer/items",
         "POST /trainer/inventory/quantity {slot, quantity}", "POST /trainer/itembox {itemId, quantity}",
         "GET /challenges", "GET /challenge", "POST /challenge/start {id, rules}", "POST /challenge/retry", "POST /challenge/stop",
-        "GET /run", "GET /livesplit.png?width&height", "POST /run/split", "POST /run/undo", "POST /run/skip", "POST /run/reset"
+        "GET /run", "GET /livesplit.png?width&height", "POST /run/split", "POST /run/undo", "POST /run/skip", "POST /run/reset",
+        "GET /widget/{id}.png?width&height|scale", "GET /stream-layout"
     ];
 
     private readonly ApiHost _host;
     private readonly ILogger _logger;
+
+    // Each widget picture's PNG, kept while the app hands out the same picture (its look hasn't changed).
+    private readonly System.Runtime.CompilerServices.ConditionalWeakTable<WidgetPicture, byte[]> _encoded = [];
     private WebApplication? _app;
     private ApiOptions? _options;
 
@@ -217,21 +221,30 @@ public sealed class ApiServer : IAsyncDisposable
                 ? Results.Bytes(Png.FromPremultipliedBgra(pixels, w, h), "image/png")
                 : Error(404, "no LiveSplit timer: choose splits on the Runs page");
         });
-        app.MapGet(Prefix + "/widget/{id}.png", async (string id, int? width, int? height) =>
+        app.MapGet(Prefix + "/widget/{id}.png", async (string id, int? width, int? height, double? scale) =>
         {
-            // An overlay widget, drawn as large as fits (the OBS page /overlay/widget shows it); 204 while it has
-            // nothing to show (e.g. no enemies in the room).
-            if (_host.Widget is not { } widget)
+            // An overlay widget, drawn as large as fits (the OBS page /overlay/widget shows it), or with scale at its
+            // own size times that (the stream layout, /overlay/stream); 204 while it has nothing to show (e.g. no
+            // enemies in the room).
+            WidgetPicture? picture;
+            if (scale is { } factor && _host.WidgetAtScale is { } atScale)
+            {
+                picture = await atScale(id, Math.Clamp(double.IsFinite(factor) ? factor : 1, 0.25, 6)).ConfigureAwait(false);
+            }
+            else if (_host.Widget is { } widget)
+            {
+                picture = await widget(id, Math.Clamp(width ?? 400, 64, 2000), Math.Clamp(height ?? 400, 64, 2000)).ConfigureAwait(false);
+            }
+            else
             {
                 return Error(404, "widgets aren't available");
             }
 
-            var w = Math.Clamp(width ?? 400, 64, 2000);
-            var h = Math.Clamp(height ?? 400, 64, 2000);
-            return await widget(id, w, h).ConfigureAwait(false) is { } picture
-                ? Results.Bytes(Png.FromPremultipliedBgra(picture.Pixels, picture.Width, picture.Height), "image/png")
-                : Results.NoContent();
+            return picture is not null ? Results.Bytes(Encoded(picture), "image/png") : Results.NoContent();
         });
+        app.MapGet(Prefix + "/stream-layout", () => _host.StreamLayout is { } layout
+            ? Ok(new { widgets = layout() })
+            : Error(404, "the stream layout isn't available"));
         app.MapPost(Prefix + "/run/split", () => RunCommand(r => r.Split()));
         app.MapPost(Prefix + "/run/undo", () => RunCommand(r => r.Undo()));
         app.MapPost(Prefix + "/run/skip", () => RunCommand(r => r.Skip()));
@@ -491,6 +504,9 @@ public sealed class ApiServer : IAsyncDisposable
     private static IResult Ok(object value) => Results.Json(value, Json);
 
     /// <summary>An embedded page for OBS browser sources (src/Lockpick.Api/Pages/<name>.html), or null.</summary>
+    private byte[] Encoded(WidgetPicture picture) =>
+        _encoded.GetValue(picture, p => Png.FromPremultipliedBgra(p.Pixels, p.Width, p.Height));
+
     internal static string? Page(string name)
     {
         if (name.Length == 0 || !name.All(c => char.IsAsciiLetterOrDigit(c) || c == '-'))

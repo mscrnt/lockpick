@@ -81,6 +81,7 @@ public partial class App : Application
             _widgets = new WidgetRenderer(_services, _main.Overlay);
             WidgetRenderer.Current = _widgets;
             _services.DrawWidget = _widgets.ForBrowser;
+            _services.DrawWidgetAtScale = _widgets.ForBrowserAtScale;
             _overlay = new OverlayController(_services, _main.Overlay, _widgets);
             _services.GameWindow = () => _overlay?.Game;
             FocusGuard.GameHoldsTheScreen = () => _overlay?.Game is { Mode: Core.Display.GameWindowMode.ExclusiveFullscreen, Foreground: true };

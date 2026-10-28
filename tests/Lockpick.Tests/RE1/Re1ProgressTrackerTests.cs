@@ -94,6 +94,7 @@ public class Re1ProgressTrackerTests
         Assert.Equal(Path.Combine(@"G:\GOG Games\Resident Evil", "SAVE"), adapter.SaveDirectory(@"G:\GOG Games\Resident Evil\ResidentEvil.exe"));
         Assert.Equal(1, adapter.SaveSlot("savedat1.dat"));
         Assert.Equal(8, adapter.SaveSlot("SAVEDAT8.DAT"));
+        Assert.Equal(3, adapter.SaveSlot("savedat3.daj")); // GOG's Japanese build
         Assert.Null(adapter.SaveSlot("savedat9.dat"));
         Assert.Null(adapter.SaveSlot("savedat1.dat.tmp"));
         Assert.Null(adapter.SaveSlot("notes.txt"));

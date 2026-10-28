@@ -7,14 +7,17 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
-- **Routes for every built-in split set**, and a "Follow my splits" choice in the route guide: it follows the route
-  made for the split set picked on the Runs page (each split a step of its own), or the character's full-game route
-  for a split set of your own. Made by the route simulator heading for each split in turn; drafts until followed in a
-  real run.
-
-## [0.4.1] - 2026-10-27
+- **The route guide follows any split set** (Map → Route guide → *Follow my splits*; work in progress): the split
+  set chosen on the Runs page, built in, imported from LiveSplit or your own, gets a route worked out by Lockpick from
+  your own game's room files: the route simulator (`tools/routesim`) ported into the app plays toward each split in
+  turn, solving the puzzles and choices from the room scripts (answering Rebecca "No" when a split needs Chris's
+  Master Key). It takes from seconds to a few minutes the first time ("Working out a route…"). Not checked in a real
+  run yet: if a step is wrong, record a capture (Debug → Capture) and press the marker key where it goes wrong.
 
 ### Changed
+- **Cheats turn leaderboard mode off** instead of leaderboard mode locking cheats: a run with cheats is practice and
+  doesn't count for the leaderboards. Turning leaderboard mode on still turns cheats off. Other challenges keep running
+  with cheats on (the attempt shows "with cheats").
 - The simulated full-game routes for Jill and Chris start from the game's real new-game state (read live: control in
   the dining room, Jill's opening flags, both starting inventories), know where the player can walk (the room scripts'
   changes to the collision: the alley lift has no power until the battery's in) and keep the Shield key until the
@@ -23,9 +26,73 @@ All notable changes to this project are documented here. The format follows
   later than it expects, which the harness's walk didn't wait for).
 
 ### Fixed
+- **GOG Japanese: more cheats.** Live checks on Biohazard.exe (2026-10-28) confirmed every inventory slot (counts in
+  slots 5–8 too, so infinite ammo works for any slot) and the focus flag and key map, so *Keep running in the
+  background* is offered on it. Rebecca's items, the item box past its first entry, enemy HP and poison still wait for
+  their own live check there.
+- **GOG Japanese saves** (`savedatN.daj`) are noticed now (they were ignored: only `.dat` counted).
 - Route guide: an optional step (the guardhouse statue) or a medal got from a Doom book and used before its step came
   up no longer holds the guide on that step for ever. The Jill any% route gets the done flags it was missing (the
   guardhouse red book, the batteries, the hex crank, the medals), taken from the simulated playthrough.
+
+## [0.4.7] - 2026-10-28
+
+### Added
+- **Drag widgets anywhere in the one browser source** (Stream → OBS): the card has the overlay's layout editor on a
+  16:9 canvas (the game's 4:3 picture outlined): drag a widget and it keeps that spot ("Your spot"); OBS follows
+  within a second. *Back to the corners* undoes it. Sizes, margins and spots scale with the browser source's height,
+  so the layout looks the same on a 1080p or 1440p canvas.
+
+## [0.4.6] - 2026-10-27
+
+(0.4.5 was tagged but never published: its build stopped on a test that timed out on the build machine.)
+
+### Added
+- **Overlay widgets in the black bars** (Settings → Overlay → Layout, *Use the black bars beside the game's picture*):
+  with GOG's 4:3 picture in a wider window (16:9), the corners and the spots you drag widgets to cover the whole game
+  window, so widgets can sit beside the picture instead of over it. The route drawn in the picture and the
+  full-screen maps stay on the picture. The layout editor draws the window's real shape with its bars.
+
+### Fixed
+- **Pop-outs keep the game's picture clear:** a widget popped out into its own window stayed on the overlay over the
+  game too. It now leaves the game while its window is open (and the layout editor shows it gone); closing the window
+  puts it back. Opening a pop-out no longer takes focus from the game.
+
+## [0.4.4] - 2026-10-27
+
+### Added
+- **One browser source for everything** (Stream → OBS): tick the widgets your stream should show (time and HP, splits,
+  the route guide, big messages, enemies, what just happened, the minimap), choose where each sits and how large, and
+  add one OBS Browser Source the size of your canvas. Changes in Lockpick show in OBS within a second; widgets in the
+  same place are stacked. Separate from the overlay on the game. (`/overlay/stream`, `GET /api/v1/stream-layout`,
+  `scale` on `/api/v1/widget/{id}.png`.)
+
+### Changed
+- **Browser sources update faster:** widget pictures 30 times a second by default (`fps` up to 60), asked for on a
+  steady beat instead of after each one arrives; widgets that haven't changed aren't drawn again. The splits page's
+  clock is drawn every screen frame, to the hundredth. The HUD shows "with cheats" for an attempt the trainer changed.
+
+## [0.4.3] - 2026-10-27
+
+### Fixed
+- **OBS script with the portable zip:** it looked for Lockpick's files in %LOCALAPPDATA%\Lockpick, but the portable
+  zip keeps them in its own `data` folder, so the script kept asking for the API to be turned on (and its hotkeys,
+  recording and chapters didn't reach Lockpick). It now finds the portable data folder from where it is.
+
+## [0.4.2] - 2026-10-27
+
+### Changed
+- **Challenges no longer turn cheats off.** Cheats stay as you set them during a challenge; if the trainer changes the
+  game, the attempt shows "with cheats" instead of "clean" (Runs → Challenges, the overlay, `withCheats` in the API).
+  Only leaderboard mode (record runs for speedrun.com) still locks the trainer off.
+
+## [0.4.1] - 2026-10-27
+
+### Fixed
+- **Lockpick's window on stream:** OBS's Window Capture showed it blank (its usual capture method can't see windows
+  drawn through DirectComposition). Lockpick now draws into a plain window surface, so any capture method works.
+- **Streamer mode** smeared the whole window on some PCs and left trails behind the mouse (a blur effect). It now
+  shows the API token as dots and leaves the rest readable: paths and process ids are no longer hidden.
 
 ## [0.4.0] - 2026-10-27
 

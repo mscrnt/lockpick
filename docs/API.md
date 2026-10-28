@@ -52,8 +52,9 @@ http://127.0.0.1:1996/overlay/hud?token=<token>&corner=top-right&scale=1
 |---|---|---|
 | `/overlay/hud` | In-game time, HP, the room, the challenge (clean, or failed with the reason) | `corner` = `top-right` (default), `top-left`, `bottom-right`, `bottom-left`; `scale` 0.5–4 |
 | `/overlay/splits` | The run's splits: the category, the splits around the current one with times and differences to the personal best (gold for a best segment), the in-game clock, PB and sum of best | `corner` = `top-left` (default) or another; `scale` 0.5–4; `rows` 3–30 (default 8) |
-| `/overlay/widget` | Any overlay widget, live (`id` = `status`, `minimap`, `enemies`, `splits`, `feed` or `banner`), as large as fits, top left | `width` and `height` (size the source to them); `align` = `center` (default), `left`, `right`; `valign` = `top` (default), `middle`, `bottom`; `fps` 1–30 (default 10) |
-| `/overlay/livesplit` | The run with LiveSplit's look (livesplit-core) | `width`, `height`, `fps` |
+| `/overlay/widget` | Any overlay widget, live (`id` = `status`, `minimap`, `enemies`, `splits`, `feed` or `banner`), as large as fits, top left | `width` and `height` (size the source to them); `align` = `center` (default), `left`, `right`; `valign` = `top` (default), `middle`, `bottom`; `fps` 1–60 (default 30) |
+| `/overlay/livesplit` | The run with LiveSplit's look (livesplit-core) | `width`, `height`, `fps` 1–60 (default 30) |
+| `/overlay/stream` | Every widget ticked in Lockpick (Stream → OBS → *One browser source for everything*), each in its place (a corner, or the spot it was dragged to) at its own size times the size chosen there, for a 1080-high canvas and scaled with the source's height; changes in Lockpick show within a second. Size the source like the canvas | `fps` 1–60 (default 30); `margin` (default 24 px from the edges); `gap` (default: the margin, between stacked widgets) |
 | `/overlay/feed` | What just happened, in plain words (pickups, kills, enemies appearing, damage, story events), the newest at the bottom, each line for a while | `corner` = `bottom-left` (default) or another; `scale`; `lines` 1–20 (default 5); `seconds` (default 20); `types` = event types to show (default `Happened`; e.g. add `SplitReached,RunEnded,ChallengeFailed`) |
 
 The app lists every widget's address with its size and a **Copy OBS link** button (Stream → OBS).
@@ -61,7 +62,7 @@ The app lists every widget's address with its size and a **Copy OBS link** butto
 ### Lockpick's OBS script
 
 `obs/lockpick.lua` ships next to Lockpick.exe (OBS → Tools → Scripts → +). OBS's Lua has no network, so Lockpick
-writes two files for it in `%LOCALAPPDATA%\Lockpick\obs`: `connection.json` (the API's port and token, rewritten when
+writes two files for it in `%LOCALAPPDATA%\Lockpick\obs` (the portable zip: its own `data\obs`): `connection.json` (the API's port and token, rewritten when
 they change) and `events.txt` (emptied at each start; one line per moment: `time-ms<TAB>kind<TAB>detail`, kinds
 `run-start`, `split`, `run-end`, `finished`, `new-best`, `death`, `challenge-fail`, `game-active`, `game-inactive`).
 The script's settings, each optional: **Add Lockpick to this scene** (the browser sources above and a Game Capture of
@@ -99,7 +100,7 @@ the game — so use these pages for the stream. Game Capture of the game works i
 
 | Request | Body | Does |
 |---|---|---|
-| `/api/v1/challenge/start` | `{"id": "no-damage"}`, optional `"rules": ["noDamage", "knifeOnly"]` | Starts a challenge (Lockpick goes into Challenge Mode: no changes to the game) |
+| `/api/v1/challenge/start` | `{"id": "no-damage"}`, optional `"rules": ["noDamage", "knifeOnly"]` | Starts a challenge (cheats are left as they are; an attempt the trainer changed shows `withCheats`) |
 | `/api/v1/challenge/retry` | — | A new attempt |
 | `/api/v1/challenge/stop` | — | Ends the challenge |
 | `/api/v1/run/split` · `/undo` · `/skip` · `/reset` | — | The run keys (they change Lockpick's timing only, never the game); each answers with the run |

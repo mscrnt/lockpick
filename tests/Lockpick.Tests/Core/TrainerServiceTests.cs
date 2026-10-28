@@ -13,8 +13,8 @@ namespace Lockpick.Tests.Core;
 
 public sealed class TrainerServiceTests : IDisposable
 {
-    private const ulong Hp = 0x401000;
-    private const ulong MaxHp = 0x401002;
+    internal const ulong Hp = 0x401000;
+    internal const ulong MaxHp = 0x401002;
     private const ulong Room = 0x401004;
 
     internal static readonly VersionProfile Profile = new()

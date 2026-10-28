@@ -159,7 +159,7 @@ public sealed class LeaderboardGuard
         // The trainer locked read-only for the whole session: the Speedrun challenge (no rules of its own).
         if (_services.Challenges.Status.State == ChallengeState.Off && ChallengeDefinition.Presets.FirstOrDefault(p => p.Id == "speedrun") is { } speedrun)
         {
-            _services.Challenges.Start(speedrun);
+            _services.Challenges.Start(speedrun, lockTrainer: true);
         }
 
         TurnOffAskMode?.Invoke();
@@ -171,7 +171,7 @@ public sealed class LeaderboardGuard
         var checks = new List<GuardCheck>();
         var trainerOff = _services.Trainer is not { Mode: TrainerMode.Trainer };
         checks.Add(trainerOff
-            ? new GuardCheck(GuardState.Pass, "Lockpick's trainer is off and locked (read-only; switching it on would fail the attempt).")
+            ? new GuardCheck(GuardState.Pass, "Lockpick's trainer is off (read-only; turning cheats on turns leaderboard mode off).")
             : new GuardCheck(GuardState.Fail, "Lockpick's trainer is on: turn it off (Trainer → Cheats)."));
         checks.Add(AskModeOn?.Invoke() == true
             ? new GuardCheck(GuardState.Fail, "Ask mode is on: it pauses the game. Turn it off (Debug → Capture).")

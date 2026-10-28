@@ -39,7 +39,7 @@ public sealed class PopOutManager : IDisposable
         }
         else
         {
-            Open(id, activate: true);
+            Open(id, activate: false); // the game keeps focus (it pauses when it loses it)
         }
     }
 

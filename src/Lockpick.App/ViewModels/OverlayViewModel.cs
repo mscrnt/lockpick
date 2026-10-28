@@ -630,7 +630,7 @@ public sealed partial class OverlayViewModel : ObservableObject
             : status.Attempt;
         Challenge = status.State switch
         {
-            ChallengeState.Running => $"{status.Challenge?.Name} · attempt {attempt} · clean{deaths}",
+            ChallengeState.Running => $"{status.Challenge?.Name} · attempt {attempt} · {(status.WithCheats ? "with cheats" : "clean")}{deaths}",
             ChallengeState.Failed => $"{status.Challenge?.Name} · failed: {status.FailReason}{deaths}",
             _ => string.Empty,
         };

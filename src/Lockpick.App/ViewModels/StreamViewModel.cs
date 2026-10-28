@@ -69,6 +69,69 @@ public sealed partial class StreamTile : ObservableObject
 /// <summary>An OBS Browser Source for a widget: its address (with the API token) and the size to give the source.</summary>
 public sealed record ObsLinkRow(string Name, string Url, string Size);
 
+/// <summary>One widget of the stream layout (one browser source for every widget): ticked or not, where, how large.</summary>
+public sealed partial class StreamLayoutRow : ObservableObject, ILayoutRow
+{
+    private readonly Action _save;
+    private readonly bool _loading = true;
+
+    public StreamLayoutRow(string id, string name, StreamWidgetChoice choice, Action save)
+    {
+        Id = id;
+        Name = name;
+        _save = save;
+        Shown = choice.Shown;
+        Corner = choice.Corner;
+        Size = $"{choice.Size}%";
+        Spot = choice.X is { } x && choice.Y is { } y ? new WidgetSpot(x, y) : null;
+        _loading = false;
+    }
+
+    /// <summary>Where it sits when placed by hand (the layout editor), or null.</summary>
+    public WidgetSpot? Spot { get; set; }
+
+    string ILayoutRow.Corner => Shown ? Corner : OverlayLayout.Off;
+
+    public int SizePercent => Choice.Size;
+
+    public bool PoppedOut => false;
+
+    public string Id { get; }
+
+    public string Name { get; }
+
+    public static IReadOnlyList<string> CornerChoices { get; } = [.. OverlayCorners.All, OverlayCorners.Custom];
+
+    public static IReadOnlyList<string> SizeChoices { get; } = [.. StreamLayout.Sizes.Select(s => $"{s}%")];
+
+    [ObservableProperty]
+    public partial bool Shown { get; set; }
+
+    [ObservableProperty]
+    public partial string Corner { get; set; }
+
+    [ObservableProperty]
+    public partial string Size { get; set; } = "150%";
+
+    public StreamWidgetChoice Choice =>
+        new(Shown, Corner, int.TryParse(Size.TrimEnd('%'), System.Globalization.CultureInfo.InvariantCulture, out var size) ? size : 100,
+            Corner == OverlayCorners.Custom ? Spot?.X : null, Corner == OverlayCorners.Custom ? Spot?.Y : null);
+
+    partial void OnShownChanged(bool value) => Save();
+
+    partial void OnCornerChanged(string value) => Save();
+
+    partial void OnSizeChanged(string value) => Save();
+
+    private void Save()
+    {
+        if (!_loading)
+        {
+            _save();
+        }
+    }
+}
+
 /// <summary>
 /// Stream page (roadmap: widgets off the game too): the overlay's widgets inside Lockpick, as large as the player
 /// likes, so the game's picture can stay clean — the tiles they choose, in their order and sizes (remembered). Any
@@ -89,6 +152,7 @@ public sealed partial class StreamViewModel : PageViewModel
         Obs = new ObsLinkViewModel(services);
         Windows = services.WidgetWindows;
         Load(services.Settings.Current.StreamWidgets ?? Defaults);
+        LayoutRows = [.. StreamLayout.Widgets.Select(w => new StreamLayoutRow(w.Id, w.Name, StreamLayout.Of(services.Settings.Current, w.Id), SaveLayout))];
         RefreshAddable();
         Windows.Changed += (_, _) =>
         {
@@ -111,6 +175,48 @@ public sealed partial class StreamViewModel : PageViewModel
     [ObservableProperty]
     public partial string ObsNote { get; private set; } = string.Empty;
 
+    /// <summary>The stream layout: every widget, ticked or not (one browser source shows the ticked ones).</summary>
+    public IReadOnlyList<StreamLayoutRow> LayoutRows { get; private set; } = [];
+
+    /// <summary>The stream layout's browser-source address (null while the API is off).</summary>
+    [ObservableProperty]
+    public partial string? LayoutUrl { get; private set; }
+
+    private void SaveLayout() => _services.Settings.Save(_services.Settings.Current with
+    {
+        StreamLayout = LayoutRows.ToDictionary(r => r.Id, r => r.Choice),
+    });
+
+    /// <summary>A widget dragged in the stream layout's editor: it keeps that spot (and is shown).</summary>
+    public void PlaceLayoutWidget(string id, WidgetSpot spot)
+    {
+        if (LayoutRows.FirstOrDefault(r => r.Id == id) is not { } row)
+        {
+            return;
+        }
+
+        row.Spot = spot;
+        if (row.Corner == OverlayCorners.Custom)
+        {
+            SaveLayout();
+        }
+        else
+        {
+            row.Corner = OverlayCorners.Custom; // saves
+        }
+    }
+
+    /// <summary>The widgets placed by hand go back to their own corners.</summary>
+    [RelayCommand]
+    private void ResetLayoutSpots()
+    {
+        foreach (var row in LayoutRows.Where(r => r.Corner == OverlayCorners.Custom))
+        {
+            row.Spot = null;
+            row.Corner = StreamLayout.Widgets.First(w => w.Id == row.Id).Default.Corner;
+        }
+    }
+
     /// <summary>Lockpick's OBS script, next to Lockpick.exe.</summary>
     public string ObsScript { get; } = Path.Combine(AppContext.BaseDirectory, "obs", "lockpick.lua");
 
@@ -130,6 +236,7 @@ public sealed partial class StreamViewModel : PageViewModel
         if (!settings.ApiEnabled || string.IsNullOrEmpty(settings.ApiToken))
         {
             ObsLinks = [];
+            LayoutUrl = null;
             ObsNote = "Turn on the API in Settings → API and profiles: OBS reads the widgets through it (on this PC only).";
             return;
         }
@@ -137,6 +244,7 @@ public sealed partial class StreamViewModel : PageViewModel
         var root = $"http://127.0.0.1:{settings.ApiPort}/overlay/";
         var token = Uri.EscapeDataString(settings.ApiToken);
         string Widget(string id, int width, int height) => $"{root}widget?id={id}&token={token}&width={width}&height={height}";
+        LayoutUrl = $"{root}stream?token={token}";
         ObsLinks =
         [
             new("Time, HP, room, challenge", Widget(OverlayLayout.Status, 420, 160), "420 × 160"),

@@ -43,10 +43,10 @@
               <c:LucideIcon Data="{StaticResource Icon.Gamepad}" />
               <TextBlock Classes="caption" Text="GAME INSTALLATION" />
             </StackPanel>
-            <TextBlock Classes="private" Text="{Binding DetectedInstall}" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding DetectedInstall}" TextWrapping="Wrap" />
             <TextBlock Classes="label" Text="Executable override (leave empty to use the detected GOG install)" />
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
-              <TextBox Classes="private" Text="{Binding GameExecutablePath}" PlaceholderText="e.g. D:\Games\Resident Evil\ResidentEvil.exe" FontFamily="{StaticResource LpMono}" />
+              <TextBox Text="{Binding GameExecutablePath}" PlaceholderText="e.g. D:\Games\Resident Evil\ResidentEvil.exe" FontFamily="{StaticResource LpMono}" />
               <Button Grid.Column="1" Content="Browse..." Click="OnBrowse" />
             </Grid>
             <StackPanel Orientation="Horizontal" Spacing="8">
@@ -54,7 +54,7 @@
               <Button Content="Save" Command="{Binding SaveCommand}" />
               <TextBlock Text="{Binding SaveResult}" VerticalAlignment="Center" Foreground="{StaticResource LpMutedBrush}" />
             </StackPanel>
-            <SelectableTextBlock Classes="mono private" Text="{Binding BuildCheckResult}" TextWrapping="Wrap" />
+            <SelectableTextBlock Classes="mono" Text="{Binding BuildCheckResult}" TextWrapping="Wrap" />
           </StackPanel>
         </Border>
 
@@ -64,14 +64,14 @@
             <TextBlock Classes="caption" Text="SETUP AND DATA" />
             <ToggleSwitch IsChecked="{Binding StreamerMode}" OnContent="Streamer mode on" OffContent="Streamer mode off"
                           AutomationProperties.Name="Streamer mode"
-                          ToolTip.Tip="Blurs file paths, process ids and the API token wherever Lockpick shows them, so you can show its window on stream." />
+                          ToolTip.Tip="Hides the API token, so you can show Lockpick's window on stream." />
             <Button Content="Make a support bundle" Command="{Binding MakeSupportBundleCommand}" HorizontalAlignment="Left"
                     ToolTip.Tip="Zips the last few days&apos; logs, your settings without the API token and the versions, to attach to a GitHub issue." />
             <TextBlock Text="{Binding SupportStatus}" TextWrapping="Wrap" Foreground="{StaticResource LpMutedBrush}"
                        IsVisible="{Binding SupportStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
             <Button Content="Run first-time setup again" Command="{Binding RunSetupCommand}" />
             <TextBlock Classes="label" Text="Lockpick data folder (logs, captures, settings)" />
-            <SelectableTextBlock Classes="mono private" Text="{Binding DataFolder}" />
+            <SelectableTextBlock Classes="mono" Text="{Binding DataFolder}" />
           </StackPanel>
         </Border>
 
@@ -179,7 +179,7 @@
               <TextBlock Classes="caption" Text="OVERLAY" />
             </StackPanel>
             <TextBlock TextWrapping="Wrap" Foreground="{StaticResource LpMutedBrush}"
-                       Text="Shows the in-game time and HP, a map, the enemies in the room, your run's splits and what just happened on top of the game. Clicks go through it and it never takes focus, so the game keeps running. It works with the game windowed, borderless or fullscreen. Put each widget in a corner or turn it off; widgets in the same corner stack. To keep the game's picture clear, pop a widget out into a window of its own (put it on another monitor, or capture it in OBS), or use the Stream page." />
+                       Text="Shows the in-game time and HP, a map, the enemies in the room, your run's splits and what just happened on top of the game. Clicks go through it and it never takes focus, so the game keeps running. It works with the game windowed, borderless or fullscreen. Put each widget in a corner or turn it off; widgets in the same corner stack. To keep the game's picture clear, pop a widget out into a window of its own: it leaves the game while its window is open (put the window on another monitor, or capture it in OBS), or use the Stream page." />
             <ToggleSwitch IsChecked="{Binding OverlayEnabled}" OnContent="Overlay on" OffContent="Overlay off" AutomationProperties.Name="Show the overlay over the game" />
             <ItemsControl ItemsSource="{Binding OverlayWidgetRows}">
               <ItemsControl.ItemTemplate>
@@ -191,6 +191,7 @@
                     <ComboBox ItemsSource="{x:Static vm:OverlayWidgetRow.SizeChoices}" SelectedItem="{Binding Size}" MinWidth="86"
                               AutomationProperties.Name="{Binding Name, StringFormat='Size of {0}'}" ToolTip.Tip="Its size on the overlay (also live: Settings → Hotkeys → Overlay: bigger / smaller)" />
                     <Button Content="{Binding PopOutText}" Command="{Binding PopOutCommand}" MinWidth="110"
+                            AutomationProperties.Name="{Binding Name, StringFormat='Pop out {0}'}"
                             ToolTip.Tip="Show this widget in a window of its own: move it anywhere, resize it, or capture it in OBS (right-click it for a green background and always on top)." />
                   </WrapPanel>
                 </DataTemplate>
@@ -265,7 +266,10 @@
             <TextBlock Classes="caption" Text="LAYOUT" />
             <TextBlock TextWrapping="Wrap" Foreground="{StaticResource LpMutedBrush}"
                        Text="Drag a widget to put it anywhere on the game's picture: it keeps that spot at any size (its place above reads Your spot). Choosing a corner above puts it back. Widgets with nothing to show yet are boxes." />
-            <c:OverlayLayoutEditor x:Name="LayoutEditor" Rows="{Binding OverlayWidgetRows}"
+            <CheckBox Content="Use the black bars beside the game's picture (the whole game window)" IsChecked="{Binding OverlayUseBars}"
+                      AutomationProperties.Name="Use the black bars beside the game's picture"
+                      ToolTip.Tip="With GOG's 4:3 picture in a wider window, widgets can sit in the black bars at the sides. The route drawn in the picture and the full-screen maps stay on the picture." />
+            <c:OverlayLayoutEditor x:Name="LayoutEditor" Rows="{Binding OverlayWidgetRows}" UseBars="{Binding OverlayUseBars}"
                                    AutomationProperties.Name="Overlay layout: drag widgets to place them" />
             <WrapPanel ItemSpacing="8" LineSpacing="6">
               <Button Content="Back to the corners" Command="{Binding ResetOverlayLayoutCommand}" />
@@ -413,7 +417,7 @@
             </StackPanel>
             <TextBlock TextWrapping="Wrap" Foreground="{StaticResource LpMutedBrush}"
                        Text="Built-in profiles are embedded. Additional or overriding profiles (*.json) are loaded at startup from:" />
-            <SelectableTextBlock Classes="mono private" Text="{Binding ProfileDirectory}" />
+            <SelectableTextBlock Classes="mono" Text="{Binding ProfileDirectory}" />
             <TextBlock Classes="label" Text="Loaded" />
             <SelectableTextBlock Classes="mono" Text="{Binding LoadedProfiles}" TextWrapping="Wrap" />
           </StackPanel>

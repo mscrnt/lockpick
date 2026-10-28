@@ -82,7 +82,7 @@
     if (challenge && (challenge.state === "running" || challenge.state === "failed")) {
       const name = challenge.challenge ? challenge.challenge.name : "Challenge";
       c.textContent = challenge.state === "running"
-        ? name + " · attempt " + challenge.attempt + " · clean"
+        ? name + " · attempt " + challenge.attempt + " · " + (challenge.withCheats ? "with cheats" : "clean")
         : name + " · failed: " + challenge.failReason;
       c.className = challenge.state === "failed" ? "failed" : "";
     } else {
