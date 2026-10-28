@@ -110,4 +110,15 @@ public sealed class TrainerPatchTests : IDisposable
         _trainer.ClearRule("bg");
         Assert.Equal(JumpOriginal, At(Jump, 10));
     }
+
+    [Fact]
+    public void A_restarted_game_gets_the_patches_again()
+    {
+        _trainer.SetRule("bg", Rule("focus"));
+        _source.Detach();
+        _host.Memory.Write(Jump, JumpOriginal); // the new process has the game's own code
+        _source.Attach(5678, Profile);
+        Assert.Equal(JumpPatched, At(Jump, 10));
+        Assert.True(_trainer.HasRule("bg"));
+    }
 }

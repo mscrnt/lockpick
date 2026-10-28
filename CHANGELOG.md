@@ -11,6 +11,13 @@ All notable changes to this project are documented here. The format follows
   item, spot or door, and a puzzle's numbers) has its own switch now, apart from *the way* (the line on the floor).
 
 ### Fixed
+- **Japanese 1.01 (Classic REbirth, and the Seamless HD pack):** a live trace of the HD pack confirmed the focus flag,
+  inventory slots 4–6 and the counts of slots 1–6 (shots, a reload, items from the box), the item box's second entry
+  and enemy HP in slots 2–3, so infinite ammo and item counts work there now (10 writable fields, from 2). Keep-running
+  isn't offered on 1.01 yet: REbirth pauses the game itself when it isn't in front unless its `FocusIgnore` is set in
+  its `config.ini`.
+- **Controller and sound in the background** go back in when the game is restarted while the option is on (they were
+  applied only when it was switched on).
 - **The Seamless HD pack** (Classic REbirth with the HD backgrounds, its game folder running `Bio.exe`): Lockpick looked
   only for `ResidentEvil.exe` and `Biohazard.exe`, so it never saw the game. `Bio.exe` is the Japanese 1.01 executable
   and is supported like any other copy of it (identified by its hash; the room files and REbirth's saves as usual).

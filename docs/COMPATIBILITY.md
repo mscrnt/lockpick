@@ -74,6 +74,12 @@ To request support, run `lockpick-probe identify "<path to exe>"` and open an "U
 - **Classic REbirth:** replaces the DirectDraw wrapper (`ddraw.dll`) and keeps its own settings (`config.ini`) and
   saves (`savedata\`); Lockpick reads both and leaves the display settings to REbirth's own setup. It runs only on
   the Japanese game (on GOG: the Japanese version with the 1.01 exe).
+- **The Seamless HD pack** (AI-upscaled backgrounds for REbirth, often shared as a ready game folder with its
+  `hires\` textures, an ASI loader `dinput8.dll` and `bio1hd.asi`): its `Bio.exe` is the Japanese 1.01 executable
+  under another name (same SHA-256), with Classic REbirth 1.1.3, so it is `re1-jpn-101` like any other copy (seen live
+  2026-10-28: attached, rooms, HP, the clock, the inventory, the map). The HD loader doesn't touch the code Lockpick
+  checks. Fine for play, cheats and the route guide; not for leaderboard runs (its mods, and REbirth's quickturn,
+  tactical reload and debug menu are on in the pack's `config.ini`).
 
 ## Platform
 

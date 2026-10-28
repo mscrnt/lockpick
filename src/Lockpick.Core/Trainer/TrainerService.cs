@@ -261,6 +261,7 @@ public sealed class TrainerService : IDisposable
                 if (Mode == TrainerMode.Trainer)
                 {
                     OpenWriter();
+                    ReapplyPatches();
                 }
             }
             else
@@ -444,6 +445,22 @@ public sealed class TrainerService : IDisposable
             if (_profile?.FindPatch(name) is { } patch)
             {
                 PatchCore(patch, patch.Patched, patch.Original, source, $"{rule.Name} off: put back {name}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// A game (re)started while rules with code patches are on: the new process has the game's own code, so their patches
+    /// go in again; a rule whose patches can't (another build, unexpected code) is switched off and says why.
+    /// </summary>
+    private void ReapplyPatches()
+    {
+        foreach (var (id, rule) in _rules.Where(r => r.Value.Patches.Count > 0).ToList())
+        {
+            if (ApplyPatches(rule, TrainerSource.Rule) is { } why)
+            {
+                _rules.Remove(id);
+                Record(new TrainerAction(_time.GetUtcNow(), $"{rule.Name} off", null, null, null, TrainerSource.Rule, TrainerResult.Refused, why));
             }
         }
     }

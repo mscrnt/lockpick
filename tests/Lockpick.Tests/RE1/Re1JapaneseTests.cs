@@ -32,8 +32,9 @@ public sealed class Re1JapaneseTests : IDisposable
         Assert.Equal(0x990000u, jp.Executable.SizeOfImage); // the RE1 autosplitter's "JapaneseREbirth" module size
         Assert.True(jp.IsLiveVerified); // Classic REbirth 1.1.4, 2026-10-17
         Assert.Equal(Verification.Runtime, jp.FindField("gameTimer")!.Verification);
-        Assert.Equal(Verification.Static, jp.FindField("inv5")!.Verification); // not shown by the trace: no writes
-        Assert.False(jp.FindField("inv5Qty")!.IsWritable);
+        Assert.Equal(Verification.Static, jp.FindField("inv7")!.Verification); // not shown by a trace yet: no writes
+        Assert.False(jp.FindField("inv7Qty")!.IsWritable);
+        Assert.True(jp.FindField("inv5Qty")!.IsWritable); // the Seamless HD pack's trace, 2026-10-28
         // REbirth replaces the frame loop's timer tick in memory, so the timer's anchor is the New Game reset.
         Assert.Contains(jp.Anchors, a => a.Name == "New Game zeroes the game timer" && a.Address == 0x48CBAA);
         Assert.DoesNotContain(jp.Anchors, a => a.Address == 0x48D36E);

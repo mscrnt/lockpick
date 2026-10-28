@@ -20,7 +20,72 @@
     "enemy0Hp": "−1 in the empty slot, then a zombie's HP (68, 65) in the dining room.",
     "enemy0Type": "NPC 0x24 in the opening, then 0x11 in the dining room.",
     "flagRoomItems1": "The Emblem's bit cleared at the moment it appeared in the inventory.",
-    "box0": "0x0F0B (Clip x15) at the start."
+    "box0": "0x0F0B (Clip x15) at the start.",
+    "windowFocused": {
+      "date": "2026-10-28",
+      "session": "the Seamless HD pack (Bio.exe = the 1.01 executable, Classic REbirth 1.1.3, HD loader), owner playing Jill, probe trace",
+      "seen": "0 each time another window was clicked (the game paused) and 1 when the game came back to the front, five times."
+    },
+    "inv3": {
+      "date": "2026-10-28",
+      "session": "the Seamless HD pack (Bio.exe = the 1.01 executable, Classic REbirth 1.1.3, HD loader), owner playing Jill, probe trace",
+      "seen": "Clip x15 (0x0F0B) after taking items from the box and moving them up: the inventory as the status screen showed it."
+    },
+    "inv4": {
+      "date": "2026-10-28",
+      "session": "the Seamless HD pack (Bio.exe = the 1.01 executable, Classic REbirth 1.1.3, HD loader), owner playing Jill, probe trace",
+      "seen": "Clip x15 (0x0F0B) taken out of the item box into the fifth slot, then empty when the inventory was rearranged."
+    },
+    "inv5": {
+      "date": "2026-10-28",
+      "session": "the Seamless HD pack (Bio.exe = the 1.01 executable, Classic REbirth 1.1.3, HD loader), owner playing Jill, probe trace",
+      "seen": "Clip x15 (0x0F0B) taken out of the item box into the sixth slot, then empty."
+    },
+    "inv0Qty": {
+      "date": "2026-10-28",
+      "session": "the Seamless HD pack (Bio.exe = the 1.01 executable, Classic REbirth 1.1.3, HD loader), owner playing Jill, probe trace",
+      "seen": "The first slot's count as items moved through it (0, then 15 for the Beretta moved up)."
+    },
+    "inv1Qty": {
+      "date": "2026-10-28",
+      "session": "the Seamless HD pack (Bio.exe = the 1.01 executable, Classic REbirth 1.1.3, HD loader), owner playing Jill, probe trace",
+      "seen": "The Beretta loaded with 15: one less per shot (14, 13 … 9), 15 again after a reload."
+    },
+    "inv2Qty": {
+      "date": "2026-10-28",
+      "session": "the Seamless HD pack (Bio.exe = the 1.01 executable, Classic REbirth 1.1.3, HD loader), owner playing Jill, probe trace",
+      "seen": "The clips: 9 after the reload took six rounds from 15."
+    },
+    "inv3Qty": {
+      "date": "2026-10-28",
+      "session": "the Seamless HD pack (Bio.exe = the 1.01 executable, Classic REbirth 1.1.3, HD loader), owner playing Jill, probe trace",
+      "seen": "Clip x15 then x9 as the reload took six rounds from it."
+    },
+    "inv4Qty": {
+      "date": "2026-10-28",
+      "session": "the Seamless HD pack (Bio.exe = the 1.01 executable, Classic REbirth 1.1.3, HD loader), owner playing Jill, probe trace",
+      "seen": "15 with the Clip x15 taken from the box, 0 when the slot emptied."
+    },
+    "inv5Qty": {
+      "date": "2026-10-28",
+      "session": "the Seamless HD pack (Bio.exe = the 1.01 executable, Classic REbirth 1.1.3, HD loader), owner playing Jill, probe trace",
+      "seen": "15 with the second Clip x15 taken from the box, 0 when the slot emptied."
+    },
+    "box1": {
+      "date": "2026-10-28",
+      "session": "the Seamless HD pack (Bio.exe = the 1.01 executable, Classic REbirth 1.1.3, HD loader), owner playing Jill, probe trace",
+      "seen": "The box's second entry: Clip x15 (0x0F0B), empty after it was taken out to the inventory (entry 0 the same; the knife then stored into entry 0)."
+    },
+    "enemy1Hp": {
+      "date": "2026-10-28",
+      "session": "the Seamless HD pack (Bio.exe = the 1.01 executable, Classic REbirth 1.1.3, HD loader), owner playing Jill, probe trace",
+      "seen": "Set when the room loaded, lower after each hit, -1 when the enemy died (2 kills)."
+    },
+    "enemy2Hp": {
+      "date": "2026-10-28",
+      "session": "the Seamless HD pack (Bio.exe = the 1.01 executable, Classic REbirth 1.1.3, HD loader), owner playing Jill, probe trace",
+      "seen": "73 when the room loaded, then 61, 49, 37, 25, 13, 1: twelve less for each Beretta hit."
+    }
   },
   "addresses": {
     "inventoryPointer": "Holds the inventory's address (0xC38814) during Chris's game.",

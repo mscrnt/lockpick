@@ -163,9 +163,8 @@ public sealed class Re1KeepRunningTests : IDisposable
         Assert.All(fields, f => Assert.True(japanese.FindField(f) is { IsWritable: true, Write.AnyTime: true }, f));
         foreach (var port in _adapter.Profiles.Where(p => p.Id != Gog.Id && p.Id != japanese.Id))
         {
-            // Carried over by the cross-mapper (static) and waiting for a live check on that build.
-            Assert.All(fields, f => Assert.Equal(Verification.Static, port.FindField(f)!.Verification));
-            Assert.DoesNotContain(fields, f => port.FindField(f)!.IsWritable);
+            // Waiting for a live check of the whole set on that build (1.01 has the focus flag, not yet the key map).
+            Assert.False(fields.All(f => port.FindField(f)!.IsWritable), port.Id);
         }
 
         var steam = _adapter.Profiles.Single(p => p.Id == "re1-steam-usa");
