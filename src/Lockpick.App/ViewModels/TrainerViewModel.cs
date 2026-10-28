@@ -327,6 +327,20 @@ public sealed partial class TrainerViewModel : PageViewModel
         Sync();
     }
 
+    /// <summary>The versions keep-running has been checked on (from the profiles, so it stays true as more are).</summary>
+    private string Checked(IGameTrainer game)
+    {
+        var names = _services.Adapter.Profiles
+            .Where(p => game.KeepRunningFields.All(f => p.FindField(f) is { IsWritable: true }))
+            .Select(p => p.DisplayName).ToList();
+        return names.Count switch
+        {
+            0 => "no version yet",
+            1 => names[0],
+            _ => string.Join(", ", names.SkipLast(1)) + " and " + names[^1],
+        };
+    }
+
     /// <summary>The game is the active window and showing (no window seen yet counts as in front: nothing to do).</summary>
     private bool GameInFront() => _services.GameWindow() is not { } window || (window.Foreground && !window.Minimized);
 
@@ -463,9 +477,9 @@ public sealed partial class TrainerViewModel : PageViewModel
                 && game.KeepRunningFields.All(f => profile.FindField(f) is { IsWritable: true });
             BackgroundInputAvailable = KeepRunningAvailable && game!.BackgroundPatches.Count > 0
                 && game.BackgroundPatches.All(p => profile!.FindPatch(p) is { IsUsable: true });
-            KeepRunningNote = KeepRunningAvailable || profile is null
+            KeepRunningNote = KeepRunningAvailable || profile is null || game is null
                 ? string.Empty
-                : $"Not checked on this version of the game yet ({profile.DisplayName}); so far it works on GOG's English release.";
+                : $"Not checked on this version of the game yet ({profile.DisplayName}); so far it works on {Checked(game)}.";
         }
         finally
         {
