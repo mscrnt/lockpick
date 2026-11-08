@@ -32,7 +32,7 @@ jobs:
           rustup default 1.99.1
 
       - name: Cache livesplit-core's build
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             artifacts/livesplit-core
